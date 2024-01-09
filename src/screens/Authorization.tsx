@@ -69,19 +69,28 @@ const LogoSection = ({isLoading, marginTop}) => {
         ;
 }
 const AuthScreen = () => {
+//************ Component Config ***************/
     const topPos = useRef(new Animated.Value(650)).current;
     const marginTop = useRef(new Animated.Value(270)).current;
 
+    const isLoading = useRef(false);
+    const [loginType, setLoginType] = useState('phone');
+    const [isRegister, setRegister] = useState(false);
+
+    useEffect(() => {
+        showAuth({topPos, marginTop});
+    }, [[]]);
+
+//************ OTP Verification ***************/
     const phoneInput = useRef(null);
+    const {recaptcha
+        ,sendOtp,
+        verifyOtp} = useFirebaseOTPLogin({auth: auth, firebaseConfig:firebaseConfig});
+
     const [formattedValue, setFormattedValue] = useState("");
     const [value, setValue] = useState("");
-    const isLoading = useRef(false);
-    const [isRegister, setRegister] = useState(false);
-    const [loginType, setLoginType] = useState('phone');
     const [phoneNumberIsValid, setNumberValid] = useState(true);
 
-    //OTP Verification
-    const {recaptcha,recaptchaBanner,sendOtp,verifyOtp} = useFirebaseOTPLogin({auth: auth, firebaseConfig:firebaseConfig});
     const [code, setCode] = useState('');
     const [verificationId, setVerificationId] = useState(null);
     const [isWrongCode, setWrongCode] = useState(false);
@@ -114,13 +123,26 @@ const AuthScreen = () => {
         return;
     }
 
+//************ Email Verification ***************/
+    const [email, setEmail] = useState('');
+    const [isValidEmail, setValidEmail] = useState(true);
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [isPasswordSame, setIsPasswordSame] = useState(true);
+    const emailValidator =/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+
     const handleContinueEmailClick = () => {
+        const emailValidation = emailValidator.test(email);
+        setValidEmail(emailValidation);
+        console.log(emailValidation);
+        if(!emailValidation) return;
+        const passwordIsSame = password === confirmPassword || !isRegister;
+        setIsPasswordSame(passwordIsSame);
+        if(!passwordIsSame) return;
+
 
     }
 
-    useEffect(() => {
-        showAuth({topPos, marginTop});
-    }, [[]]);
 
     return (
         <Animated.View style={{...styles.body }}>
@@ -141,8 +163,8 @@ const AuthScreen = () => {
                         <Icon name={'key'} size={36} color={'#48218c'} style={{marginLeft: -48}}/>
                     </View>}
                 {loginType === 'email' &&
-                    <EmailInput handleContinueClick={handleContinueEmailClick} isRegister={isRegister}
-                                setRegister={setRegister}/>}
+                    <EmailInput setIsPasswordSame={setIsPasswordSame} isEmailValid={isValidEmail} isPasswordSame={isPasswordSame} isRegister={isRegister}
+                                setRegister={setRegister} onChangeEmail={(text:string)=>{setEmail(text);}} onChangeConfirmPassword={(text:string)=>{setConfirmPassword(text)}} onChangePassword={(text:string)=>{setPassword(text)}}/>}
                 <ContinueButton handleContinueClick={loginType ==='phone' ? handleContinueOTPClick : handleContinueEmailClick} />
                 <LineSectionDivider/>
 

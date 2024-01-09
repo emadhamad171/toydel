@@ -52,6 +52,14 @@ export const styles = StyleSheet.create({
         fontSize: 18,
         marginBottom: 15,
     },
+    emailInput: {
+        backgroundColor: '#b593d9',
+        color: '#0d0117',
+        borderRadius: 10,
+        width: '100%',
+        padding: 10,
+        borderColor: '#f11'
+    },
     continueButton: {
         alignSelf:'center',
         alignItems: "center",

@@ -3,7 +3,7 @@ import {Button, StyleSheet, Text, View} from 'react-native';
 import Authorization from "./src/screens/Authorization";
 import {useEffect, useState} from "react";
 import * as firebase_auth from "firebase/auth";
-import Toast, {BaseToast, ErrorToast} from "react-native-toast-message";
+import Toast from "react-native-toast-message";
 import {onAuthStateChanged} from "firebase/auth";
 import {auth} from "./src/firebase";
 
@@ -13,7 +13,7 @@ export default function App() {
 
     useEffect(() => {
         onAuthStateChanged(auth, (userInstance) => {
-            userInstance && setUserLogin("USER: " + userInstance?.phoneNumber);
+            userInstance && setUserLogin("USER: " + userInstance?.phoneNumber ? userInstance.phoneNumber : userInstance?.email);
             userInstance && setUser(userInstance);
             Toast.show({type: 'success', text1:'Log out successfully!'});
         });

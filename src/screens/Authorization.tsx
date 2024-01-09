@@ -13,6 +13,8 @@ import PhoneNumberInput from "../components/PhoneNumberInput";
 import {styles} from '../styles/authorization';
 import {useFirebaseLogin as useFirebaseOTPLogin} from "@itzsunny/firebase-login";
 import {auth, firebaseConfig} from "../firebase";
+import {signInWithEmailAndPassword, createUserWithEmailAndPassword} from 'firebase/auth';
+
 import ContinueButton from "../components/ContinueButton";
 
 const GoogleButton = () => {
@@ -131,7 +133,8 @@ const AuthScreen = () => {
     const [isPasswordSame, setIsPasswordSame] = useState(true);
     const emailValidator =/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 
-    const handleContinueEmailClick = () => {
+    const handleContinueEmailClick = async () => {
+        //**************** Email & Password Validation ***************/
         const emailValidation = emailValidator.test(email);
         setValidEmail(emailValidation);
         console.log(emailValidation);
@@ -140,7 +143,33 @@ const AuthScreen = () => {
         setIsPasswordSame(passwordIsSame);
         if(!passwordIsSame) return;
 
-
+        //***************** Authorization with Email *********************
+        const cred = isRegister ? await createUserWithEmailAndPassword(auth, email,password).then().catch((e)=>{
+            const errorCode= e.code;
+            switch (errorCode) {
+                //TODO: Process error code of registration
+                case 'auth/email-already-in-use':
+                    console.log('User already exist');
+                    break;
+                default:
+                    console.log('Something went wrong.');
+                    break;
+            }
+        }) : await signInWithEmailAndPassword(auth,email,password).then().catch((e)=>{
+            const errorCode= e.code;
+            switch (errorCode) {
+                //TODO: Process error code of authorization
+                case 'auth/wrong-password':
+                    console.log('Wrong password!');
+                    break;
+                case 'auth/user-not-found':
+                    console.log('User in`t registered.');
+                    break;
+                default:
+                    console.log('Something went wrong.');
+                    break;
+            }
+        });
     }
 
 

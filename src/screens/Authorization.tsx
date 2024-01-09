@@ -2,6 +2,9 @@ import {ActivityIndicator, Animated, StyleSheet, Text, TextInput, TouchableOpaci
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import Toast from 'react-native-toast-message';
+import {isValidNumber} from "react-native-phone-number-input";
+import 'react-native-webview';
+
 import {
     hideLoading,
     hideAuthScreen,
@@ -12,6 +15,10 @@ import {
 import EmailInput from "../components/EmailInput";
 import PhoneNumberInput from "../components/PhoneNumberInput";
 import {styles} from '../styles/authorization';
+import {useFirebaseLogin as useFirebaseOTPLogin} from "@itzsunny/firebase-login";
+import {auth, firebaseConfig} from "../firebase";
+import * as firebase_auth from "firebase/auth";
+import ContinueButton from "../components/ContinueButton";
 
 const GoogleButton = () => {
     return (
@@ -66,7 +73,7 @@ const LogoSection = ({isLoading, marginTop}) => {
         </Animated.View>)
         ;
 }
-const AuthScreen = () => {
+const AuthScreen = ({setUserCred}) => {
     // const {isDarkTheme} = useContext(ThemeContext);
     const topPos = useRef(new Animated.Value(650)).current;
     const posBody = useRef(new Animated.Value(0)).current;
@@ -80,19 +87,32 @@ const AuthScreen = () => {
     const [confirmMobile, setConfirmMobile] = useState(null);
 
     //OTP Verification
-
+    const {recaptcha,recaptchaBanner,sendOtp,verifyOtp} = useFirebaseOTPLogin({auth: auth, firebaseConfig:firebaseConfig});
     const [code, setCode] = useState('');
     const [verificationId, setVerificationId] = useState(null);
     const recaptchaVerifier = useRef(null);
     const [isCodeSend, setCodeStatus] = useState(false);
+    const handleContinueOTPClick = async () => {
+        const isValid = phoneInput.current?.isValidNumber(value);
+        Toast.show({type: 'error', text1: "Phone number isn't valid!.", text2: "Try again!",topOffset: 10})
 
-    const handleContinueOTPClick = () => {
-        // isCodeSend ? confirmCode({verificationId,code, setCode}) : showLoading({topPos,marginTop, afterAnimate: async ()=> {
-        //         await authOTPAction({formattedValue,recaptchaVerifier, setVerificationId, setFormattedValue});
-        //         hideLoading({topPos, marginTop});
-        //         setCodeStatus(true);
-        //     }
-        // });
+        if(!isValid){
+            Toast.show({type: 'error', text1: "Phone number isn't valid!.", text2: "Try again!",topOffset: 10})
+            return;
+        }
+        if(!verificationId) {
+            const verificationOTP = await sendOtp(formattedValue);
+            setVerificationId(verificationOTP);
+            return;
+        }
+        const verificated = await verifyOtp(verificationId, code);
+        if(verificated) {
+            Toast.show({type: 'success', text1: "Login successfully", text2: 'Enjoy app'});
+            setUserCred(verificated);
+        } else {
+            Toast.show({type: 'error', text1: "Wrong OTP code!.", text2: "Try again!",topOffset: 10})
+        }
+        return;
     }
 
     const handleContinueEmailClick = () => {
@@ -103,6 +123,7 @@ const AuthScreen = () => {
         showAuth({topPos, marginTop});
     }, [[]]);
 
+    //loginType === 'phone' && !!!verificationId
     return (
         <Animated.View style={{...styles.body, transform: [{translateX: posBody}]}}>
 
@@ -115,12 +136,16 @@ const AuthScreen = () => {
 
                 {loginType === 'phone' &&
                     <PhoneNumberInput phoneInput={phoneInput} setFormattedValue={setFormattedValue} setValue={setValue}
-                                      value={value} handleContinueClick={handleContinueOTPClick}/>}
-
+                                      value={value} handleContinueClick={handleContinueOTPClick} />}
+                {loginType === 'phone' && !!verificationId &&
+                    <View style={{marginTop: 10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', width: 330}}>
+                        <TextInput placeholder={"123456"} onChangeText={(text)=>{setCode(text)}} value={code} style={{backgroundColor: '#c9aaff', width: 150, padding: 10, borderRadius: 10}} />
+                        <Icon name={'key'} size={36} color={'#48218c'} style={{marginLeft: -48}}/>
+                    </View>}
                 {loginType === 'email' &&
                     <EmailInput handleContinueClick={handleContinueEmailClick} isRegister={isRegister}
                                 setRegister={setRegister}/>}
-
+                <ContinueButton handleContinueClick={loginType ==='phone' ? handleContinueOTPClick : handleContinueEmailClick} />
                 <LineSectionDivider/>
 
                 <GoogleButton/>
@@ -128,6 +153,7 @@ const AuthScreen = () => {
                 <View style={{alignItems: 'center', justifyContent: 'space-between', flexGrow: 1}}>
                     <OtherLoginWayButton loginType={loginType} setLoginType={setLoginType}/>
                     <FooterText/>
+                    {recaptcha}
                 </View>
             </Animated.View>
         </Animated.View>);

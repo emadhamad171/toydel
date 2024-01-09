@@ -58,7 +58,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 10,
         borderRadius: 25,
-        width: '100%',
+        width: 330,
         backgroundColor: '#367dc7'
     },
     continueButtonText: {

@@ -1,9 +1,5 @@
-import {TextInput, View} from "react-native";
+import {View} from "react-native";
 import PhoneInput from "react-native-phone-number-input";
-
-import {styles} from '../styles/authorization';
-import ContinueButton from "./ContinueButton";
-
 const PhoneNumberInput = ({phoneInput,setFormattedValue,setValue,value, handleContinueClick}) => {
     return (<View style={{gap: 10,width:330, alignItems: 'center', justifyContent:'center'}}>
         <PhoneInput
@@ -26,7 +22,6 @@ const PhoneNumberInput = ({phoneInput,setFormattedValue,setValue,value, handleCo
             }}
             textInputProps={{ placeholderTextColor: '#864cb4', }}
         />
-        <ContinueButton handleContinueClick={handleContinueClick} />
     </View>);
 }
 

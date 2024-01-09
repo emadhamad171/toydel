@@ -1,15 +1,11 @@
-import {ActivityIndicator, Animated, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, Animated, Text, TextInput, TouchableOpacity, View} from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import { useEffect, useRef, useState} from "react";
 import Toast from 'react-native-toast-message';
-import {isValidNumber} from "react-native-phone-number-input";
 import 'react-native-webview';
 
 import {
-    hideLoading,
-    hideAuthScreen,
-    showAuth,
-    showLoading
+    showAuth
 } from './Animations';
 
 import EmailInput from "../components/EmailInput";
@@ -17,7 +13,6 @@ import PhoneNumberInput from "../components/PhoneNumberInput";
 import {styles} from '../styles/authorization';
 import {useFirebaseLogin as useFirebaseOTPLogin} from "@itzsunny/firebase-login";
 import {auth, firebaseConfig} from "../firebase";
-import * as firebase_auth from "firebase/auth";
 import ContinueButton from "../components/ContinueButton";
 
 const GoogleButton = () => {
@@ -73,28 +68,27 @@ const LogoSection = ({isLoading, marginTop}) => {
         </Animated.View>)
         ;
 }
-const AuthScreen = ({setUserCred}) => {
-    // const {isDarkTheme} = useContext(ThemeContext);
+const AuthScreen = () => {
     const topPos = useRef(new Animated.Value(650)).current;
-    const posBody = useRef(new Animated.Value(0)).current;
     const marginTop = useRef(new Animated.Value(270)).current;
+
     const phoneInput = useRef(null);
     const [formattedValue, setFormattedValue] = useState("");
     const [value, setValue] = useState("");
     const isLoading = useRef(false);
     const [isRegister, setRegister] = useState(false);
     const [loginType, setLoginType] = useState('phone');
-    const [confirmMobile, setConfirmMobile] = useState(null);
+    const [phoneNumberIsValid, setNumberValid] = useState(true);
 
     //OTP Verification
     const {recaptcha,recaptchaBanner,sendOtp,verifyOtp} = useFirebaseOTPLogin({auth: auth, firebaseConfig:firebaseConfig});
     const [code, setCode] = useState('');
     const [verificationId, setVerificationId] = useState(null);
-    const recaptchaVerifier = useRef(null);
-    const [isCodeSend, setCodeStatus] = useState(false);
+    const [isWrongCode, setWrongCode] = useState(false);
+
     const handleContinueOTPClick = async () => {
-        const isValid = phoneInput.current?.isValidNumber(value);
-        Toast.show({type: 'error', text1: "Phone number isn't valid!.", text2: "Try again!",topOffset: 10})
+        const isValid = phoneInput.current?.isValidNumber(value) || false;
+        setNumberValid(isValid);
 
         if(!isValid){
             Toast.show({type: 'error', text1: "Phone number isn't valid!.", text2: "Try again!",topOffset: 10})
@@ -103,14 +97,19 @@ const AuthScreen = ({setUserCred}) => {
         if(!verificationId) {
             const verificationOTP = await sendOtp(formattedValue);
             setVerificationId(verificationOTP);
+
             return;
         }
-        const verificated = await verifyOtp(verificationId, code);
-        if(verificated) {
-            Toast.show({type: 'success', text1: "Login successfully", text2: 'Enjoy app'});
-            setUserCred(verificated);
-        } else {
-            Toast.show({type: 'error', text1: "Wrong OTP code!.", text2: "Try again!",topOffset: 10})
+
+        try {
+            const verified = await verifyOtp(verificationId, code);
+            if(verified) {
+                Toast.show({type: 'success', text1: "Login successfully", text2: 'Enjoy app'});
+            } else {
+                Toast.show({type: 'error', text1: "Wrong OTP code!.", text2: "Try again!",topOffset: 10})
+            }
+        } catch (e) {
+            setWrongCode(true);
         }
         return;
     }
@@ -123,9 +122,8 @@ const AuthScreen = ({setUserCred}) => {
         showAuth({topPos, marginTop});
     }, [[]]);
 
-    //loginType === 'phone' && !!!verificationId
     return (
-        <Animated.View style={{...styles.body, transform: [{translateX: posBody}]}}>
+        <Animated.View style={{...styles.body }}>
 
             <LogoSection isLoading={isLoading} marginTop={marginTop}/>
 
@@ -135,11 +133,11 @@ const AuthScreen = ({setUserCred}) => {
                     your {loginType === 'email' ? 'email' : "phone number"}</Text>
 
                 {loginType === 'phone' &&
-                    <PhoneNumberInput phoneInput={phoneInput} setFormattedValue={setFormattedValue} setValue={setValue}
+                    <PhoneNumberInput phoneNumberIsValid={phoneNumberIsValid} phoneInput={phoneInput} setFormattedValue={setFormattedValue} setValue={setValue}
                                       value={value} handleContinueClick={handleContinueOTPClick} />}
                 {loginType === 'phone' && !!verificationId &&
                     <View style={{marginTop: 10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', width: 330}}>
-                        <TextInput placeholder={"123456"} onChangeText={(text)=>{setCode(text)}} value={code} style={{backgroundColor: '#c9aaff', width: 150, padding: 10, borderRadius: 10}} />
+                        <TextInput placeholder={"123456"} onChangeText={(text)=>{setCode(text)}} value={code} style={{backgroundColor: '#c9aaff', width: 150, padding: 10, borderRadius: 10, borderColor: '#f11', borderWidth: isWrongCode ? 1 : 0}} />
                         <Icon name={'key'} size={36} color={'#48218c'} style={{marginLeft: -48}}/>
                     </View>}
                 {loginType === 'email' &&
@@ -152,8 +150,8 @@ const AuthScreen = ({setUserCred}) => {
 
                 <View style={{alignItems: 'center', justifyContent: 'space-between', flexGrow: 1}}>
                     <OtherLoginWayButton loginType={loginType} setLoginType={setLoginType}/>
-                    <FooterText/>
                     {recaptcha}
+                    <FooterText/>
                 </View>
             </Animated.View>
         </Animated.View>);

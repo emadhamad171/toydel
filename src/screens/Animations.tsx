@@ -13,17 +13,19 @@ export const hideAuthScreen = ({posBody}) => {
 export const showAuth = ({topPos, marginTop}) =>{
     Animated.spring(topPos,{
             toValue: 0,
+            speed: 5,
             useNativeDriver: false,
         }
     ).start();
     Animated.spring(marginTop,{
             toValue: 0,
+            speed: 5,
             useNativeDriver: false,
         }
     ).start();
 }
 
-export const showLoading = ({topPos, marginTop, afterAnimate}) =>{
+export const showLoading = ({topPos, marginTop, afterAnimate = ()=>{}}) =>{
     Animated.spring(topPos,{
             toValue: 650,
             speed:1.5,

@@ -10,10 +10,9 @@ import {auth} from "./src/firebase";
 export default function App() {
   const [userLogin, setUserLogin] = useState('');
   const [user, setUser] = useState<firebase_auth.User>();
-
     useEffect(() => {
         onAuthStateChanged(auth, (userInstance) => {
-            !!userInstance &&setUserLogin(`USER: ${userInstance?.phoneNumber ? userInstance?.phoneNumber : userInstance?.email}`);
+            !!userInstance && setUserLogin(`USER: ${userInstance?.phoneNumber ? userInstance?.phoneNumber : userInstance?.email ? userInstance.email : userInstance?.displayName ? userInstance.displayName : ''}`);
             !!userInstance && setUser(userInstance);
             !!userInstance && Toast.show({type: 'success', text1:'Log in successfully!'});
         });
@@ -24,7 +23,7 @@ export default function App() {
           <Toast/>
           {!user && <Authorization />}
           <Text>Welcome! {userLogin && userLogin}</Text>
-          <Button title={'Log out'} onPress={()=>{Toast.show({type: 'success', text1:'Log out successfully!'}); auth.signOut(); setUserLogin(''); setUser(null)}} />
+          <Button title={'Log out'} onPress={()=>{auth.signOut(); setUserLogin(''); setUser(null)}} />
           <StatusBar style="auto" />
       </View>
   );

@@ -5,15 +5,15 @@ import {
     initializeAuth,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-
+import {apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId, measurementId} from 'react-native-dotenv';
 export const firebaseConfig = {
-    apiKey: "AIzaSyBhUiAzIkanr8uXLiAIc2dZ6v0grBYIrMQ",
-    authDomain: "testotp-fabeb.firebaseapp.com",
-    projectId: "testotp-fabeb",
-    storageBucket: "testotp-fabeb.appspot.com",
-    messagingSenderId: "594375925573",
-    appId: "1:594375925573:web:b0f04ed3a89deeb0dce82c",
-    measurementId: "G-H1RMLQD9CJ"
+    apiKey: apiKey,
+    authDomain: authDomain,
+    projectId: projectId,
+    storageBucket: storageBucket,
+    messagingSenderId: messagingSenderId,
+    appId: appId,
+    measurementId: measurementId
 }
 
 export const app = initializeApp(firebaseConfig);

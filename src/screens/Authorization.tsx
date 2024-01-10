@@ -1,4 +1,4 @@
-import {ActivityIndicator, Animated, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, Animated, Text, TouchableOpacity, View} from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useEffect, useRef, useState} from "react";
 import Toast from 'react-native-toast-message';
@@ -8,18 +8,22 @@ import {
     showAuth
 } from './Animations';
 
-import EmailInput from "../components/EmailInput";
 import PhoneNumberInput from "../components/PhoneNumberInput";
 import {styles} from '../styles/authorization';
 import {useFirebaseLogin as useFirebaseOTPLogin} from "@itzsunny/firebase-login";
 import {auth, firebaseConfig} from "../firebase";
 import {signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCredential} from 'firebase/auth';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 import ContinueButton from "../components/ContinueButton";
+import {GoogleAuthProvider} from 'firebase/auth'
+import Input from "../components/Input";
 
-const GoogleButton = () => {
+import {GOOGLE_WEB_CLIENT_ID} from 'react-native-dotenv'
+
+const GoogleButton = ({handleGoogleClick}) => {
     return (
-        <TouchableOpacity style={styles.otherWayButton}>
+        <TouchableOpacity onPress={handleGoogleClick} style={styles.otherWayButton}>
             <Icon name={"google"} size={28} style={{marginLeft: 10, position: 'absolute', left: 10, top: 6.5}}/>
             <Text style={{alignSelf: 'center', fontWeight: '600', fontSize: 16}}>
                 Google
@@ -43,7 +47,7 @@ const OtherLoginWayButton = ({loginType, setLoginType}) => {
 const FooterText = () => {
     return (
         <Text style={styles.footerText}>
-            By continuing, you automatically accept our Terms & Conditions, Privacy Policy adn Cookies policy.
+            By continuing, you automatically accept our Terms & Conditions, Privacy Policy and Cookies policy.
         </Text>
     );
 }
@@ -171,6 +175,21 @@ const AuthScreen = () => {
         });
     }
 
+    //***************** Google Authorization *********************
+
+    const handleContinueGoogleClick = async () => {
+        GoogleSignin.configure({
+            webClientId: GOOGLE_WEB_CLIENT_ID,
+            offlineAccess: true,
+        });
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+        const googleUser = await GoogleSignin.signIn();
+
+        const {idToken} = googleUser;
+        const googleCredential = GoogleAuthProvider.credential(idToken);
+
+        await signInWithCredential(auth, googleCredential);
+    }
 
     return (
         <Animated.View style={{...styles.body }}>
@@ -187,16 +206,28 @@ const AuthScreen = () => {
                                       value={value} handleContinueClick={handleContinueOTPClick} />}
                 {loginType === 'phone' && !!verificationId &&
                     <View style={{marginTop: 10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', width: 330}}>
-                        <TextInput placeholder={"123456"} onChangeText={(text)=>{setCode(text)}} value={code} style={{backgroundColor: '#c9aaff', width: 150, padding: 10, borderRadius: 10, borderColor: '#f11', borderWidth: isWrongCode ? 1 : 0}} />
+                        <Input placeholder={"123456"} onChangeAction={(text:string)=>{setCode(text)}} value={code} style={{backgroundColor: '#c9aaff', width: 150, padding: 10, borderRadius: 10, borderColor: '#f11', borderWidth: isWrongCode ? 1 : 0}} />
                         <Icon name={'key'} size={36} color={'#48218c'} style={{marginLeft: -48}}/>
                     </View>}
-                {loginType === 'email' &&
-                    <EmailInput setIsPasswordSame={setIsPasswordSame} isEmailValid={isValidEmail} isPasswordSame={isPasswordSame} isRegister={isRegister}
-                                setRegister={setRegister} onChangeEmail={(text:string)=>{setEmail(text);}} onChangeConfirmPassword={(text:string)=>{setConfirmPassword(text)}} onChangePassword={(text:string)=>{setPassword(text)}}/>}
+
+                {loginType === 'email' && <View style={{gap: 10, width: 320}}>
+                    <Input style={{...styles.emailInput, borderWidth: isValidEmail ? 0 : 1}} placeholderTextColor={'#864cb4'} placeholder={'email@example.com'} onChangeAction={setEmail} />
+                    <Input style={{...styles.emailInput, borderWidth: isPasswordSame ? 0 : 1}} placeholderTextColor={'#864cb4'} placeholder={'Password'} onChangeAction={setPassword} secureTextEntry={true}/>
+                    {isRegister && <Input style={{...styles.emailInput, borderWidth: isPasswordSame ? 0 : 1}} placeholderTextColor={'#864cb4'} placeholder={'Confirm password'} onChangeAction={setConfirmPassword} secureTextEntry={true}/>}
+                    <TouchableOpacity>
+                        <Text style={{marginTop: -5, marginLeft: 5}} onPress={()=>{
+                            setRegister(!isRegister);
+                            setIsPasswordSame(true);
+                            setConfirmPassword('');
+                        }}>
+                            {isRegister ? "Login" : "Register"}
+                        </Text>
+                    </TouchableOpacity>
+                </View>}
                 <ContinueButton handleContinueClick={loginType ==='phone' ? handleContinueOTPClick : handleContinueEmailClick} />
                 <LineSectionDivider/>
 
-                <GoogleButton/>
+                <GoogleButton handleGoogleClick={handleContinueGoogleClick}/>
 
                 <View style={{alignItems: 'center', justifyContent: 'space-between', flexGrow: 1}}>
                     <OtherLoginWayButton loginType={loginType} setLoginType={setLoginType}/>
@@ -207,7 +238,8 @@ const AuthScreen = () => {
         </Animated.View>);
 }
 
-
+//<EmailInput setIsPasswordSame={setIsPasswordSame} isEmailValid={isValidEmail} isPasswordSame={isPasswordSame} isRegister={isRegister}
+//                                 setRegister={setRegister} onChangeEmail={(text:string)=>{setEmail(text);}} onChangeConfirmPassword={(text:string)=>{setConfirmPassword(text)}} onChangePassword={(text:string)=>{setPassword(text)}}/>
 const LineView = ({width, color = '#000'}) => {
     return <View style={{height: 1, width: width, backgroundColor: color, marginTop: 2}}></View>
 }

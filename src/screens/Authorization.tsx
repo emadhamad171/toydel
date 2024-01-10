@@ -13,7 +13,7 @@ import PhoneNumberInput from "../components/PhoneNumberInput";
 import {styles} from '../styles/authorization';
 import {useFirebaseLogin as useFirebaseOTPLogin} from "@itzsunny/firebase-login";
 import {auth, firebaseConfig} from "../firebase";
-import {signInWithEmailAndPassword, createUserWithEmailAndPassword} from 'firebase/auth';
+import {signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCredential} from 'firebase/auth';
 
 import ContinueButton from "../components/ContinueButton";
 
@@ -137,7 +137,6 @@ const AuthScreen = () => {
         //**************** Email & Password Validation ***************/
         const emailValidation = emailValidator.test(email);
         setValidEmail(emailValidation);
-        console.log(emailValidation);
         if(!emailValidation) return;
         const passwordIsSame = password === confirmPassword || !isRegister;
         setIsPasswordSame(passwordIsSame);

@@ -13,17 +13,17 @@ export default function App() {
 
     useEffect(() => {
         onAuthStateChanged(auth, (userInstance) => {
-            userInstance && setUserLogin("USER: " + userInstance?.phoneNumber ? userInstance.phoneNumber : userInstance?.email);
-            userInstance && setUser(userInstance);
-            Toast.show({type: 'success', text1:'Log out successfully!'});
+            !!userInstance &&setUserLogin(`USER: ${userInstance?.phoneNumber ? userInstance?.phoneNumber : userInstance?.email}`);
+            !!userInstance && setUser(userInstance);
+            !!userInstance && Toast.show({type: 'success', text1:'Log in successfully!'});
         });
     }, []);
 
   return (
       <View style={styles.container}>
           <Toast/>
-          {!!!userLogin && <Authorization />}
-          <Text>Welcome! {userLogin}</Text>
+          {!user && <Authorization />}
+          <Text>Welcome! {userLogin && userLogin}</Text>
           <Button title={'Log out'} onPress={()=>{Toast.show({type: 'success', text1:'Log out successfully!'}); auth.signOut(); setUserLogin(''); setUser(null)}} />
           <StatusBar style="auto" />
       </View>

@@ -1,11 +1,12 @@
-import {ActivityIndicator, Animated, Text, TouchableOpacity, View} from "react-native";
+import {Animated, Text, TouchableOpacity, View} from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useEffect, useRef, useState} from "react";
 import Toast from 'react-native-toast-message';
 import 'react-native-webview';
 
 import {
-    showAuth
+    hideLoading,
+    showAuth, showLoading
 } from './Animations';
 
 import PhoneNumberInput from "../components/PhoneNumberInput";
@@ -20,6 +21,10 @@ import {GoogleAuthProvider} from 'firebase/auth'
 import Input from "../components/Input";
 
 import {GOOGLE_WEB_CLIENT_ID} from 'react-native-dotenv'
+
+const wait = async () =>{
+    return await new Promise((resolve)=>{setTimeout(()=>{resolve(1);}, 600)});
+}
 
 const GoogleButton = ({handleGoogleClick}) => {
     return (
@@ -61,13 +66,10 @@ const LineSectionDivider = () => {
         </View>
     );
 }
-const LogoSection = ({isLoading, marginTop}) => {
+const LogoSection = ({marginTop}) => {
     return (
         <Animated.View style={{...styles.logoContainer, marginVertical: marginTop}}>
             <View style={styles.logoTextContainer}>
-                {isLoading.current &&
-                    <ActivityIndicator style={{zIndex: 2, position: 'absolute', left: -50}} size={260}
-                                       color={"#864cb4"}/>}
                 <Text style={styles.logoText}>ToyDel </Text>
                 <Icon name={"teddy-bear"} style={styles.logoIcon} size={52}/>
             </View>
@@ -79,7 +81,6 @@ const AuthScreen = () => {
     const topPos = useRef(new Animated.Value(650)).current;
     const marginTop = useRef(new Animated.Value(270)).current;
 
-    const isLoading = useRef(false);
     const [loginType, setLoginType] = useState('phone');
     const [isRegister, setRegister] = useState(false);
 
@@ -112,18 +113,21 @@ const AuthScreen = () => {
         if(!verificationId) {
             const verificationOTP = await sendOtp(formattedValue);
             setVerificationId(verificationOTP);
-
             return;
         }
 
         try {
+            showLoading({marginTop, topPos});
+            await wait();
             const verified = await verifyOtp(verificationId, code);
             if(verified) {
                 Toast.show({type: 'success', text1: "Login successfully", text2: 'Enjoy app'});
             } else {
+                hideLoading({topPos, marginTop});
                 Toast.show({type: 'error', text1: "Wrong OTP code!.", text2: "Try again!",topOffset: 10})
             }
         } catch (e) {
+            hideLoading({topPos, marginTop});
             setWrongCode(true);
         }
         return;
@@ -147,8 +151,11 @@ const AuthScreen = () => {
         if(!passwordIsSame) return;
 
         //***************** Authorization with Email *********************
+        showLoading({topPos,marginTop});
+        await wait();
         const cred = isRegister ? await createUserWithEmailAndPassword(auth, email,password).then().catch((e)=>{
             const errorCode= e.code;
+            hideLoading({topPos,marginTop});
             switch (errorCode) {
                 //TODO: Process error code of registration
                 case 'auth/email-already-in-use':
@@ -158,8 +165,9 @@ const AuthScreen = () => {
                     console.log('Something went wrong.');
                     break;
             }
-        }) : await signInWithEmailAndPassword(auth,email,password).then().catch((e)=>{
+        }) : await signInWithEmailAndPassword(auth,email,password).then().catch(async (e)=>{
             const errorCode= e.code;
+            hideLoading({topPos,marginTop});
             switch (errorCode) {
                 //TODO: Process error code of authorization
                 case 'auth/wrong-password':
@@ -182,19 +190,24 @@ const AuthScreen = () => {
             webClientId: GOOGLE_WEB_CLIENT_ID,
             offlineAccess: true,
         });
-        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-        const googleUser = await GoogleSignin.signIn();
-
-        const {idToken} = googleUser;
-        const googleCredential = GoogleAuthProvider.credential(idToken);
-
-        await signInWithCredential(auth, googleCredential);
+        try {
+            await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+            showLoading({topPos,marginTop})
+            await wait();
+            const googleUser = await GoogleSignin.signIn();
+            const {idToken} = googleUser;
+            const googleCredential = GoogleAuthProvider.credential(idToken);
+            await signInWithCredential(auth, googleCredential);
+        } catch (e){
+            hideLoading({topPos,marginTop})
+            console.log(e);
+        }
     }
 
     return (
         <Animated.View style={{...styles.body }}>
 
-            <LogoSection isLoading={isLoading} marginTop={marginTop}/>
+            <LogoSection marginTop={marginTop}/>
 
             <Animated.View style={{...styles.authContainer, transform: [{translateY: topPos}]}}>
                 <Text style={styles.headerText}>Welcome</Text>

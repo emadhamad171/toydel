@@ -31,11 +31,56 @@ const updateImage = async({userInstance, user})=>{
         console.log(e);
     }
 }
-const UserIcon = ({user, onChangePhoto, userInstance}) => {
+const UserIcon = ({user, userInstance}) => {
     return <TouchableOpacity style={{flexDirection: 'row'}} onPress={()=>{updateImage({userInstance:userInstance, user: user});}}>
         {user?.photoURL || userInstance?.photoURL ? <Image style={profileStyles.userPhoto} source={{uri: userInstance.photoURL || user.photoURL}} /> : <Icon style={{alignItems:'center', justifyContent: 'center',padding:5,backgroundColor: '#aaa',borderRadius: 50}} name={'account'} size={86} />}
     <EvilIcon name={'gear'} style={{padding: 0, margin: 0, position:'absolute', right:-2,top:4}} color={"#8a7064"} size={24}/>
     </TouchableOpacity>
+}
+
+const UserNameAndIcon = ({ userInfo, userInstance, userName, setUserName})=>{
+
+    const userNameInput = useRef(null);
+    const [isUserNameChanged, handleUsernameChange] = useState(false);
+    const [isUserNameValid, handleUserNameValid] = useState(true);
+    useEffect(() => {
+        handleUsernameChange(userName!==userInfo.displayName);
+        handleUserNameValid(userName.length>0 && (userName.length<12 || userName.length < userInfo.displayName));
+    }, [userName]);
+    const handleUserNameChangeSubmit = () =>{
+        if(isUserNameChanged && isUserNameValid) {
+            updateName({user:userInstance, name: userName});
+            Toast.show({type:'success', text1:'Name changed!', swipeable: true, visibilityTime:800});
+            userNameInput.current.blur();
+        } else {
+            if(!isUserNameValid) {
+                setUserName(userInfo.displayName);
+                Toast.show({type:'info', text1:'Name isn`t valid!', swipeable: true, visibilityTime:800});
+                return;
+            }
+            if(!isUserNameChanged) {
+                if(userNameInput.current.isFocused()) {
+                    userNameInput.current.blur();
+                } else {
+                    userNameInput.current.focus()
+                }
+            }
+        }
+    }
+    return <View style={{flexDirection: 'row', alignItems:'center',width:'100%'}}>
+        <UserIcon user={userInfo} userInstance={userInstance} />
+        <View style={{gap: 5, flexGrow: 1,alignItems:'center', justifyContent: 'center'}}>
+            <View style={{flexDirection: 'row'}}>
+                <TextInput ref={userNameInput}  onSubmitEditing={()=>{handleUserNameChangeSubmit()}} value={userName} onChangeText={(text)=>{(text.length<13 || text.length < userName.length) && setUserName(text)}} style={profileStyles.headerText} />
+                <TouchableOpacity onPress={()=>{handleUserNameChangeSubmit()}}>
+                    <Icon style={{padding: 0,marginLeft:5}} color={isUserNameChanged ? isUserNameValid ? '#56a10b' : '#f55' : '#5e3520'} name={isUserNameChanged ? isUserNameValid ? 'check' : 'close' :'pencil'} size={18}/>
+                </TouchableOpacity>
+            </View>
+            <Text style={profileStyles.subText}>
+                I Love ToyApp!
+            </Text>
+        </View>
+    </View>
 }
 
 const ReviewsModal = () => {
@@ -46,8 +91,10 @@ const ReviewsModal = () => {
 }
 
 const InfoModal = ({props}) =>{
-    const {user, setModal} = props;
-    return <View></View>
+    const {user, userInfo, userName, setUserName} = props;
+    return <View style={{marginTop: 10}}>
+        <UserNameAndIcon userInfo={userInfo} userInstance={user} userName={userName} setUserName={setUserName}/>
+    </View>
 }
 
 function WrapperComponent({ItemModal, setModal, modalName}) {
@@ -83,31 +130,8 @@ const Profile = ({user, setUser}) => {
     const [userInstance, setUserInstance] = useState(user);
     const [userInfo, setUserInfo] = useState(user?.providerData[0]);
     const [userName, setUserName] = useState('');
-    const userNameInput = useRef(null);
-    const [isUserNameChanged, handleUsernameChange] = useState(false);
-    const [isUserNameValid, handleUserNameValid] = useState(true);
     const [CustomModal, setModal] = useState(null);
     const [currentModalName, setModalName] = useState('');
-    const handleUserNameChangeSubmit = () =>{
-        if(isUserNameChanged && isUserNameValid) {
-            updateName({user, name: userName});
-            Toast.show({type:'success', text1:'Name changed!', swipeable: true, visibilityTime:800});
-            userNameInput.current.blur();
-        } else {
-            if(!isUserNameValid) {
-                setUserName(userInfo.displayName);
-                Toast.show({type:'info', text1:'Name isn`t valid!', swipeable: true, visibilityTime:800});
-                return;
-            }
-            if(!isUserNameChanged) {
-                if(userNameInput.current.isFocused()) {
-                    userNameInput.current.blur();
-                } else {
-                    userNameInput.current.focus()
-                }
-            }
-        }
-    }
 
     const onPressLogout = () => {
             auth.signOut();
@@ -120,31 +144,14 @@ const Profile = ({user, setUser}) => {
         setUserInfo((userInfo)=>{return{...userInfo, displayName:  name}});
         setUserName((userName)=>name);
         }, [user]);
-    useEffect(() => {
-        handleUsernameChange(userName!==userInfo.displayName);
-        handleUserNameValid(userName.length>0 && (userName.length<12 || userName.length < userInfo.displayName));
-    }, [userName]);
     return <ScrollView style={{flex:1,backgroundColor:'#fff',marginTop:24}}>
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
         <View style={{justifyContent:'center', flex: 1, width:350, alignSelf: 'center', maxWidth: '100%', alignItems: 'center', gap: 25,marginHorizontal:15}}>
-            <View style={{flexDirection: 'row', alignItems:'center',width:'100%'}}>
-            <UserIcon user={userInfo} userInstance={userInstance} />
-            <View style={{gap: 5, flexGrow: 1,alignItems:'center', justifyContent: 'center'}}>
-                <View style={{flexDirection: 'row'}}>
-                <TextInput ref={userNameInput}  onSubmitEditing={()=>{handleUserNameChangeSubmit()}} value={userName} onChangeText={(text)=>{(text.length<13 || text.length < userName.length) && setUserName(text)}} style={profileStyles.headerText} />
-                    <TouchableOpacity onPress={()=>{handleUserNameChangeSubmit()}}>
-                        <Icon style={{padding: 0,marginLeft:5}} color={isUserNameChanged ? isUserNameValid ? '#56a10b' : '#f55' : '#5e3520'} name={isUserNameChanged ? isUserNameValid ? 'check' : 'close' :'pencil'} size={18}/>
-                    </TouchableOpacity>
-                </View>
-                <Text style={profileStyles.subText}>
-                    I Love ToyApp!
-                </Text>
-            </View>
-        </View>
+            <UserNameAndIcon userInfo={userInfo} userInstance={userInstance} userName={userName} setUserName={setUserName}/>
         <View style={{gap: 5}}>
 
             <UserButton icon={'account'} onPressAction={()=>{
-                setModal(()=>{return ()=><InfoModal props={{user: user, setModal: setModal}}/>})
+                setModal(()=>{return ()=><InfoModal props={{user: userInstance, setUserName, userName, userInfo}}/>})
                 setModalName("Personal Info");
             }} placeholder={"Personal Info"} />
             <UserButton icon={'progress-question'} iconSize={24} onPressAction={()=>{

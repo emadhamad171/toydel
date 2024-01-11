@@ -194,7 +194,12 @@ const AuthScreen = () => {
             await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
             showLoading({topPos,marginTop})
             await wait();
-            const googleUser = await GoogleSignin.signIn();
+            let googleUser;
+            try {
+                googleUser = await GoogleSignin.signInSilently();
+            } catch (e){
+                googleUser = await GoogleSignin.signIn();
+            }
             const {idToken} = googleUser;
             const googleCredential = GoogleAuthProvider.credential(idToken);
             await signInWithCredential(auth, googleCredential);

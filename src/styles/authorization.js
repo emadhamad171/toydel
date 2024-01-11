@@ -8,7 +8,6 @@ export const styles = StyleSheet.create({
         left: 0,
         backgroundColor: "#e3aeff",
         justifyContent: 'space-between',
-        zIndex: 2,
     },
     authContainer: {
         width: '100%',
@@ -36,13 +35,11 @@ export const styles = StyleSheet.create({
         color: '#4f2279',
         fontSize: 38,
         fontWeight: "600",
-        zIndex: 5,
     },
     logoIcon:{
         color: '#4f2279',
         margin: 0,
         padding: 0,
-        zIndex: 5,
     },
     headerText: {
         fontSize: 24,

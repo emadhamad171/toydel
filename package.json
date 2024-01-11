@@ -18,6 +18,8 @@
     "firebase": "^10.7.1",
     "react": "18.2.0",
     "react-native": "0.72.5",
+    "react-native-image-picker": "^7.1.0",
+    "react-native-modal": "^13.0.1",
     "react-native-phone-number-input": "^2.1.0",
     "react-native-toast-message": "^2.2.0",
     "react-native-vector-icons": "^10.0.3",

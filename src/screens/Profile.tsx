@@ -1,4 +1,4 @@
-import {Image, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {AppRegistry, FlatList, Image, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {useEffect, useRef, useState} from "react";
 import {updateProfile} from 'firebase/auth'
 import {auth} from "../firebase";
@@ -9,6 +9,11 @@ import Toast from "react-native-toast-message";
 import Modal from "react-native-modal";
 import {launchImageLibrary} from "react-native-image-picker";
 import {StatusBar} from "expo-status-bar";
+import Input from "../components/Input";
+import {styles} from "../styles/authorization";
+import ContinueButton from "../components/ContinueButton";
+import App from "../../App";
+import getAppKeys = AppRegistry.getAppKeys;
 
 const updateName = async ({user, name}) => {
     await updateProfile(user,{displayName: name});
@@ -31,11 +36,25 @@ const updateImage = async({userInstance, user})=>{
         console.log(e);
     }
 }
+const HeaderText = ({text,style, ...props}:{text:string, style?:any})=>{
+
+    return <Text style={style || {...styles.subHeaderText, marginBottom: 4}} {...props}>
+        {text}
+    </Text>
+}
 const UserIcon = ({user, userInstance}) => {
     return <TouchableOpacity style={{flexDirection: 'row'}} onPress={()=>{updateImage({userInstance:userInstance, user: user});}}>
         {user?.photoURL || userInstance?.photoURL ? <Image style={profileStyles.userPhoto} source={{uri: userInstance.photoURL || user.photoURL}} /> : <Icon style={{alignItems:'center', justifyContent: 'center',padding:5,backgroundColor: '#aaa',borderRadius: 50}} name={'account'} size={86} />}
     <EvilIcon name={'gear'} style={{padding: 0, margin: 0, position:'absolute', right:-2,top:4}} color={"#8a7064"} size={24}/>
     </TouchableOpacity>
+}
+
+const AnswerComponent =({text, isDisplayed})=>{
+    return <View style={{display:isDisplayed?'flex': 'none', marginBottom:14,marginHorizontal: 5}}>
+        <Text>
+            {text}
+        </Text>
+    </View>
 }
 
 const UserNameAndIcon = ({ userInfo, userInstance, userName, setUserName})=>{
@@ -83,18 +102,102 @@ const UserNameAndIcon = ({ userInfo, userInstance, userName, setUserName})=>{
     </View>
 }
 
-const ReviewsModal = () => {
-    //TODO: Fetch some reviews
-    return <View>
-        <Text>123</Text>
+const FaqSection = ({index,item,currentId}) =>{
+    return <View style={{gap: 10,marginTop: 5}}>
+        <UserButton icon={'progress-question'} chevronIcon={index===currentId ? 'chevron-down' : 'chevron-right'} iconSize={24} onPressAction={item.question.onPressAction(index===currentId ? -1 : index)} placeholder={item.question.placeholder} />
+        <AnswerComponent isDisplayed={index===currentId} text={item.answer.text} />
+
     </View>
 }
 
-const InfoModal = ({props}) =>{
-    const {user, userInfo, userName, setUserName} = props;
-    return <View style={{marginTop: 10}}>
-        <UserNameAndIcon userInfo={userInfo} userInstance={user} userName={userName} setUserName={setUserName}/>
+const FaqModal = () => {
+    const [answerDisplayedId, setAnswerDisplayed] = useState(-1);
+    const QuestionsAndAnswers = [
+        {
+            question: {
+                placeholder: 'Why ToyDel?',
+                onPressAction: (id:number)=>{
+                   return ()=>setAnswerDisplayed(id);
+                }
+            },
+            answer: {
+                text: 'Because asodmdoasmdo amdoasm odmasodmoa smdoasmdo amsdom asodm asom doasmd oams odmas dmaosm doasm doasmdo amso dmaso mdaos mdoam sodmao mdosa mdoams odmas omdo asmd oamsodma somdomasomom asdma odmaosm '
+            }
+        },
+        {
+            question: {
+                placeholder: 'Payments',
+                onPressAction: (id:number)=>{
+                    return ()=>setAnswerDisplayed(id);
+                }
+            },
+            answer: {
+                text: 'Because asodmdoasmdo amdoasm odmasodmoa smdoasmdo amsdom asodm asom doasmd oams odmas dmaosm doasm doasmdo amso dmaso mdaos mdoam sodmao mdosa mdoams odmas omdo asmd oamsodma somdomasomom asdma odmaosm '
+            }
+        },
+        {
+            question: {
+                placeholder: 'Security',
+                onPressAction: (id:number)=>{
+                    return ()=>setAnswerDisplayed(id);
+                }
+            },
+            answer: {
+                text: 'Because asodmdoasmdo amdoasm odmasodmoa smdoasmdo amsdom asodm asom doasmd oams odmas dmaosm doasm doasmdo amso dmaso mdaos mdoam sodmao mdosa mdoams odmas omdo asmd oamsodma somdomasomom asdma odmaosm '
+            }
+        },
+        {
+            question: {
+                placeholder: 'Big Bob',
+                onPressAction: (id:number)=>{
+                    return ()=>setAnswerDisplayed(id);
+                }
+            },
+            answer: {
+                text: 'Because asodmdoasmdo amdoasm odmasodmoa smdoasmdo amsdom asodm asom doasmd oams odmas dmaosm doasm doasmdo amso dmaso mdaos mdoam sodmao mdosa mdoams odmas omdo asmd oamsodma somdomasomom asdma odmaosm '
+            }
+        },
+        {
+            question: {
+                placeholder: 'Developers',
+                onPressAction: (id:number)=>{
+                    return ()=>setAnswerDisplayed(id);
+                }
+            },
+            answer: {
+                text: 'Because asodmdoasmdo amdoasm odmasodmoa smdoasmdo amsdom asodm asom doasmd oams odmas dmaosm doasm doasmdo amso dmaso mdaos mdoam sodmao mdosa mdoams odmas omdo asmd oamsodma somdomasomom asdma odmaosm '
+            }
+        }
+    ]
+    return <View style={{marginTop: 24}}>
+        <FlatList data={QuestionsAndAnswers} renderItem={({item,index})=><FaqSection item={item} index={index} currentId={answerDisplayedId}/>} />
     </View>
+}
+const InfoModal = ({props}) =>{
+    const {userInstance, userInfo, userName, setUserName} = props;
+    const [userModalName, setUserModalName]=useState(userName);
+    const handleModalNameChange = (name:string) =>{
+        setUserModalName(name);
+        setUserName(name);
+    }
+    return <ScrollView style={{flex: 1}}>
+        <View style={{gap: 15, flex: 1,justifyContent:'center', marginTop:14}}>
+        <UserNameAndIcon userInfo={userInfo} userInstance={userInstance} userName={userModalName} setUserName={handleModalNameChange}/>
+        <View>
+            <HeaderText text={"Email"} />
+        <Input onChangeAction={()=>{}} placeholder={userInfo?.email || 'Nothing'} readOnly={true} style={{...styles.emailInput, backgroundColor: '#eee'}}/>
+        </View>
+        <View>
+            <HeaderText text={"Phone Number"} />
+            <Input onChangeAction={()=>{}} placeholder={userInfo?.phoneNumber || '+0-(123)-45-678-9123'} readOnly={true} style={{...styles.emailInput, backgroundColor: '#eee'}}/>
+        </View>
+        <View>
+            <HeaderText text={"Bio"} />
+            <Input onChangeAction={()=>{}} placeholder={userInfo?.phoneNumber || 'Bio'} multiline={true} style={{...styles.emailInput, backgroundColor: '#eee'}}/>
+        </View>
+        <ContinueButton text={"Save"} style={{backgroundColor:'#7c108d',marginTop: 5}} handleContinueClick={()=>{}}/>
+        </View>
+    </ScrollView>
 }
 
 function WrapperComponent({ItemModal, setModal, modalName}) {
@@ -114,15 +217,15 @@ function WrapperComponent({ItemModal, setModal, modalName}) {
 }
 
 
-const UserButton = ({placeholder,iconColor='#000', icon, iconSize=22, iconProps={}, buttonProps={}, onPressAction,iconStyle={borderRadius: 55, backgroundColor: '#eee', alignItems: 'center', width:36,height:36,  justifyContent: 'center'}, buttonStyle = {flexDirection: 'row', alignItems: 'center',gap: 10,width:'100%', paddingHorizontal:16, paddingVertical: 8, borderRadius: 10, backgroundColor:'#dcdada'}})=> {
-    return <TouchableOpacity style={{...buttonStyle}} onPress={onPressAction} {...buttonProps}>
+const UserButton = ({placeholder,chevronIcon='chevron-right',iconColor='#000', icon, iconSize=22, iconProps={}, buttonProps={}, onPressAction,iconStyle={borderRadius: 55, backgroundColor: '#eee', alignItems: 'center', width:36,height:36,  justifyContent: 'center'}, buttonStyle = {flexDirection: 'row', alignItems: 'center',gap: 10,width:'100%', paddingHorizontal:16, paddingVertical: 8, borderRadius: 10, backgroundColor:'#dcdada'}})=> {
+    return <TouchableOpacity style={buttonStyle} onPress={onPressAction} {...buttonProps}>
 
         <View style={{...iconStyle}}>
             <Icon {...iconProps} style={{padding: 0, margin: 0}} color={iconColor} name={icon} size={iconSize}/>
         </View>
         <View style={{flexDirection: 'row', alignItems:'center',justifyContent:'space-between',flexGrow:1}}>
         <Text style={profileStyles.baseText}> {placeholder} </Text>
-            <Icon name={'chevron-right'} size={16}/>
+            <Icon name={chevronIcon} size={16}/>
         </View>
     </TouchableOpacity>
 }
@@ -144,22 +247,22 @@ const Profile = ({user, setUser}) => {
         setUserInfo((userInfo)=>{return{...userInfo, displayName:  name}});
         setUserName((userName)=>name);
         }, [user]);
-    return <ScrollView style={{flex:1,backgroundColor:'#fff',marginTop:24}}>
-        <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
+    return <><WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
+        <ScrollView style={{flex:1,backgroundColor:'#fff',marginTop:24}}>
         <View style={{justifyContent:'center', flex: 1, width:350, alignSelf: 'center', maxWidth: '100%', alignItems: 'center', gap: 25,marginHorizontal:15}}>
             <UserNameAndIcon userInfo={userInfo} userInstance={userInstance} userName={userName} setUserName={setUserName}/>
         <View style={{gap: 5}}>
 
             <UserButton icon={'account'} onPressAction={()=>{
-                setModal(()=>{return ()=><InfoModal props={{user: userInstance, setUserName, userName, userInfo}}/>})
+                setModal(()=>{return ()=><InfoModal props={{userInstance, setUserName, userName, userInfo}}/>})
                 setModalName("Personal Info");
             }} placeholder={"Personal Info"} />
             <UserButton icon={'progress-question'} iconSize={24} onPressAction={()=>{
-                setModal(()=>{return ()=><ReviewsModal />})
+                setModal(()=>{return ()=><FaqModal />})
                 setModalName("Faq");
             }} placeholder={"FAQ"} />
             <UserButton icon={'star'} iconSize={24} onPressAction={()=>{
-                setModal(()=>{return ()=><ReviewsModal />})
+                setModal(()=>{return ()=><FaqModal />})
                 setModalName("Reviews");
             }} placeholder={"Reviews"} />
         </View>
@@ -176,7 +279,7 @@ const Profile = ({user, setUser}) => {
         <UserButton icon={'logout'} onPressAction={onPressLogout} placeholder={"Logout"} />
     </View>
         <StatusBar style="auto" hidden={true} />
-        </ScrollView>;
+        </ScrollView></>;
 }
 
 const profileStyles = StyleSheet.create({

@@ -1,9 +1,11 @@
-import {AppRegistry, FlatList, Image, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
-import {useEffect, useRef, useState} from "react";
+import {FlatList, Image, ScrollView, StyleProp, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {ReactElement, useEffect, useRef, useState} from "react";
 import {updateProfile} from 'firebase/auth'
 import {auth} from "../firebase";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import EvilIcon from 'react-native-vector-icons/FontAwesome'
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import AwesomeIcon from 'react-native'
 import {StyleSheet} from "react-native";
 import Toast from "react-native-toast-message";
 import Modal from "react-native-modal";
@@ -208,8 +210,13 @@ const ReviewComponent = ({item})=>{
     starRate.push(unfiledStars);
 return <View style={{flexDirection: 'row', gap :18, marginTop: 24}}>
     <Image source={{uri: item.photo}} style={{borderRadius: 50, width: 50, height: 50}} />
-    <View style={{backgroundColor:'#e0e0e0', borderRadius: 30, padding: 15, width: 270, marginRight: 1000}}>
-        <Text style={{color: '#5d5d5d'}}>{item.date}</Text>
+    <View style={{backgroundColor:'#e0e0e0', borderRadius: 30, padding: 15, width: 270}}>
+        <View style={{flexGrow:1, flexDirection:'row', justifyContent:'space-between'}}>
+            <Text style={{color: '#5d5d5d'}}>{item.date}</Text>
+            <TouchableOpacity onPress={()=>{}}>
+            <MaterialIcon name={'more-horiz'} size={24} style={{padding: 0, margin: 0}}/>
+            </TouchableOpacity>
+        </View>
         <Text style={{...styles.subHeaderText, marginBottom: 2}}>{item.name}</Text>
         <Text>{starRate}</Text>
         <Text>{item.text}</Text>
@@ -242,6 +249,60 @@ const ReviewModal = ()=>{
     ]
     return <View style={{marginTop: 24}}>
         <FlatList data={reviews} renderItem={({item})=><ReviewComponent item={item}/>} />
+    </View>
+}
+
+const PlanComponent = ({backgroundColor, price, name, description, features, style, PlanSign,...props}:{backgroundColor:string, price:number, name:string, description:string, features:string[], style?:StyleProp<View>, PlanSign?:any})=>{
+
+
+    return <View style={{...profileStyles.defaultPlanContainer, backgroundColor: backgroundColor || '#999'}}>
+        <Text style={{...profileStyles.headerText, alignSelf: 'center'}}>{name}</Text>
+        <View style={{flexDirection: 'row', justifyContent:'space-between',marginTop: 14}}>
+            <FlatList data={features} renderItem={({item})=><Text style={{fontSize: 16}}><Icon name={"check"} color={'#4c4'} size={16} /> {item} </Text>} />
+            <View>
+         <Text style={{...profileStyles.baseText,alignSelf:'flex-end', textDecorationLine:'line-through', fontSize:12, color:'#555'}}>{price}$</Text>
+            <Text style={{...profileStyles.baseText,alignSelf:'flex-end', fontWeight:'400', color:'#111'}}>{price*0.85}$</Text>
+            </View>
+        </View>
+        <Text style={{...profileStyles.subText, marginTop: 12}}>{description}</Text>
+        <ContinueButton handleContinueClick={()=>{}} text={'Buy'} style={{marginTop: 14,marginBottom: 0, borderRadius:15, backgroundColor: '#4d4d4d'}}  />
+        {!!PlanSign && <PlanSign />}
+    </View>
+}
+const PlanTopSign = ({backgroundColor, text, iconName,iconSize, style, ...props}:{backgroundColor?:string, text?:'string', iconName?:string,iconSize?:number, style?:any})=>{
+    return <View style={{...profileStyles.defaultPlanSign, backgroundColor: backgroundColor || '#cca732'}}>
+        {!!iconName && <Text><Icon name={iconName} style={{margin: 0, padding: 0}} padding={0} size={iconSize || 18} /> </Text>}
+    </View>
+}
+const PlansModal = ({user}) => {
+    //TODO: Get current user plan
+    const [currentPlan,setCurrentPlan] = useState(null);
+    //TODO: Get plans from database
+    const plans = [{
+        price: 100,
+        backgroundColor: '#999',
+        name: 'Normal',
+        description: 'Regular plan and blablabla bla blabla blaalb a lab blabla. Some bla bla bla and blablabla.',
+        features: ['1 toy per mounth', 'Change toys some times', 'Big boss required'],
+        Sign: ()=><PlanTopSign iconName={'star'}/>
+    },{
+        price: 140,
+        backgroundColor: '#6fa2a2',
+        name: 'Normal',
+        description: 'Regular plan and blablabla bla blabla blaalb a lab blabla. Some bla bla bla and blablabla.',
+        features: ['1 toy per mounth', 'Change toys some times', 'Big boss required'],
+        Sign: ()=><PlanTopSign backgroundColor={"#d66"} iconName={'star'}/>
+    },{
+        price: 120,
+        backgroundColor: '#999',
+        name: 'Normal',
+        description: 'Regular plan and blablabla bla blabla blaalb a lab blabla. Some bla bla bla and blablabla.',
+        features: ['1 toy per mounth', 'Change toys some times', 'Big boss required'],
+        Sign: ()=><PlanTopSign iconName={'star'}/>
+    }]
+
+    return <View style={{marginTop: 14}}>
+    <FlatList style={{paddingBottom:14}} data={plans} renderItem={({item})=><PlanComponent backgroundColor={item.backgroundColor} price={item.price} name={item.name} description={item.description} features={item.features} PlanSign={item.Sign} />} />
     </View>
 }
 function WrapperComponent({ItemModal, setModal, modalName}) {
@@ -311,7 +372,10 @@ const Profile = ({user, setUser}) => {
             }} placeholder={"Reviews"} />
         </View>
         <View style={{gap: 5}}>
-            <UserButton icon={''} onPressAction={onPressLogout} placeholder={""} />
+            <UserButton icon={'layers'} onPressAction={()=>{
+                setModal(()=>{return ()=><PlansModal user={userInstance} />})
+                setModalName("Plans");
+            }} placeholder={"Plans"} />
             <UserButton icon={''} iconSize={24} onPressAction={onPressLogout} placeholder={""} />
             <UserButton icon={''} onPressAction={onPressLogout} placeholder={""} />
         </View>
@@ -343,7 +407,27 @@ const profileStyles = StyleSheet.create({
     subText: {
         fontSize: 16,
         fontWeight: '200'
-    }
+    },
+    defaultPlanContainer: {
+        alignSelf:'center',
+        paddingHorizontal: 10,
+        paddingTop: 10,
+        marginBottom: 12,
+        width: '100%',
+        maxWidth: 330,
+        borderRadius: 15,
+        backgroundColor: '#999'
+    },
+    defaultPlanSign: {
+        backgroundColor: '#ffd22d',
+        position:'absolute',
+        alignItems: 'center',
+        justifyContent: 'center',
+        top:0,
+        right: 0,
+        borderRadius: 50,
+        padding: 5
+    },
 })
 
 export default Profile;

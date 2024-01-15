@@ -7,6 +7,24 @@ import Toast from "react-native-toast-message";
 import {onAuthStateChanged} from "firebase/auth";
 import {auth} from "./src/firebase";
 import Profile from "./src/screens/Profile";
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import 'react-native-gesture-handler';
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+
+const Tab = createBottomTabNavigator();
+const screenOptions = {
+    headerShown: false,
+    tabBarShowLabel:false,
+    tabBarStyle: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      elevation: 0,
+      height: 50
+    }
+};
 
 export default function App() {
     const [user, setUser] = useState<firebase_auth.User>();
@@ -17,13 +35,26 @@ export default function App() {
         });
     }, []);
 
-    return (
-        <View style={styles.container}>
-            {!user && <Authorization />}
-            {user && <Profile user={user} setUser={setUser}/> }
-            <StatusBar style="auto" hidden={true} />
-            <Toast />
-        </View>
+    const ProfileScreen = ()=> <Profile user={user} setUser={setUser} />;
+
+
+    return (<>
+            <StatusBar style="auto" hidden={true}/>
+        {user ?
+        <NavigationContainer>
+            <Tab.Navigator screenOptions={screenOptions}>
+                <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{
+                        return <Icon name={'apple-keyboard-command'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
+                <Tab.Screen name="Cart" options={{tabBarIcon: ({focused})=>{
+                        return <Icon name={'format-list-bulleted'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
+                <Tab.Screen name="Notifications" options={{tabBarIcon: ({focused})=>{
+                        return <Icon name={ focused ? 'bell' : 'bell-outline'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
+                <Tab.Screen name="Profile" options={{tabBarIcon: ({focused})=>{
+                    return <Icon name={'account'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
+            </Tab.Navigator>
+        </NavigationContainer>
+            : <Authorization />}
+        </>
     );
 }
 

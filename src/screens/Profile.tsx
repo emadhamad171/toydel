@@ -1,16 +1,14 @@
 import {FlatList, Image, ScrollView, StyleProp, Text, TextInput, TouchableOpacity, View} from "react-native";
-import {ReactElement, useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {updateProfile} from 'firebase/auth'
 import {auth} from "../firebase";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import EvilIcon from 'react-native-vector-icons/FontAwesome'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import AwesomeIcon from 'react-native'
 import {StyleSheet} from "react-native";
 import Toast from "react-native-toast-message";
 import Modal from "react-native-modal";
 import {launchImageLibrary} from "react-native-image-picker";
-import {StatusBar} from "expo-status-bar";
 import Input from "../components/Input";
 import {styles} from "../styles/authorization";
 import ContinueButton from "../components/ContinueButton";
@@ -439,11 +437,9 @@ const Profile = ({user, setUser}) => {
         <View style={{gap: 5}}>
             <UserButton icon={''} onPressAction={onPressLogout} placeholder={""} />
             <UserButton icon={''} iconSize={24} onPressAction={onPressLogout} placeholder={""} />
-            <UserButton icon={''} onPressAction={onPressLogout} placeholder={""} />
         </View>
         <UserButton icon={'logout'} onPressAction={onPressLogout} placeholder={"Logout"} />
     </View>
-        <StatusBar style="auto" hidden={true} />
         </ScrollView></>;
 }
 

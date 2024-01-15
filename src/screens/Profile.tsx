@@ -271,7 +271,7 @@ const PlanComponent = ({backgroundColor, price, name, description, features, sty
 }
 const PlanTopSign = ({backgroundColor, text, iconName,iconSize, style, ...props}:{backgroundColor?:string, text?:'string', iconName?:string,iconSize?:number, style?:any})=>{
     return <View style={{...profileStyles.defaultPlanSign, backgroundColor: backgroundColor || '#cca732'}}>
-        {!!iconName && <Text><Icon name={iconName} style={{margin: 0, padding: 0}} padding={0} size={iconSize || 18} /> </Text>}
+        {!!iconName && <Text style={{marginRight: -2}}><Icon name={iconName} style={{margin: 0, padding: 0}} padding={0} size={iconSize || 18} /> </Text>}
     </View>
 }
 const PlansModal = ({user}) => {
@@ -279,25 +279,25 @@ const PlansModal = ({user}) => {
     const [currentPlan,setCurrentPlan] = useState(null);
     //TODO: Get plans from database
     const plans = [{
-        price: 100,
-        backgroundColor: '#999',
-        name: 'Normal',
+        price: 400,
+        backgroundColor: '#d29f6c',
+        name: 'Bronze',
         description: 'Regular plan and blablabla bla blabla blaalb a lab blabla. Some bla bla bla and blablabla.',
-        features: ['1 toy per mounth', 'Change toys some times', 'Big boss required'],
-        Sign: ()=><PlanTopSign iconName={'star'}/>
+        features: ['1 toy per month', 'Change toys some times', 'Big boss required'],
+        Sign: ()=><PlanTopSign iconName={'star-outline'}/>
     },{
-        price: 140,
-        backgroundColor: '#6fa2a2',
-        name: 'Normal',
+        price: 960,
+        backgroundColor: '#ffe44b',
+        name: 'Gold',
         description: 'Regular plan and blablabla bla blabla blaalb a lab blabla. Some bla bla bla and blablabla.',
-        features: ['1 toy per mounth', 'Change toys some times', 'Big boss required'],
-        Sign: ()=><PlanTopSign backgroundColor={"#d66"} iconName={'star'}/>
+        features: ['4 toy per month', 'Change toys every week', 'You are big boss'],
+        Sign: ()=><PlanTopSign backgroundColor={"#d66"} iconName={'check-decagram-outline'}/>
     },{
-        price: 120,
-        backgroundColor: '#999',
-        name: 'Normal',
+        price: 780,
+        backgroundColor: '#d6e1e3',
+        name: 'Silver',
         description: 'Regular plan and blablabla bla blabla blaalb a lab blabla. Some bla bla bla and blablabla.',
-        features: ['1 toy per mounth', 'Change toys some times', 'Big boss required'],
+        features: ['2 toy per month', 'Change toys some times', 'Big boss required'],
         Sign: ()=><PlanTopSign iconName={'star'}/>
     }]
 
@@ -305,10 +305,64 @@ const PlansModal = ({user}) => {
     <FlatList style={{paddingBottom:14}} data={plans} renderItem={({item})=><PlanComponent backgroundColor={item.backgroundColor} price={item.price} name={item.name} description={item.description} features={item.features} PlanSign={item.Sign} />} />
     </View>
 }
+
+const FavoriteComponent = ({list,setFavoriteToyList,item}) =>{
+    const {name, brand, category, id ,description, price, rentPrice, isIncludedInPlan, photo} = item;
+    const removeItemFromFavoriteList = () =>{
+        setFavoriteToyList(list.filter((listItem)=>{if(listItem.id!==id) return listItem;}))
+    }
+    return <View style={{flexDirection: 'row', padding: 10, borderRadius: 15}}>
+        <TouchableOpacity onPress={removeItemFromFavoriteList} style={{position: 'absolute', zIndex: 4, top: 15, left:15}}><Icon name={'heart'} style={{zIndex: 4, borderRadius: 50, padding: 5, backgroundColor: '#ccc'}} color={'#522d7e'} size={22}/></TouchableOpacity>
+        <Image style={{width: 150, height: 150, borderRadius: 10, zIndex:2,borderColor:'#cccccc', borderWidth: 2}} source={{uri: photo}} />
+        <View style={{backgroundColor:'#cccccc',borderColor:'#cccccc', borderWidth: 1,paddingRight: 15, width:'100%', maxWidth: 220, marginLeft: -10, borderTopRightRadius: 15, borderBottomRightRadius: 10, paddingLeft:20, paddingTop: 10}}>
+            <Text numberOfLines={1} ellipsizeMode={"tail"} style={{fontSize: 16,color: '#522d7e', alignSelf: 'flex-start'}}>{name}</Text>
+            <Text numberOfLines={2} ellipsizeMode={'tail'} style={{fontSize: 12, color: '#333',marginTop: 5}}>{description}</Text>
+            <View style={{width: '100%', borderStyle: "dashed", borderWidth: 1, borderColor: '#555', borderRadius: 5, marginVertical: 8}}></View>
+            <Text style={{fontSize: 12}}>Brand: {brand} </Text>
+            <Text numberOfLines={1} ellipsizeMode={'clip'} style={{fontSize: 12}}>Category: {category.join(', ')}</Text>
+            <Text style={{fontSize: 12, color: '#1f4f1a'}}>{isIncludedInPlan ? 'Included in base plan' : 'You can order it from us'}</Text>
+        </View>
+    </View>
+}
+
+const FavoriteModal = ({user}) =>{
+    //TODO: Get prom database favorite positions
+
+    const favoriteList = [
+        {
+            name: 'Big toy',
+            brand: 'Antonio Glinlomessi',
+            id: 123,
+            category: ['Fun', 'Toys', 'Smart'],
+            description: 'Just a big toy. Have fun with this big toy, if you know what i mean, you should know yes?',
+            price: 1500,
+            isIncludedInPlan: true,
+            rentPrice: 400,
+            photo: 'https://ua.all.biz/img/ua/catalog/27767876.jpeg'
+        },
+        {
+            name: 'Some very long name idk and some text here',
+            brand: 'Georgio Pedrachely',
+            id: 3,
+            category: ['Fun'],
+            description: 'Just a big toy. Have fun with this big toy, if you know what i mean...',
+            price: 1500,
+            isIncludedInPlan: true,
+            rentPrice: 400,
+            photo: 'https://ua.all.biz/img/ua/catalog/27767876.jpeg'
+        }
+    ]
+
+    const [favoriteToyList, setFavoriteToyList] = useState(favoriteList);
+
+    return <View style={{flex: 1, marginTop: 14}}>
+        <FlatList data={favoriteToyList} renderItem={({item})=><FavoriteComponent list={favoriteToyList} setFavoriteToyList={setFavoriteToyList} item={item} /> } />
+    </View>
+}
 function WrapperComponent({ItemModal, setModal, modalName}) {
     return (
             <Modal propagateSwipe style={{padding: 0, margin: 0, flex:1}} swipeDirection="left" onSwipeComplete={()=>{setModal(null)}} animationInTiming={600} animationOutTiming={500} animationOut={'slideOutDown'} coverScreen={false} backdropOpacity={0} isVisible={!!ItemModal} onBackdropPress={() => setModal(null)}>
-                <View style={{backgroundColor: '#fff',borderRadius:0, paddingTop:20,paddingHorizontal:25, width:"100%", height: '100%'}}>
+                <View style={{backgroundColor: '#fff',borderRadius:0, paddingTop:20,paddingHorizontal:10, width:"100%", height: '100%'}}>
                     <View style={{flexDirection:'row', alignItems:'center'}}>
                         <TouchableOpacity style={{backgroundColor:'#ccc',borderRadius:50,width:40,height:40,alignItems:'center',justifyContent:'center', marginRight: 32}} onPress={()=>setModal(null)}>
                             <Icon name={'chevron-left'} size={32} />
@@ -376,7 +430,10 @@ const Profile = ({user, setUser}) => {
                 setModal(()=>{return ()=><PlansModal user={userInstance} />})
                 setModalName("Plans");
             }} placeholder={"Plans"} />
-            <UserButton icon={''} iconSize={24} onPressAction={onPressLogout} placeholder={""} />
+            <UserButton icon={'heart'} iconSize={24} onPressAction={()=>{
+                setModal(()=>{return ()=><FavoriteModal user={userInstance} />});
+                setModalName("Favorite");
+            }} placeholder={"Favorite"} />
             <UserButton icon={''} onPressAction={onPressLogout} placeholder={""} />
         </View>
         <View style={{gap: 5}}>

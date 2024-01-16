@@ -1,4 +1,13 @@
-import {FlatList, Image, ScrollView, StyleProp, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+    FlatList,
+    Image,
+    ScrollView,
+    StyleProp,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
 import {useEffect, useRef, useState} from "react";
 import {updateProfile} from 'firebase/auth'
 import {auth} from "../firebase";
@@ -13,10 +22,13 @@ import Input from "../components/Input";
 import {styles} from "../styles/authorization";
 import ContinueButton from "../components/ContinueButton";
 
+import {ref, uploadBytes, getDownloadURL} from 'firebase/storage'
+import {imgStorage} from "../firebase";
+import {v4} from 'uuid'
 const updateName = async ({user, name}) => {
     await updateProfile(user,{displayName: name});
 }
-const updateImage = async({userInstance, user})=>{
+const updateImage = async({userInstance, setImage})=>{
     try {
         const options:any = {
             selectionLimit: 1,
@@ -27,9 +39,17 @@ const updateImage = async({userInstance, user})=>{
             quality: 0.1,
         };
         const res = await launchImageLibrary(options);
-        // const uri = res?.assets && res.assets[0].base64;
-       // await updateProfile(userInstance, {photoURL: "https://freight.cargo.site/t/original/i/c511067eb5c64bbe81b3c66c11edbd2533233dcaff898525f899d158680a76ce/gasmask_someart_friendly_faces.jpg"});
-        // user.photoURL=uri;
+        const uri = res?.assets && res.assets[0].uri;
+        const imgs = ref(imgStorage,`profile/pictures${v4()}`);
+        const img = await fetch(uri);
+        const bytes = await img.blob();
+        uploadBytes(imgs, bytes).then(data =>
+            getDownloadURL(data.ref).then(
+                url => updateProfile(userInstance, {photoURL: url}).then(
+                    ()=>{setImage(url);}
+                )
+            )
+        )
     } catch (e){
         console.log(e);
     }
@@ -42,9 +62,9 @@ const HeaderText = ({text,style, ...props}:{text:string, style?:any})=>{
         {text}
     </Text>
 }
-const UserIcon = ({user, userInstance}) => {
-    return <TouchableOpacity style={{flexDirection: 'row'}} onPress={()=>{updateImage({userInstance:userInstance, user: user});}}>
-        {user?.photoURL || userInstance?.photoURL ? <Image style={profileStyles.userPhoto} source={{uri: userInstance.photoURL || user.photoURL}} /> : <Icon style={{alignItems:'center', justifyContent: 'center',padding:5,backgroundColor: '#aaa',borderRadius: 50}} name={'account'} size={86} />}
+const UserIcon = ({userInstance,userImage, setUserImage}) => {
+    return <TouchableOpacity style={{flexDirection: 'row'}} onPress={()=>{updateImage({userInstance:userInstance, setImage:setUserImage});}}>
+        {userImage ? <Image style={profileStyles.userPhoto} source={{uri: userImage}} /> : <Icon style={{alignItems:'center', justifyContent: 'center',padding:5,backgroundColor: '#aaa',borderRadius: 50}} name={'account'} size={86} />}
     <EvilIcon name={'gear'} style={{padding: 0, margin: 0, position:'absolute', right:-2,top:4}} color={"#8a7064"} size={24}/>
     </TouchableOpacity>
 }
@@ -57,7 +77,7 @@ const AnswerComponent =({text, isDisplayed})=>{
     </View>
 }
 
-const UserNameAndIcon = ({ userInfo, userInstance, userName, setUserName})=>{
+const UserNameAndIcon = ({userImage, setUserImage, userInfo, userInstance, userName, setUserName})=>{
 
     const userNameInput = useRef(null);
     const [isUserNameChanged, handleUsernameChange] = useState(false);
@@ -87,7 +107,7 @@ const UserNameAndIcon = ({ userInfo, userInstance, userName, setUserName})=>{
         }
     }
     return <View style={{flexDirection: 'row', alignItems:'center',width:'100%'}}>
-        <UserIcon user={userInfo} userInstance={userInstance} />
+        <UserIcon userImage={userImage} setUserImage={setUserImage} userInstance={userInstance} />
         <View style={{gap: 5, flexGrow: 1,alignItems:'center', justifyContent: 'center'}}>
             <View style={{flexDirection: 'row'}}>
                 <TextInput ref={userNameInput}  onSubmitEditing={()=>{handleUserNameChangeSubmit()}} value={userName} onChangeText={(text)=>{(text.length<13 || text.length < userName.length) && setUserName(text)}} style={profileStyles.headerText} />
@@ -174,7 +194,7 @@ const FaqModal = () => {
     </View>
 }
 const InfoModal = ({props}) =>{
-    const {userInstance, userInfo, userName, setUserName} = props;
+    const {userInstance, userInfo, userName, setUserName,setUserImage, userImage} = props;
     const [userModalName, setUserModalName]=useState(userName);
     const handleModalNameChange = (name:string) =>{
         setUserModalName(name);
@@ -182,7 +202,7 @@ const InfoModal = ({props}) =>{
     }
     return <ScrollView style={{flex: 1}}>
         <View style={{gap: 15, flex: 1,justifyContent:'center', marginTop:14}}>
-        <UserNameAndIcon userInfo={userInfo} userInstance={userInstance} userName={userModalName} setUserName={handleModalNameChange}/>
+        <UserNameAndIcon setUserImage={setUserImage} userImage={userImage} userInfo={userInfo} userInstance={userInstance} userName={userModalName} setUserName={handleModalNameChange}/>
         <View>
             <HeaderText text={"Email"} />
         <Input onChangeAction={()=>{}} placeholder={userInfo?.email || 'Nothing'} readOnly={true} style={{...styles.emailInput, backgroundColor: '#eee'}}/>
@@ -191,6 +211,10 @@ const InfoModal = ({props}) =>{
             <HeaderText text={"Phone Number"} />
             <Input onChangeAction={()=>{}} placeholder={userInfo?.phoneNumber || '+0-(123)-45-678-9123'} readOnly={true} style={{...styles.emailInput, backgroundColor: '#eee'}}/>
         </View>
+            <View>
+                <HeaderText text={"Location"} />
+                <Input onChangeAction={()=>{}} placeholder={'Kiyv, st. Vasylya Stusa 35B'} readOnly={true} style={{...styles.emailInput, backgroundColor: '#eee'}}/>
+            </View>
         <View>
             <HeaderText text={"Bio"} />
             <Input onChangeAction={()=>{}} placeholder={userInfo?.phoneNumber || 'Bio'} multiline={true} style={{...styles.emailInput, backgroundColor: '#eee'}}/>
@@ -360,7 +384,7 @@ const FavoriteModal = ({user}) =>{
 function WrapperComponent({ItemModal, setModal, modalName}) {
     return (
             <Modal propagateSwipe style={{padding: 0, margin: 0, flex:1}} swipeDirection="left" onSwipeComplete={()=>{setModal(null)}} animationInTiming={600} animationOutTiming={500} animationOut={'slideOutDown'} coverScreen={false} backdropOpacity={0} isVisible={!!ItemModal} onBackdropPress={() => setModal(null)}>
-                <View style={{backgroundColor: '#fff',borderRadius:0, paddingTop:20,paddingHorizontal:10, width:"100%", height: '100%'}}>
+                <View style={{backgroundColor: '#fff',borderRadius:0,paddingHorizontal:10,paddingTop:20, width:"100%", height: '100%'}}>
                     <View style={{flexDirection:'row', alignItems:'center'}}>
                         <TouchableOpacity style={{backgroundColor:'#ccc',borderRadius:50,width:40,height:40,alignItems:'center',justifyContent:'center', marginRight: 32}} onPress={()=>setModal(null)}>
                             <Icon name={'chevron-left'} size={32} />
@@ -392,7 +416,7 @@ const Profile = ({user, setUser}) => {
     const [userName, setUserName] = useState('');
     const [CustomModal, setModal] = useState(null);
     const [currentModalName, setModalName] = useState('');
-
+    const [userImage, setUserImage] = useState(userInstance.photoURL || user.photoURL ||'');
     const onPressLogout = () => {
             auth.signOut();
             setUser(null);
@@ -405,13 +429,13 @@ const Profile = ({user, setUser}) => {
         setUserName((userName)=>name);
         }, [user]);
     return <><WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
-        <ScrollView style={{flex:1,backgroundColor:'#fff',marginTop:24}}>
+        <ScrollView style={{flex:1,backgroundColor:'#fff',paddingTop:24}}>
         <View style={{justifyContent:'center', flex: 1, width:350, alignSelf: 'center', maxWidth: '100%', alignItems: 'center', gap: 25,marginHorizontal:15}}>
-            <UserNameAndIcon userInfo={userInfo} userInstance={userInstance} userName={userName} setUserName={setUserName}/>
+            <UserNameAndIcon userInfo={userInfo} setUserImage={setUserImage} userInstance={userInstance} userName={userName} userImage={userImage} setUserName={setUserName}/>
         <View style={{gap: 5}}>
 
             <UserButton icon={'account'} onPressAction={()=>{
-                setModal(()=>{return ()=><InfoModal props={{userInstance, setUserName, userName, userInfo}}/>})
+                setModal(()=>{return ()=><InfoModal props={{userInstance, setUserName, userName, userInfo,setUserImage,userImage}}/>})
                 setModalName("Personal Info");
             }} placeholder={"Personal Info"} />
             <UserButton icon={'progress-question'} iconSize={24} onPressAction={()=>{

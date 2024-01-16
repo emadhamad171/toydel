@@ -11,6 +11,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import 'react-native-gesture-handler';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import Home from "./src/screens/Home";
 
 const Tab = createBottomTabNavigator();
 const screenOptions = {
@@ -42,9 +43,9 @@ export default function App() {
             <StatusBar style="auto" hidden={true}/>
         {user ?
         <NavigationContainer>
-            <Tab.Navigator screenOptions={screenOptions}>
+            <Tab.Navigator initialRouteName={'Profile'} screenOptions={screenOptions}>
                 <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{
-                        return <Icon name={'apple-keyboard-command'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
+                        return <Icon name={'apple-keyboard-command'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={Home} />
                 <Tab.Screen name="Cart" options={{tabBarIcon: ({focused})=>{
                         return <Icon name={'format-list-bulleted'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
                 <Tab.Screen name="Notifications" options={{tabBarIcon: ({focused})=>{
@@ -54,6 +55,7 @@ export default function App() {
             </Tab.Navigator>
         </NavigationContainer>
             : <Authorization />}
+            <Toast />
         </>
     );
 }

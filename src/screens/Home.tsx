@@ -23,6 +23,9 @@ const ItemComponent = ({setFavoriteToyList,item, isFavorite}) =>{
     const addItemToFavoriteList = () => {
         setFavoriteToyList((prevValue)=>{
             const updatedList = [...prevValue, item.id];
+            console.log(item.id);
+            console.log(prevValue);
+            console.log(updatedList);
             db.collection('users').doc(auth.currentUser.uid).update({favoriteList: updatedList})
             return updatedList;
         });
@@ -128,10 +131,10 @@ const loadData = async ({setListItems,setRefreshing, setFavoriteList, userID}) =
     const itemRef=collection(fStorage, 'items');
     const favoriteItemsRef= query(collection(fStorage, "users"), where('id','==',userID));
     getDocs(itemRef).then((docs)=>{
-        const fetchedData = docs.docs.map(el=>{return {...el.data(),id: el.id}});
+        const fetchedData = docs.docs.map(el=>{return {...el.data()}});
         setListItems(fetchedData);
         getDocs(favoriteItemsRef).then((favoriteDocs)=>{
-            const fetchedFavoriteData :{id:string, favoriteList:string[]} = favoriteDocs.docs.map(el=>{return {...el.data(), id:el.id}});
+            const fetchedFavoriteData :{id:string, favoriteList:string[]} = favoriteDocs.docs.map(el=>{return {...el.data()}});
             setFavoriteList(fetchedFavoriteData[0].favoriteList);
             setRefreshing(false);
         })
@@ -144,7 +147,7 @@ const [pageNumber, setPageNumber] = useState(0);
 const [listItems, setListItems] = useState([]);
 const [isRefreshing, setRefreshing] = useState(true);
 const [userID, setUserID] = useState(auth.currentUser.uid);
-const [favoriteList, setFavoriteList] = useState<string[]>(['']);
+const [favoriteList, setFavoriteList] = useState<string[]>([]);
     useEffect(() => {
         LogBox.ignoreLogs(["VirtualizedLists should never be nested"])
         loadData({setListItems, setRefreshing, setFavoriteList, userID})
@@ -154,7 +157,7 @@ const [favoriteList, setFavoriteList] = useState<string[]>(['']);
         setRefreshing(true);
         loadData({setListItems,setRefreshing, setFavoriteList, userID});
     }, []);
-    return <View><HeaderComponent />
+    return <View style={{paddingBottom: 50}}><HeaderComponent />
     <ScrollView refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
     }>

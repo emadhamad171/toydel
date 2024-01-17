@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import {useEffect, useRef, useState} from "react";
 import {updateProfile} from 'firebase/auth'
-import {auth, fStorage} from "../firebase";
+import {auth, db, fStorage} from "../firebase";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import EvilIcon from 'react-native-vector-icons/FontAwesome'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -344,7 +344,11 @@ const loadData = async ({setFavoriteList, userID}) =>{
 const FavoriteComponent = ({list,setFavoriteToyList,item}) =>{
     const {name, brand, category, id ,description, price, rentPrice, isIncludedInPlan, photo} = item;
     const removeItemFromFavoriteList = () =>{
-        setFavoriteToyList(list.filter((listItem)=>{if(listItem.id!==id) return listItem;}))
+        setFavoriteToyList((prevValue)=>{
+            const updatedList =prevValue.filter((listItem)=>{ if(listItem.id !== item.id) return listItem});
+            db.collection('users').doc(auth.currentUser.uid).update({favoriteList: updatedList.map((item=>item.id))})
+            return updatedList;
+        })
     }
     return <View style={{flexDirection: 'row', padding: 10, borderRadius: 15}}>
         <TouchableOpacity onPress={removeItemFromFavoriteList} style={{position: 'absolute', zIndex: 4, top: 15, left:15}}><Icon name={'heart'} style={{zIndex: 4, borderRadius: 50, padding: 5, backgroundColor: '#ccc'}} color={'#522d7e'} size={22}/></TouchableOpacity>
@@ -372,7 +376,7 @@ const FavoriteModal = ({user}) =>{
 }
 function WrapperComponent({ItemModal, setModal, modalName}) {
     return (
-            <Modal propagateSwipe style={{padding: 0, margin: 0, flex:1}} swipeDirection="left" onSwipeComplete={()=>{setModal(null)}} animationInTiming={600} animationOutTiming={500} animationOut={'slideOutDown'} coverScreen={false} backdropOpacity={0} isVisible={!!ItemModal} onBackdropPress={() => setModal(null)}>
+            <Modal propagateSwipe style={{padding: 0, margin: 0, flex:1}}  animationInTiming={600} animationOutTiming={500} animationOut={'slideOutDown'} coverScreen={false} backdropOpacity={0} isVisible={!!ItemModal} onBackdropPress={() => setModal(null)}>
                 <View style={{backgroundColor: '#fff',borderRadius:0,paddingHorizontal:10,paddingTop:20, width:"100%", height: '100%'}}>
                     <View style={{flexDirection:'row', alignItems:'center'}}>
                         <TouchableOpacity style={{backgroundColor:'#ccc',borderRadius:50,width:40,height:40,alignItems:'center',justifyContent:'center', marginRight: 32}} onPress={()=>setModal(null)}>

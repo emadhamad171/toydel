@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import {useEffect, useRef, useState} from "react";
 import {updateProfile} from 'firebase/auth'
-import {auth} from "../firebase";
+import {auth, fStorage} from "../firebase";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import EvilIcon from 'react-native-vector-icons/FontAwesome'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -25,6 +25,7 @@ import ContinueButton from "../components/ContinueButton";
 import {ref, uploadBytes, getDownloadURL} from 'firebase/storage'
 import {imgStorage} from "../firebase";
 import {v4} from 'uuid'
+import {collection, getDocs, query, where} from "firebase/firestore";
 const updateName = async ({user, name}) => {
     await updateProfile(user,{displayName: name});
 }
@@ -327,7 +328,19 @@ const PlansModal = ({user}) => {
     <FlatList style={{paddingBottom:14}} data={plans} renderItem={({item})=><PlanComponent backgroundColor={item.backgroundColor} price={item.price} name={item.name} description={item.description} features={item.features} PlanSign={item.Sign} />} />
     </View>
 }
-
+const loadData = async ({setFavoriteList, userID}) =>{
+    const favoriteItemsRef= query(collection(fStorage, "users"), where('id','==',userID));
+        getDocs(favoriteItemsRef).then((favoriteDocsIds)=>{
+            const fetchedFavoriteData :{id:string, favoriteList:string[]} = favoriteDocsIds.docs.map(el=>{return {...el.data(), id:el.id}});
+            const itemRef=query(collection(fStorage, "items"), where('id','in',fetchedFavoriteData[0].favoriteList));
+            getDocs(itemRef).then((favoriteItems)=>{
+                const fetchedItems = favoriteItems.docs.map(el=>{
+                    return {...el.data(), id: el.id};
+                });
+                setFavoriteList(fetchedItems);
+            })
+        });
+}
 const FavoriteComponent = ({list,setFavoriteToyList,item}) =>{
     const {name, brand, category, id ,description, price, rentPrice, isIncludedInPlan, photo} = item;
     const removeItemFromFavoriteList = () =>{
@@ -348,35 +361,11 @@ const FavoriteComponent = ({list,setFavoriteToyList,item}) =>{
 }
 
 const FavoriteModal = ({user}) =>{
-    //TODO: Get prom database favorite positions
+    const [favoriteToyList, setFavoriteToyList] = useState(null);
 
-    const favoriteList = [
-        {
-            name: 'Big toy',
-            brand: 'Antonio Glinlomessi',
-            id: 123,
-            category: ['Fun', 'Toys', 'Smart'],
-            description: 'Just a big toy. Have fun with this big toy, if you know what i mean, you should know yes?',
-            price: 1500,
-            isIncludedInPlan: true,
-            rentPrice: 400,
-            photo: 'https://ua.all.biz/img/ua/catalog/27767876.jpeg'
-        },
-        {
-            name: 'Some very long name idk and some text here',
-            brand: 'Georgio Pedrachely',
-            id: 3,
-            category: ['Fun'],
-            description: 'Just a big toy. Have fun with this big toy, if you know what i mean...',
-            price: 1500,
-            isIncludedInPlan: true,
-            rentPrice: 400,
-            photo: 'https://ua.all.biz/img/ua/catalog/27767876.jpeg'
-        }
-    ]
-
-    const [favoriteToyList, setFavoriteToyList] = useState(favoriteList);
-
+    useEffect(() => {
+        loadData({setFavoriteList: setFavoriteToyList, userID: user.uid})
+    }, []);
     return <View style={{flex: 1, marginTop: 14}}>
         <FlatList data={favoriteToyList} renderItem={({item})=><FavoriteComponent list={favoriteToyList} setFavoriteToyList={setFavoriteToyList} item={item} /> } />
     </View>

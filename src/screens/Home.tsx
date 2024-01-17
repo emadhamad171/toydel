@@ -6,18 +6,32 @@ import {useCallback, useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import {launchImageLibrary} from "react-native-image-picker";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
-import {fStorage, imgStorage} from "../firebase";
+import {auth, db, fStorage, imgStorage} from "../firebase";
 import {v4} from 'uuid'
 import ContinueButton from "../components/ContinueButton";
-import {addDoc, collection,getDocs} from 'firebase/firestore'
+import {addDoc, collection,getDocs,query, where} from 'firebase/firestore'
 import Toast from "react-native-toast-message";
-const FavoriteComponent = ({list,setFavoriteToyList,item}) =>{
+const ItemComponent = ({setFavoriteToyList,item, isFavorite}) =>{
     const {name, brand, category, id ,description, price, rentPrice, isIncludedInPlan, photo} = item;
     const removeItemFromFavoriteList = () =>{
-        setFavoriteToyList(list.filter((listItem)=>{if(listItem.id!==id) return listItem;}))
+        setFavoriteToyList((prevValue)=>{
+            const updatedList =prevValue.filter((listItem)=>{ if(listItem !== item.id) return listItem});
+            db.collection('users').doc(auth.currentUser.uid).update({favoriteList: updatedList})
+            return updatedList;
+        })
+    }
+    const addItemToFavoriteList = () => {
+        setFavoriteToyList((prevValue)=>{
+            const updatedList = [...prevValue, item.id];
+            db.collection('users').doc(auth.currentUser.uid).update({favoriteList: updatedList})
+            return updatedList;
+        });
+    }
+    const handleFavoriteClick = () => {
+        isFavorite ? removeItemFromFavoriteList() : addItemToFavoriteList();
     }
     return <View style={{flexDirection: 'row', padding: 10, borderRadius: 15}}>
-        <TouchableOpacity onPress={removeItemFromFavoriteList} style={{position: 'absolute', zIndex: 4, top: 15, left:15}}><Icon name={'heart-outline'} style={{zIndex: 4, borderRadius: 50, padding: 5, backgroundColor: '#ccc'}} color={'#522d7e'} size={22}/></TouchableOpacity>
+        <TouchableOpacity onPress={handleFavoriteClick} style={{position: 'absolute', zIndex: 4, top: 15, left:15}}><Icon name={isFavorite ? 'heart' : 'heart-outline'} style={{zIndex: 4, borderRadius: 50, padding: 5, backgroundColor: '#ccc'}} color={'#522d7e'} size={22}/></TouchableOpacity>
         <Image style={{width: 150, height: 150, borderRadius: 10, zIndex:2,borderColor:'#cccccc', borderWidth: 2}} source={{uri: photo}} />
         <View style={{backgroundColor:'#cccccc',borderColor:'#cccccc', borderWidth: 1,paddingRight: 15, width:'100%', maxWidth: 220, marginLeft: -10, borderTopRightRadius: 15, borderBottomRightRadius: 10, paddingLeft:20, paddingTop: 10}}>
             <Text numberOfLines={1} ellipsizeMode={"tail"} style={{fontSize: 16,color: '#522d7e', alignSelf: 'flex-start'}}>{name}</Text>
@@ -25,7 +39,7 @@ const FavoriteComponent = ({list,setFavoriteToyList,item}) =>{
             <View style={{width: '100%', borderStyle: "dashed", borderWidth: 1, borderColor: '#555', borderRadius: 5, marginVertical: 8}}></View>
             <Text style={{fontSize: 12}}>Brand: {brand} </Text>
             <Text numberOfLines={1} ellipsizeMode={'clip'} style={{fontSize: 12}}>Category: {category.join(', ')}</Text>
-            <Text style={{fontSize: 12, color: '#1f4f1a'}}>{isIncludedInPlan ? 'Included in base plan' : 'You can order it from us'}</Text>
+            <Text style={{fontSize: 12, color: isIncludedInPlan ? '#1f4f1a' : '#51297e'}}>{isIncludedInPlan ? 'Included in base plan' : 'You can order it from us'}</Text>
         </View>
     </View>
 }
@@ -110,12 +124,17 @@ const SearchComponent = () =>{
     </View>
 }
 
-const loadData = async ({setListItems,setRefreshing = (state:boolean)=>{}}) =>{
+const loadData = async ({setListItems,setRefreshing, setFavoriteList, userID}) =>{
     const itemRef=collection(fStorage, 'items');
+    const favoriteItemsRef= query(collection(fStorage, "users"), where('id','==',userID));
     getDocs(itemRef).then((docs)=>{
         const fetchedData = docs.docs.map(el=>{return {...el.data(),id: el.id}});
         setListItems(fetchedData);
-        setRefreshing(false);
+        getDocs(favoriteItemsRef).then((favoriteDocs)=>{
+            const fetchedFavoriteData :{id:string, favoriteList:string[]} = favoriteDocs.docs.map(el=>{return {...el.data(), id:el.id}});
+            setFavoriteList(fetchedFavoriteData[0].favoriteList);
+            setRefreshing(false);
+        })
     })
 
 }
@@ -124,25 +143,23 @@ const Home = () =>{
 const [pageNumber, setPageNumber] = useState(0);
 const [listItems, setListItems] = useState([]);
 const [isRefreshing, setRefreshing] = useState(true);
-
+const [userID, setUserID] = useState(auth.currentUser.uid);
+const [favoriteList, setFavoriteList] = useState<string[]>(['']);
     useEffect(() => {
         LogBox.ignoreLogs(["VirtualizedLists should never be nested"])
-        loadData({setListItems, setRefreshing})
+        loadData({setListItems, setRefreshing, setFavoriteList, userID})
     }, []);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        loadData({setListItems,setRefreshing});
-        // setTimeout(() => {
-        //     setRefreshing(false);
-        // }, 2000);
+        loadData({setListItems,setRefreshing, setFavoriteList, userID});
     }, []);
     return <View><HeaderComponent />
     <ScrollView refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
     }>
         <SearchComponent />
-        {listItems.map(item=><FavoriteComponent key={item.id} item={item} list={listItems} setFavoriteToyList={setListItems} />)}
+        {listItems.map(item=><ItemComponent key={item.id} item={item} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)}/>)}
     </ScrollView>
     </View>
 }

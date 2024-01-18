@@ -35,6 +35,9 @@ export default function App() {
                         if(!fetchedUserInstance.length){
                             const userDBInstanceCreate = {
                                 id: userInstance.uid,
+                                name: userInstance.displayName,
+                                email: userInstance?.email,
+                                phoneNumber: userInstance?.phoneNumber,
                                 favoriteList: ['']
                             }
                             db.collection('users').doc(userInstance.uid).set(userDBInstanceCreate);

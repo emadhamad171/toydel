@@ -11,6 +11,7 @@ import {v4} from 'uuid'
 import ContinueButton from "../components/ContinueButton";
 import {addDoc, collection,getDocs,query, where} from 'firebase/firestore'
 import Toast from "react-native-toast-message";
+import Modal from "react-native-modal";
 const ItemComponent = ({setFavoriteToyList,item, isFavorite}) =>{
     const {name, brand, category, id ,description, price, rentPrice, isIncludedInPlan, photo} = item;
     const removeItemFromFavoriteList = () =>{
@@ -23,9 +24,6 @@ const ItemComponent = ({setFavoriteToyList,item, isFavorite}) =>{
     const addItemToFavoriteList = () => {
         setFavoriteToyList((prevValue)=>{
             const updatedList = [...prevValue, item.id];
-            console.log(item.id);
-            console.log(prevValue);
-            console.log(updatedList);
             db.collection('users').doc(auth.currentUser.uid).update({favoriteList: updatedList})
             return updatedList;
         });
@@ -117,12 +115,14 @@ const HeaderComponent = ({}) =>{
         </View>
     </View>
 }
-const SearchComponent = () =>{
-
+const SearchComponent = ({fetchedListItems, setListItems,searchString, setSearch}) =>{
     return <View style={{backgroundColor: '#a333ff', borderBottomStartRadius:10, borderBottomEndRadius:10,width: '100%', paddingBottom: 50, paddingTop:30}}>
         <View style={{flexDirection: 'row', position:'relative', maxWidth: 330,display: 'flex',alignSelf: 'center'}}>
-        <Input placeholder={"Find your toy."} onChangeAction={(text:string)=>{}} value={''} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
-        <Icon name={'magnify'} size={24} style={{position:'absolute', right: 5, bottom: '25%'}}/>
+        <Input placeholder={"Find your toy."} onChangeAction={(text:string)=>{
+            setSearch(()=>text);
+            setListItems((prevState)=>fetchedListItems.filter(item=>{return item&&item.name&&(item.name.toLowerCase().includes(text.toLowerCase()) ||item.description.toLowerCase().includes(text.toLowerCase()) )}));
+        }} value={searchString} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
+            <TouchableOpacity><Icon name={'magnify'} size={24} style={{position:'absolute', right: 5, bottom: '25%'}}/></TouchableOpacity>
         </View>
     </View>
 }
@@ -142,26 +142,88 @@ const loadData = async ({setListItems,setRefreshing, setFavoriteList, userID}) =
 
 }
 
+const CategoryItem = ({name, isSelected, onPressAction}) => {
+    return <TouchableOpacity onPress={()=>onPressAction(isSelected)}><Text style={{fontSize: 18}}> <Icon name={isSelected? 'checkbox-marked-outline' : 'checkbox-blank-outline'} size={24}/> {name}</Text></TouchableOpacity>
+}
+const FilterModal = ({setModal, setListItems,fetchedList, setSelectedCategory, selectedCategories}) =>{
+    const [categories, setCategories] = useState<string[]>(selectedCategories);
+    const removeCategory = (name : string)=> {setCategories(categories.filter(el=>{if(el!=name) return el;}))};
+    const addCategory = (name : string) => {setCategories(prevState => [...prevState, name])};
+
+    return <View>
+        <CategoryItem name={'Fun'} isSelected={categories.includes('Fun')} onPressAction={(isSelected:boolean)=>{isSelected ? removeCategory('Fun') : addCategory('Fun')}}/>
+        <CategoryItem name={'Games'} isSelected={categories.includes('Games')} onPressAction={(isSelected:boolean)=>{isSelected ? removeCategory('Games') : addCategory('Games')}}/>
+        <TouchableOpacity style={{paddingVertical: 5,paddingHorizontal:10, alignSelf: 'center', borderRadius: 25, borderWidth: 1}} onPress={()=>{
+            if(categories.length) {
+                setListItems((prevState) => {
+                    return fetchedList.filter(item => {
+                            if (item.category.some(category => categories.includes(category))) return item;
+                        }
+                    )
+                });
+            } else {
+                setListItems(fetchedList);
+            }
+            setSelectedCategory(categories);
+            setModal(null);
+        }}>
+            <Text style={{fontSize: 24}}>Filter</Text>
+        </TouchableOpacity>
+    </View>;
+}
+function WrapperComponent({ItemModal, setModal, modalName}) {
+    return (
+        <Modal propagateSwipe style={{padding: 0, margin: 0, flex:1}}  animationInTiming={600} animationOutTiming={500} animationOut={'slideOutDown'} coverScreen={false} backdropOpacity={0} isVisible={!!ItemModal} onBackdropPress={() => setModal(null)}>
+            <View style={{backgroundColor: '#fff',borderRadius:0,paddingHorizontal:10,paddingTop:20, width:"100%", height: '100%'}}>
+                <View style={{flexDirection:'row', alignItems:'center'}}>
+                    <TouchableOpacity style={{backgroundColor:'#ccc',borderRadius:50,width:40,height:40,alignItems:'center',justifyContent:'center', marginRight: 32}} onPress={()=>setModal(null)}>
+                        <Icon name={'chevron-left'} size={32} />
+                    </TouchableOpacity>
+                    <Text style={{fontSize: 24}}>{modalName}</Text>
+                </View>
+                {!!ItemModal && <ItemModal />}
+            </View>
+        </Modal>
+    );
+}
 const Home = () =>{
 const [pageNumber, setPageNumber] = useState(0);
+const [fetchedListItems, setFetchedListItems] = useState([]);
 const [listItems, setListItems] = useState([]);
 const [isRefreshing, setRefreshing] = useState(true);
 const [userID, setUserID] = useState(auth.currentUser.uid);
 const [favoriteList, setFavoriteList] = useState<string[]>([]);
+const [selectedCategories, setChoosedCategory] = useState<string[]>([]);
+const [CustomModal, setModal] = useState(null);
+const [currentModalName, setModalName] = useState('');
+const [searchString, setSearch] = useState('');
     useEffect(() => {
         LogBox.ignoreLogs(["VirtualizedLists should never be nested"])
-        loadData({setListItems, setRefreshing, setFavoriteList, userID})
+        loadData({setListItems: (items) => {setFetchedListItems(items); setListItems(items)}, setRefreshing, setFavoriteList, userID})
     }, []);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        loadData({setListItems,setRefreshing, setFavoriteList, userID});
+        loadData({setListItems: (items)=> {setFetchedListItems(items)},setRefreshing, setFavoriteList, userID});
     }, []);
-    return <View style={{paddingBottom: 50}}><HeaderComponent />
+
+    return <View style={{paddingBottom: 50}}>
+        <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
+        <HeaderComponent />
     <ScrollView refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
     }>
-        <SearchComponent />
+        <SearchComponent setListItems={setListItems} fetchedListItems={fetchedListItems} setSearch={setSearch} searchString={searchString}/>
+        <View style={{flexDirection:'row', flexGrow: 1, alignItems: 'center',justifyContent: 'space-between'}}>
+        <Text style={{marginTop:10,marginLeft: 10, fontSize: 18}}>Toys</Text>
+        <TouchableOpacity style={{alignSelf: 'flex-end', flexDirection:'row',alignItems:'center', marginRight: 15, marginTop:10, borderWidth:1,padding:5, borderRadius: 10}} onPress={()=>{
+            setModal(()=>{return ()=><FilterModal setModal={setModal} setListItems={setListItems} fetchedList={fetchedListItems} selectedCategories={selectedCategories} setSelectedCategory={setChoosedCategory}/>})
+            setModalName("Filter");
+        }}>
+            <Text> <Icon name={'filter-variant'} size={24}/> </Text>
+            <Text>Filter</Text>
+        </TouchableOpacity>
+        </View>
         {listItems.map(item=><ItemComponent key={item.id} item={item} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)}/>)}
     </ScrollView>
     </View>

@@ -1,5 +1,5 @@
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore";
-import {fStorage, imgStorage} from "./index";
+import {db, fStorage, imgStorage} from "./index";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {updateProfile} from "firebase/auth";
 import {v4} from 'uuid'
@@ -44,6 +44,10 @@ export const addItem = async({uri, item})=>{
 export const updateUserImage = async ({userInstance, uri}) => {
     const imageURL = await uploadImage({uri, path: 'profile/pictures/'});
     await updateProfile(userInstance, {photoURL: imageURL});
+}
+
+export const updateItemInDocFromCollection = async({updatedItem, collectionPath, docName}) =>{
+    await db.collection(collectionPath).doc(docName).update(updatedItem);
 }
 
 export const updateUserName = async ({user, name}) => {

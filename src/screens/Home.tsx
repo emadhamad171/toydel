@@ -1,58 +1,27 @@
-import {RefreshControl, ScrollView, TouchableOpacity, View, Text, Image, FlatList, LogBox} from "react-native";
+import {RefreshControl, ScrollView, TouchableOpacity, View, Text, LogBox} from "react-native";
 import Input from "../components/Input";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import {useCallback, useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
-import {auth, db, fStorage, imgStorage} from "../firebase";
-import ContinueButton from "../components/ContinueButton";
-import {loadUser, loadItems, addItem} from '../firebase/firebaseAPI'
+import {auth} from "../firebase";
+import {loadUser, loadItems, addItem, updateItemInDocFromCollection} from '../firebase/firebaseAPI'
 import WrapperComponent from "../components/WrapperComponent";
-const ItemComponent = ({setFavoriteToyList,item, isFavorite}) =>{
-    const {name, brand, category, id ,description, price, rentPrice, isIncludedInPlan, photo} = item;
-    const removeItemFromFavoriteList = () =>{
-        setFavoriteToyList((prevValue)=>{
-            const updatedList =prevValue.filter((listItem)=>{ if(listItem !== item.id) return listItem});
-            db.collection('users').doc(auth.currentUser.uid).update({favoriteList: updatedList})
-            return updatedList;
-        })
-    }
-    const addItemToFavoriteList = () => {
-        setFavoriteToyList((prevValue)=>{
-            const updatedList = [...prevValue, item.id];
-            db.collection('users').doc(auth.currentUser.uid).update({favoriteList: updatedList})
-            return updatedList;
-        });
-    }
-    const handleFavoriteClick = () => {
-        isFavorite ? removeItemFromFavoriteList() : addItemToFavoriteList();
-    }
-    return <View style={{flexDirection: 'row', padding: 10, borderRadius: 15}}>
-        <TouchableOpacity onPress={handleFavoriteClick} style={{position: 'absolute', zIndex: 4, top: 15, left:15}}><Icon name={isFavorite ? 'heart' : 'heart-outline'} style={{zIndex: 4, borderRadius: 50, padding: 5, backgroundColor: '#ccc'}} color={'#522d7e'} size={22}/></TouchableOpacity>
-        <Image style={{width: 150, height: 150, borderRadius: 10, zIndex:2,borderColor:'#cccccc', borderWidth: 2}} source={{uri: photo}} />
-        <View style={{backgroundColor:'#cccccc',borderColor:'#cccccc', borderWidth: 1,paddingRight: 15, width:'100%', maxWidth: 220, marginLeft: -10, borderTopRightRadius: 15, borderBottomRightRadius: 10, paddingLeft:20, paddingTop: 10}}>
-            <Text numberOfLines={1} ellipsizeMode={"tail"} style={{fontSize: 16,color: '#522d7e', alignSelf: 'flex-start'}}>{name}</Text>
-            <Text numberOfLines={2} ellipsizeMode={'tail'} style={{fontSize: 12, color: '#333',marginTop: 5}}>{description}</Text>
-            <View style={{width: '100%', borderStyle: "dashed", borderWidth: 1, borderColor: '#555', borderRadius: 5, marginVertical: 8}}></View>
-            <Text style={{fontSize: 12}}>Brand: {brand} </Text>
-            <Text numberOfLines={1} ellipsizeMode={'clip'} style={{fontSize: 12}}>Category: {category.join(', ')}</Text>
-            <Text style={{fontSize: 12, color: isIncludedInPlan ? '#1f4f1a' : '#51297e'}}>{isIncludedInPlan ? 'Included in base plan' : 'You can order it from us'}</Text>
-        </View>
-    </View>
-}
-const AddItem = ({setListItems,listItems}) => {
-    const [name, setName] = useState('');
-    const [description, setDesc] = useState('');
-    const [price, setPrice] = useState('');
-    const [rate, setRate] = useState('');
-    return <View style={{alignItems: 'center', gap: 5, padding: 10, borderRadius: 10, backgroundColor: '#aaa', marginHorizontal: 10, marginTop: 10}}>
-        <Input placeholder={"Name"} onChangeAction={(text:string)=>{setName(text)}} value={name} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
-        <Input placeholder={"Description"} onChangeAction={(text:string)=>{setDesc(text)}} value={description} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
-        <Input placeholder={"Price"} onChangeAction={(text:string)=>{setPrice(text)}} value={price} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
-        <Input placeholder={"Rate: from 1 to 5"} onChangeAction={(text:string)=>{setRate(text)}} value={rate} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
-        <ContinueButton handleContinueClick={()=>{addItem({name, description, price, rate, setListItems, listItems,})}} />
-    </View>
-}
+import ItemComponent from "../components/ItemComponent";
+
+// const AddItem = ({setListItems,listItems}) => {
+//     const [name, setName] = useState('');
+//     const [description, setDesc] = useState('');
+//     const [price, setPrice] = useState('');
+//     const [rate, setRate] = useState('');
+//     return <View style={{alignItems: 'center', gap: 5, padding: 10, borderRadius: 10, backgroundColor: '#aaa', marginHorizontal: 10, marginTop: 10}}>
+//         <Input placeholder={"Name"} onChangeAction={(text:string)=>{setName(text)}} value={name} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
+//         <Input placeholder={"Description"} onChangeAction={(text:string)=>{setDesc(text)}} value={description} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
+//         <Input placeholder={"Price"} onChangeAction={(text:string)=>{setPrice(text)}} value={price} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
+//         <Input placeholder={"Rate: from 1 to 5"} onChangeAction={(text:string)=>{setRate(text)}} value={rate} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
+//         <ContinueButton handleContinueClick={()=>{addItem({name, description, price, rate, setListItems, listItems,})}} />
+//     </View>
+// }
 
 
 const HeaderComponent = ({}) =>{

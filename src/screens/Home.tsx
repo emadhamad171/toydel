@@ -4,14 +4,10 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import {useCallback, useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
-import {launchImageLibrary} from "react-native-image-picker";
-import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {auth, db, fStorage, imgStorage} from "../firebase";
-import {v4} from 'uuid'
 import ContinueButton from "../components/ContinueButton";
-import {addDoc, collection,getDocs,query, where} from 'firebase/firestore'
-import Toast from "react-native-toast-message";
-import Modal from "react-native-modal";
+import {loadUser, loadItems, addItem} from '../firebase/firebaseAPI'
+import WrapperComponent from "../components/WrapperComponent";
 const ItemComponent = ({setFavoriteToyList,item, isFavorite}) =>{
     const {name, brand, category, id ,description, price, rentPrice, isIncludedInPlan, photo} = item;
     const removeItemFromFavoriteList = () =>{
@@ -43,37 +39,6 @@ const ItemComponent = ({setFavoriteToyList,item, isFavorite}) =>{
             <Text style={{fontSize: 12, color: isIncludedInPlan ? '#1f4f1a' : '#51297e'}}>{isIncludedInPlan ? 'Included in base plan' : 'You can order it from us'}</Text>
         </View>
     </View>
-}
-const addItem = async({name, description, price, rate,listItems, setListItems})=>{
-    try {
-        const options:any = {
-            selectionLimit: 1,
-            mediaType: 'photo',
-            includeBase64: true,
-            width: 65,
-            height: 65,
-            quality: 0.1,
-        };
-        const res = await launchImageLibrary(options);
-        const uri = res?.assets && res.assets[0].uri;
-        const id = v4();
-        const imgs = ref(imgStorage,`item/pictures/${id}`);
-        const img = await fetch(uri);
-        const bytes = await img.blob();
-        uploadBytes(imgs, bytes).then(data =>
-            getDownloadURL(data.ref).then(
-                url=> {
-                    const itemRef = collection(fStorage, 'items');
-                    const item = {name,description,price,rate,brand:'aboba', category: ['Fun', 'MacBook'],isIncludedInPlan: true,photo: url,id: id };
-                    addDoc(itemRef,  item);
-                    Toast.show({type:'success', text1:'Added successfully'});
-                    setListItems([...listItems, item]);
-                }
-            )
-        )
-    } catch (e){
-        console.log(e);
-    }
 }
 const AddItem = ({setListItems,listItems}) => {
     const [name, setName] = useState('');
@@ -128,18 +93,12 @@ const SearchComponent = ({fetchedListItems, setListItems,searchString, setSearch
 }
 
 const loadData = async ({setListItems,setRefreshing, setFavoriteList, userID}) =>{
-    const itemRef=collection(fStorage, 'items');
-    const favoriteItemsRef= query(collection(fStorage, "users"), where('id','==',userID));
-    getDocs(itemRef).then((docs)=>{
-        const fetchedData = docs.docs.map(el=>{return {...el.data()}});
-        setListItems(fetchedData);
-        getDocs(favoriteItemsRef).then((favoriteDocs)=>{
-            const fetchedFavoriteData :{id:string, favoriteList:string[]} = favoriteDocs.docs.map(el=>{return {...el.data()}});
-            setFavoriteList(fetchedFavoriteData[0].favoriteList);
-            setRefreshing(false);
-        })
-    })
+    const user = await loadUser({userID});
+    const listItems = await loadItems({path: 'items'});
 
+    setListItems(listItems);
+    setFavoriteList(user[0].favoriteList);
+    setRefreshing(false);
 }
 
 const CategoryItem = ({name, isSelected, onPressAction}) => {
@@ -170,21 +129,6 @@ const FilterModal = ({setModal, setListItems,fetchedList, setSelectedCategory, s
             <Text style={{fontSize: 24}}>Filter</Text>
         </TouchableOpacity>
     </View>;
-}
-function WrapperComponent({ItemModal, setModal, modalName}) {
-    return (
-        <Modal propagateSwipe style={{padding: 0, margin: 0, flex:1}}  animationInTiming={600} animationOutTiming={500} animationOut={'slideOutDown'} coverScreen={false} backdropOpacity={0} isVisible={!!ItemModal} onBackdropPress={() => setModal(null)}>
-            <View style={{backgroundColor: '#fff',borderRadius:0,paddingHorizontal:10,paddingTop:20, width:"100%", height: '100%'}}>
-                <View style={{flexDirection:'row', alignItems:'center'}}>
-                    <TouchableOpacity style={{backgroundColor:'#ccc',borderRadius:50,width:40,height:40,alignItems:'center',justifyContent:'center', marginRight: 32}} onPress={()=>setModal(null)}>
-                        <Icon name={'chevron-left'} size={32} />
-                    </TouchableOpacity>
-                    <Text style={{fontSize: 24}}>{modalName}</Text>
-                </View>
-                {!!ItemModal && <ItemModal />}
-            </View>
-        </Modal>
-    );
 }
 const Home = () =>{
 const [pageNumber, setPageNumber] = useState(0);

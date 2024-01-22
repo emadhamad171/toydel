@@ -30,7 +30,8 @@ const PlansModal = ({user}) => {
     //TODO: Get current user plan
     const [currentPlan,setCurrentPlan] = useState(null);
     //TODO: Get plans from database
-    const plans = [{
+    const plans = [
+        {
         price: 400,
         backgroundColor: '#d29f6c',
         name: 'Bronze',
@@ -53,7 +54,7 @@ const PlansModal = ({user}) => {
         Sign: ()=><PlanTopSign iconName={'star'}/>
     }]
 
-    return <View style={{marginTop: 14}}>
+    return <View style={{marginTop: 14, paddingBottom: 34}}>
         <FlatList style={{paddingBottom:14}} data={plans} renderItem={({item})=><PlanComponent backgroundColor={item.backgroundColor} price={item.price} name={item.name} description={item.description} features={item.features} PlanSign={item.Sign} />} />
     </View>
 }

@@ -35,10 +35,12 @@ export default function App() {
                         if(!fetchedUserInstance.length){
                             const userDBInstanceCreate = {
                                 id: userInstance.uid,
-                                name: userInstance.displayName,
+                                displayName: userInstance?.displayName || 'Set Name',
                                 email: userInstance?.email,
                                 phoneNumber: userInstance?.phoneNumber,
-                                favoriteList: ['']
+                                favoriteList: [''],
+                                plan: 'default',
+                                photoURL: userInstance.photoURL || '',
                             }
                             db.collection('users').doc(userInstance.uid).set(userDBInstanceCreate);
                         }
@@ -81,10 +83,3 @@ export default function App() {
         </>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff'
-    },
-});

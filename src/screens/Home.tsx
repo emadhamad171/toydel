@@ -43,7 +43,7 @@ const HeaderComponent = ({}) =>{
             <TouchableOpacity>
                 <Icon name={'cart-outline'} size={28} color={'#362270'}/>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.navigate('Profile')}>
                 <Icon name={'account-outline'} size={28} color={'#362270'}/>
             </TouchableOpacity>
         </View>

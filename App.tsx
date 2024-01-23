@@ -1,18 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
-import {StyleSheet} from 'react-native';
 import Authorization from "./src/screens/Authorization";
 import {useEffect, useState} from "react";
-import * as firebase_auth from "firebase/auth";
 import Toast from "react-native-toast-message";
 import {onAuthStateChanged} from "firebase/auth";
-import {auth, db, fStorage} from "./src/firebase";
-import Profile from "./src/screens/Profile";
+import {auth, db} from "./src/firebase";
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import 'react-native-gesture-handler';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Home from "./src/screens/Home";
-import {collection, getDocs, query, where} from "firebase/firestore";
+import Profile from "./src/screens/Profile";
+import {loadUser} from "./src/firebase/firebaseAPI";
 
 const Tab = createBottomTabNavigator();
 const screenOptions = {
@@ -22,46 +20,62 @@ const screenOptions = {
         height: 50
     }
 };
+const signInSuccessfulToast = () =>{
+    Toast.show({
+        type: 'success',
+        text1: 'Log in successfully!',
+        text2: '',
+        position: 'top',
+        swipeable: true
+    });
+}
+const signInWarningToast = () =>{
+    Toast.show({
+        type: 'error',
+        text1: 'Something went wrong.',
+        text2: 'Try again',
+        position: 'top',
+        swipeable: true
+    });
+}
+const loadOrCreateUser = async ({userInstance, setUser})=>{
+    const user = await loadUser({userID: userInstance.uid});
+    if (user?.length){
+        setUser(user[0]);
+        return;
+    }
+    const userCreateInstance = {
+        id: userInstance.uid,
+        displayName: userInstance?.displayName || 'Set Name',
+        email: userInstance?.email || "",
+        phoneNumber: userInstance?.phoneNumber || '',
+        favoriteList: [''],
+        plan: 'default',
+        photoURL: userInstance?.photoURL || '',
+        bio: 'I Love Toy App!',
+        location: null
+    }
+    await db.collection('users').doc(userInstance.uid).set(userCreateInstance);
+    setUser(userCreateInstance);
+}
 
 export default function App() {
-    const [user, setUser] = useState<firebase_auth.User>();
+    const [user, setUser] = useState(null);
+
     useEffect(() => {
         onAuthStateChanged(auth, (userInstance) => {
             if(!!userInstance){
-                try {
-                    const userDBInstance = query(collection(fStorage, "users"), where('id', '==', userInstance.uid));
-                    getDocs(userDBInstance).then((favoriteDocs)=>{
-                        const fetchedUserInstance = favoriteDocs.docs.map(el=>{return {...el.data(), id:el.id}});
-                        if(!fetchedUserInstance.length){
-                            const userDBInstanceCreate = {
-                                id: userInstance.uid,
-                                displayName: userInstance?.displayName || 'Set Name',
-                                email: userInstance?.email,
-                                phoneNumber: userInstance?.phoneNumber,
-                                favoriteList: [''],
-                                plan: 'default',
-                                photoURL: userInstance.photoURL || '',
-                            }
-                            db.collection('users').doc(userInstance.uid).set(userDBInstanceCreate);
-                        }
-                    })
-                    setUser(userInstance);
-                    Toast.show({
-                        type: 'success',
-                        text1: 'Log in successfully!',
-                        text2: '',
-                        position: 'top',
-                        swipeable: true
-                    });
-                } catch (e){
-
-                }
+                loadOrCreateUser({userInstance, setUser}).then(()=>{
+                    signInSuccessfulToast();
+                }).catch((e)=>{
+                    signInWarningToast();
+                    console.log(e);
+                });
             }
         });
     }, []);
 
     const ProfileScreen = ()=> <Profile user={user} setUser={setUser} />;
-
 
     return (<>
             <StatusBar style="auto" hidden={true}/>
@@ -71,9 +85,9 @@ export default function App() {
                 <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{
                         return <Icon name={'apple-keyboard-command'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={Home} />
                 <Tab.Screen name="Cart" options={{tabBarIcon: ({focused})=>{
-                        return <Icon name={'format-list-bulleted'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
+                        return <Icon name={'format-list-bulleted'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={Profile} />
                 <Tab.Screen name="Notifications" options={{tabBarIcon: ({focused})=>{
-                        return <Icon name={ focused ? 'bell' : 'bell-outline'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
+                        return <Icon name={ focused ? 'bell' : 'bell-outline'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={Profile} />
                 <Tab.Screen name="Profile" options={{tabBarIcon: ({focused})=>{
                     return <Icon name={'account'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
             </Tab.Navigator>

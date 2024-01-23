@@ -1,8 +1,10 @@
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore";
-import {db, fStorage, imgStorage} from "./index";
+import {auth, db, fStorage, imgStorage} from "./index";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {updateProfile} from "firebase/auth";
 import {v4} from 'uuid'
+
+export const getCurrentUser = () => auth.currentUser;
 
 export const loadItems = async ({path}) =>{
     const dataRef=collection(fStorage, path);
@@ -50,6 +52,11 @@ export const updateItemInDocFromCollection = async({updatedItem, collectionPath,
     await db.collection(collectionPath).doc(docName).update(updatedItem);
 }
 
-export const updateUserName = async ({user, name}) => {
+export const updateUserField = async({updatedField, userID}) =>{
+    await db.collection('users').doc(userID).update(updatedField);
+}
+
+export const updateUserName = async ({name}) => {
+    const user = getCurrentUser();
     await updateProfile(user,{displayName: name});
 }

@@ -25,6 +25,7 @@
     "android": {
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
+      "permissions": ["android.permission.ACCESS_FINE_LOCATION","android.permission.ACCESS_COARSE_LOCATION"],
       "adaptiveIcon": {
         "backgroundColor": "#e3aeff"
       },

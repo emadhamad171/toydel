@@ -19,10 +19,10 @@ const loadData = async ({setFavoriteList, userID, setFavoriteListIds}) =>{
 
 const FavoriteItemsModal = ({user}) =>{
     const [favoriteToyList, setFavoriteToyList] = useState(null);
-    const [favoriteList, setFavoriteListIds] = useState<string[]>([])
+    const [favoriteList, setFavoriteListIds] = useState<string[]>(user.favoriteList)
 
     useEffect(() => {
-        loadData({setFavoriteList: setFavoriteToyList, userID: user.uid, setFavoriteListIds})
+        loadData({setFavoriteList: setFavoriteToyList, userID: user.id, setFavoriteListIds})
     }, []);
 
     const renderItem = ({item}) => {

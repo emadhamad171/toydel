@@ -85,9 +85,9 @@ export default function App() {
                 <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{
                         return <Icon name={'apple-keyboard-command'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={Home} />
                 <Tab.Screen name="Cart" options={{tabBarIcon: ({focused})=>{
-                        return <Icon name={'format-list-bulleted'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={Profile} />
+                        return <Icon name={'format-list-bulleted'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
                 <Tab.Screen name="Notifications" options={{tabBarIcon: ({focused})=>{
-                        return <Icon name={ focused ? 'bell' : 'bell-outline'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={Profile} />
+                        return <Icon name={ focused ? 'bell' : 'bell-outline'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
                 <Tab.Screen name="Profile" options={{tabBarIcon: ({focused})=>{
                     return <Icon name={'account'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
             </Tab.Navigator>

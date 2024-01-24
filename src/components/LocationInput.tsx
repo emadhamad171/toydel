@@ -9,6 +9,7 @@ const GooglePlacesInput = ({placeholder, setLocation}) => {
     const ref= useRef(null);
 
     return (<GooglePlacesAutocomplete
+            nearbyPlacesAPI='GoogleReverseGeocoding'
             ref={ref}
             placeholder={placeholder || 'location'}
             onPress={(data, details = null) => {

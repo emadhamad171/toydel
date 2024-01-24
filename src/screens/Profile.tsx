@@ -8,6 +8,7 @@ import {getCurrentUser, updateUserImage} from "../firebase/firebaseAPI";
 import UserButton from "../components/UserButton";
 import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfoModal } from '../modals/';
 import UserNameAndIcon from "../components/UserNameAndIcon";
+import SupportModal from "../modals/SupportModal";
 
 
 const Profile =({user, setUser}) =>{
@@ -71,7 +72,10 @@ const Profile =({user, setUser}) =>{
                     <UserButton icon={''} onPressAction={onPressLogout} placeholder={""} />
                 </View>
                 <View style={{gap: 5}}>
-                    <UserButton icon={'account-question'} onPressAction={onPressLogout} placeholder={"Support"} />
+                    <UserButton icon={'account-question'} onPressAction={()=>{
+                        setModal(()=>{return ()=><SupportModal user={user} />})
+                        setModalName("Support Chat");
+                    }} placeholder={"Support"} />
                     <UserButton icon={''} iconSize={24} onPressAction={onPressLogout} placeholder={""} />
                 </View>
                 <UserButton icon={'logout'} onPressAction={onPressLogout} placeholder={"Logout"} />

@@ -58,5 +58,6 @@ export const updateUserField = async({updatedField, userID}) =>{
 
 export const updateUserName = async ({name}) => {
     const user = getCurrentUser();
+    await updateUserField({updatedField: {displayName: name}, userID: user.uid});
     await updateProfile(user,{displayName: name});
 }

@@ -4,7 +4,7 @@ import {auth} from "../firebase";
 import Toast from "react-native-toast-message";
 import WrapperComponent from "../components/WrapperComponent";
 import {launchImageLibrary} from "react-native-image-picker";
-import {getCurrentUser, updateUserImage} from "../firebase/firebaseAPI";
+import {getCurrentUser, updateUserField, updateUserImage} from "../firebase/firebaseAPI";
 import UserButton from "../components/UserButton";
 import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfoModal } from '../modals/';
 import UserNameAndIcon from "../components/UserNameAndIcon";

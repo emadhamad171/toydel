@@ -1,7 +1,9 @@
 {
   "expo": {
     "plugins": [
-      ["@react-native-google-signin/google-signin"]
+      [
+        "@react-native-google-signin/google-signin"
+      ]
     ],
     "name": "ToyDelApp",
     "slug": "ToyDelApp",
@@ -19,20 +21,32 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.emadfrontend.ToyDelApp",
+      "bundleIdentifier": "com.toydelapp",
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
-      "permissions": ["android.permission.ACCESS_FINE_LOCATION","android.permission.ACCESS_COARSE_LOCATION"],
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#e3aeff"
       },
-      "package": "com.emadfrontend.ToyDelApp"
+      "package": "com.toydelapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6f9e05d9-24ad-44d0-9171-1f4a7f6e1ad8"
+      }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/6f9e05d9-24ad-44d0-9171-1f4a7f6e1ad8"
     }
   }
 }

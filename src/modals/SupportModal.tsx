@@ -49,7 +49,6 @@ const SupportModal = ({user}) => {
     return <WebView
         ref={WebViewRef}
         incognito={!!!user?.supportInfo?.auth_token}
-        userAgent="Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko"
         source={{ uri: 'https://secure.livechatinc.com/customer/action/open_chat?license_id=17063451' }}
         style={{ flex: 1 }}
         onMessage={(payload)=>{onMessage({payload: payload, user})}}

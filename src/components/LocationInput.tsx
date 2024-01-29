@@ -15,7 +15,6 @@ const GooglePlacesInput = ({placeholder, setLocation}) => {
             onPress={(data, details = null) => {
                 // 'details' is provided when fetchDetails = true
                 setLocation(data);
-                console.log(data, details);
             }}
             onFail={(error) => console.error(error)}
             query={{

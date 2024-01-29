@@ -33,7 +33,7 @@ const InfoModal = ({props}) =>{
 
         <View>
             <HeaderText text={"Location"} />
-            <LocationInput placeholder={location?.description} setLocation={setLocation} />
+            <LocationInput placeholder={location?.formatted_address || location?.description || 'Set location'} setLocation={setLocation} />
         </View>
 
         <View>

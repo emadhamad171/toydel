@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import Authorization from "./src/screens/Authorization";
-import {useEffect, useState} from "react";
+import React, { useState, useEffect } from 'react';
 import Toast from "react-native-toast-message";
 import {onAuthStateChanged} from "firebase/auth";
 import {auth, db} from "./src/firebase";
@@ -11,6 +11,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Home from "./src/screens/Home";
 import Profile from "./src/screens/Profile";
 import {loadUser} from "./src/firebase/firebaseAPI";
+import registerNNPushToken from './src/notifications';
 
 const Tab = createBottomTabNavigator();
 const screenOptions = {
@@ -61,7 +62,7 @@ const loadOrCreateUser = async ({userInstance, setUser})=>{
 
 export default function App() {
     const [user, setUser] = useState(null);
-
+    registerNNPushToken(19000, 'l5ddGPLeP7FdsO5c8gy4Dl');
     useEffect(() => {
         onAuthStateChanged(auth, (userInstance) => {
             if(!!userInstance){

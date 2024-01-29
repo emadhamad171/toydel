@@ -23,7 +23,7 @@ const PlanComponent = ({backgroundColor, price, name, description, features, sty
 }
 const PlanTopSign = ({backgroundColor, text, iconName,iconSize, style, ...props}:{backgroundColor?:string, text?:'string', iconName?:string,iconSize?:number, style?:any})=>{
     return <View style={{...profileStyles.defaultPlanSign, backgroundColor: backgroundColor || '#cca732'}}>
-        {!!iconName && <Text style={{marginRight: -2}}><Icon name={iconName} style={{margin: 0, padding: 0}} padding={0} size={iconSize || 18} /> </Text>}
+        {!!iconName && <Text style={{marginRight: -2}}><Icon name={iconName} style={{margin: 0, padding: 0}} size={iconSize || 18} /> </Text>}
     </View>
 }
 const PlansModal = ({user}) => {

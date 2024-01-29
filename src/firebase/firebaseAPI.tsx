@@ -45,6 +45,7 @@ export const addItem = async({uri, item})=>{
 }
 export const updateUserImage = async ({userInstance, uri}) => {
     const imageURL = await uploadImage({uri, path: 'profile/pictures/'});
+    await updateUserField({updatedField: {photoURL: imageURL}, userID: userInstance.uid});
     await updateProfile(userInstance, {photoURL: imageURL});
 }
 

@@ -11,7 +11,8 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Home from "./src/screens/Home";
 import Profile from "./src/screens/Profile";
 import {loadUser} from "./src/firebase/firebaseAPI";
-import registerNNPushToken from './src/notifications';
+import registerNNPushToken, { registerIndieID } from './src/notifications';
+import Notifications from "./src/screens/Notifications";
 
 const Tab = createBottomTabNavigator();
 const screenOptions = {
@@ -66,6 +67,7 @@ export default function App() {
     useEffect(() => {
         onAuthStateChanged(auth, (userInstance) => {
             if(!!userInstance){
+                registerIndieID(userInstance.uid, 19000, 'l5ddGPLeP7FdsO5c8gy4Dl');
                 loadOrCreateUser({userInstance, setUser}).then(()=>{
                     signInSuccessfulToast();
                 }).catch((e)=>{
@@ -77,6 +79,7 @@ export default function App() {
     }, []);
 
     const ProfileScreen = ()=> <Profile user={user} setUser={setUser} />;
+    const NotificationScreen = () => <Notifications user={user} />;
 
     return (<>
             <StatusBar style="auto" hidden={true}/>
@@ -88,7 +91,7 @@ export default function App() {
                 <Tab.Screen name="Cart" options={{tabBarIcon: ({focused})=>{
                         return <Icon name={'format-list-bulleted'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
                 <Tab.Screen name="Notifications" options={{tabBarIcon: ({focused})=>{
-                        return <Icon name={ focused ? 'bell' : 'bell-outline'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
+                        return <Icon name={ focused ? 'bell' : 'bell-outline'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={NotificationScreen} />
                 <Tab.Screen name="Profile" options={{tabBarIcon: ({focused})=>{
                     return <Icon name={'account'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
             </Tab.Navigator>

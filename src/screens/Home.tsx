@@ -37,7 +37,7 @@ const HeaderComponent = ({}) =>{
             </TouchableOpacity>
         </View>
         <View style={{flexDirection: 'row', gap: 15, marginRight: 10}}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.navigate('Notifications')}>
             <Icon name={'bell-outline'} size={28} color={'#362270'}/>
             </TouchableOpacity>
             <TouchableOpacity>

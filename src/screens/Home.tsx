@@ -1,13 +1,14 @@
-import {RefreshControl, ScrollView, TouchableOpacity, View, Text, LogBox} from "react-native";
+import { RefreshControl, ScrollView, TouchableOpacity, View, Text, LogBox } from "react-native";
 import Input from "../components/Input";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
-import {useCallback, useEffect, useState} from "react";
-import {useNavigation} from "@react-navigation/native";
-import {auth} from "../firebase";
-import {loadUser, loadItems, addItem, updateItemInDocFromCollection} from '../firebase/firebaseAPI'
+import { useCallback, useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { auth } from "../firebase";
+import { loadUser, loadItems } from '../firebase/firebaseAPI'
 import WrapperComponent from "../components/WrapperComponent";
 import ItemComponent from "../components/ItemComponent";
+import PremiumPlansModal from "../modals/PremiumPlansModal";
 
 // const AddItem = ({setListItems,listItems}) => {
 //     const [name, setName] = useState('');
@@ -24,12 +25,15 @@ import ItemComponent from "../components/ItemComponent";
 // }
 
 
-const HeaderComponent = ({}) =>{
+const HeaderComponent = ({setModal, setModalName, user}) =>{
     const navigation = useNavigation();
     return <View style={{backgroundColor: '#a333ff',width: '100%', paddingVertical: 10, paddingHorizontal:10, flexDirection: 'row', justifyContent:'space-between'}}>
         <View style={{flexDirection: 'row', gap: 15, marginLeft: 5}}>
         <Icon name={'teddy-bear'} size={32} color={"#4f0bb2"}/>
-        <TouchableOpacity style={{alignSelf:'center', backgroundColor: '#c29cff', borderRadius: 5, padding: 5}}>
+        <TouchableOpacity style={{alignSelf:'center', backgroundColor: '#c29cff', borderRadius: 5, padding: 5}} onPress={()=>{
+            setModal(()=>{return ()=><PremiumPlansModal user={user} />})
+            setModalName("Plans");
+        }}>
             <Text>View Plans</Text>
         </TouchableOpacity>
             <TouchableOpacity >
@@ -49,7 +53,7 @@ const HeaderComponent = ({}) =>{
         </View>
     </View>
 }
-const SearchComponent = ({fetchedListItems, setListItems,searchString, setSearch}) =>{
+const SearchComponent = ({ fetchedListItems, setListItems, searchString, setSearch }) =>{
     return <View style={{backgroundColor: '#a333ff', borderBottomStartRadius:10, borderBottomEndRadius:10,width: '100%', paddingBottom: 50, paddingTop:30}}>
         <View style={{flexDirection: 'row', position:'relative', maxWidth: 330,display: 'flex',alignSelf: 'center'}}>
         <Input placeholder={"Find your toy."} onChangeAction={(text:string)=>{
@@ -61,7 +65,7 @@ const SearchComponent = ({fetchedListItems, setListItems,searchString, setSearch
     </View>
 }
 
-const loadData = async ({setListItems,setRefreshing, setFavoriteList, userID}) =>{
+const loadData = async ({ setListItems, setRefreshing, setFavoriteList, userID}) =>{
     const user = await loadUser({userID});
     const listItems = await loadItems({path: 'items'});
 
@@ -70,10 +74,10 @@ const loadData = async ({setListItems,setRefreshing, setFavoriteList, userID}) =
     setRefreshing(false);
 }
 
-const CategoryItem = ({name, isSelected, onPressAction}) => {
+const CategoryItem = ({ name, isSelected, onPressAction }) => {
     return <TouchableOpacity onPress={()=>onPressAction(isSelected)}><Text style={{fontSize: 18}}> <Icon name={isSelected? 'checkbox-marked-outline' : 'checkbox-blank-outline'} size={24}/> {name}</Text></TouchableOpacity>
 }
-const FilterModal = ({setModal, setListItems,fetchedList, setSelectedCategory, selectedCategories}) =>{
+const FilterModal = ({ setModal, setListItems,fetchedList, setSelectedCategory, selectedCategories }) =>{
     const [categories, setCategories] = useState<string[]>(selectedCategories);
     const removeCategory = (name : string)=> {setCategories(categories.filter(el=>{if(el!=name) return el;}))};
     const addCategory = (name : string) => {setCategories(prevState => [...prevState, name])};
@@ -120,9 +124,10 @@ const [searchString, setSearch] = useState('');
         loadData({setListItems: (items)=> {setFetchedListItems(items)},setRefreshing, setFavoriteList, userID});
     }, []);
 
-    return <View style={{paddingBottom: 50}}>
+    return <>
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
-        <HeaderComponent />
+        <View style={{paddingBottom: 50}}>
+        <HeaderComponent setModal={setModal} setModalName={setModalName} user={userID} />
     <ScrollView refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
     }>
@@ -139,7 +144,7 @@ const [searchString, setSearch] = useState('');
         </View>
         {listItems.map(item=><ItemComponent key={item.id} item={item} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)}/>)}
     </ScrollView>
-    </View>
+    </View></>
 }
 
 export default Home;

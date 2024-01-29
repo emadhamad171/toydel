@@ -1,18 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-export type notificationProps = {
-  id?: number,
-  title: string,
-  description: string,
-  photoURL: string,
-  isIndividual: boolean,
-  isRevised: boolean,
-  iconName: string,
-  iconProps?: any,
-  props?: any,
-};
+import {notificationProps} from "../helpers/types";
 
 function NotificationComponent({id, title, description,photoURL, isIndividual, isRevised, iconName, iconProps, ...props}:notificationProps) {
     return (<>

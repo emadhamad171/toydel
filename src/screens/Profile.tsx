@@ -9,6 +9,7 @@ import UserButton from "../components/UserButton";
 import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfoModal } from '../modals/';
 import UserNameAndIcon from "../components/UserNameAndIcon";
 import SupportModal from "../modals/SupportModal";
+import {unregisterIndieDevice} from "../notifications/index";
 
 
 const Profile =({user, setUser}) =>{
@@ -34,8 +35,9 @@ const Profile =({user, setUser}) =>{
         }
     }
 
-    const onPressLogout = () => {
-        auth.signOut();
+    const onPressLogout = async () => {
+        await unregisterIndieDevice(auth.currentUser.uid, 19000, 'l5ddGPLeP7FdsO5c8gy4Dl');
+        await auth.signOut();
         setUser(null);
         Toast.show({type: 'success', text1: 'Sign out successful'});
     }

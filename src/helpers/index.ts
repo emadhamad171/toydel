@@ -38,11 +38,11 @@ export const loadOrCreateUser = async ({userInstance, setUser})=>{
     const userCreateInstance = {
         id: userInstance.uid,
         displayName: userInstance?.displayName || 'Set Name',
-        email: userInstance?.email || "",
+        email: userInstance?.email || '',
         phoneNumber: userInstance?.phoneNumber || '',
         favoriteList: [''],
         plan: 'default',
-        photoURL: userInstance?.photoURL || '',
+        photoURL: userInstance?.photoURL || 'https://firebasestorage.googleapis.com/v0/b/testotp-fabeb.appspot.com/o/noPhotoMini.png?alt=media&token=c137400e-6b63-493e-83ac-d9fab4873ef4',
         bio: 'I Love Toy App!',
         location: null
     }

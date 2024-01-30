@@ -93,7 +93,6 @@ const [CustomModal, setModal] = useState(null);
 const [currentModalName, setModalName] = useState('');
 const [searchString, setSearch] = useState('');
     useEffect(() => {
-        LogBox.ignoreLogs(["VirtualizedLists should never be nested"])
         loadData({setListItems: setFetchedListItems, setRefreshing, setFavoriteList, userID})
     }, []);
 

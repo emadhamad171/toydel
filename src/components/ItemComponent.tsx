@@ -22,7 +22,7 @@ const ItemComponent = ({setFavoriteToyList,item, isFavorite}) =>{
     const handleFavoriteClick = () => {
         isFavorite ? removeItemFromFavoriteList() : addItemToFavoriteList();
     }
-    return <View style={{flexDirection: 'row', padding: 10, borderRadius: 15}}>
+    return <View style={{flexDirection: 'row', alignSelf:'center', padding: 10, borderRadius: 15}}>
         <TouchableOpacity onPress={handleFavoriteClick} style={{position: 'absolute', zIndex: 4, top: 15, left:15}}><Icon name={isFavorite ? 'heart' : 'heart-outline'} style={{zIndex: 4, borderRadius: 50, padding: 5, backgroundColor: '#ccc'}} color={'#522d7e'} size={22}/></TouchableOpacity>
         <Image style={{width: 150, height: 150, borderRadius: 10, zIndex:2,borderColor:'#cccccc', borderWidth: 2}} source={{uri: photo}} />
         <View style={{backgroundColor:'#cccccc',borderColor:'#cccccc', borderWidth: 1,paddingRight: 15, width:'100%', maxWidth: 220, marginLeft: -10, borderTopRightRadius: 15, borderBottomRightRadius: 10, paddingLeft:20, paddingTop: 10}}>

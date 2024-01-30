@@ -1,6 +1,7 @@
 import Toast from "react-native-toast-message";
 import {loadSpecialItems, loadUser} from "../firebase/firebaseAPI";
 import {db} from "../firebase";
+import {notificationType} from "./types";
 
 export const screenOptions = {
     headerShown: false,
@@ -61,3 +62,18 @@ export const loadFavoriteData = async ({setFavoriteList, userID, setFavoriteList
     setFavoriteList(favoriteListItems);
     setFavoriteListIds(favoriteList);
 }
+
+export const notificationSample : notificationType = {
+    id: "0",
+    title: '',
+    description: '',
+    photoURL: 'https://firebasestorage.googleapis.com/v0/b/testotp-fabeb.appspot.com/o/noPhotoMini.png?alt=media&token=c137400e-6b63-493e-83ac-d9fab4873ef4',
+    isIndividual: false,
+    iconName: '',
+};
+
+export const notificationStackSample : notificationType[] = [
+    notificationSample,
+    {...notificationSample, id: '1'},
+    {...notificationSample, id: '2'},
+]

@@ -1,11 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl, ScrollView} from "react-native";
-import NotificationComponent, {notificationPropsType} from "../components/NotificationComponent";
+import {View, Text, StyleSheet, TouchableOpacity, RefreshControl } from "react-native";
+import NotificationComponent from "../components/NotificationComponent";
 import {SwipeListView} from "react-native-swipe-list-view";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {getIndieNotificationInbox,deleteIndieNotificationInbox} from "../notifications";
+import {notificationType} from "../helpers/types";
+import {notificationStackSample} from "../helpers";
 
-const getFormatedNotifications = (el:any) => {
+const getFormatedNotifications = (el:any) : notificationType => {
     const pushData = JSON.parse(el.pushData);
     return {
         id: el.notification_id,
@@ -35,12 +37,12 @@ const RenderHiddenItem= ({item, setData,uid}) => (
 
 const loadNotifications = ({setData, uid,setRefreshing}) => {
     getIndieNotificationInbox(uid,19000,'l5ddGPLeP7FdsO5c8gy4Dl')
-        .then(data=>{setData(data.map(getFormatedNotifications))})
+        .then(data=>{setData(()=>data.map(getFormatedNotifications))})
         .finally(()=>setRefreshing(false));
 }
 function Notifications({user}) {
-    const [data, setData] = useState([]);
-    const [isRefreshing, setRefreshing] = useState(true);
+    const [data, setData] = useState<notificationType[]>(notificationStackSample);
+    const [isRefreshing, setRefreshing] = useState<boolean>(true);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -71,9 +73,11 @@ function Notifications({user}) {
                         iconName={item.iconName}
                         isIndividual={item.isIndividual}
                         isRevised={index}
+                        isRefreshing={isRefreshing}
                         {...(item?.iconProps && {iconProps: item.iconProps})}
                         {...item.props}
-                    />}
+                    />
+                    }
             />
         </View>
     );

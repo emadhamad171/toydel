@@ -7,11 +7,21 @@ export type notificationPropsType = {
     photoURL: string,
     isIndividual: boolean,
     isRevised: boolean,
+    isRefreshing?: boolean,
     iconName: string,
     iconProps?: any,
     props?: any,
 };
-
+export type notificationType = {
+    id: string,
+    title: string,
+    description: string,
+    photoURL: string,
+    isIndividual: boolean,
+    iconName: string,
+    iconProps?: any,
+    props?: any
+}
 export type supprotInfoType = {
     auth_token: string,
     lc_ids: string

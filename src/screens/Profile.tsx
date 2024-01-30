@@ -1,15 +1,15 @@
 import { ScrollView, View } from "react-native";
-import {useEffect, useState} from "react";
-import {auth} from "../firebase";
+import { useEffect, useState } from "react";
+import { auth } from "../firebase";
 import Toast from "react-native-toast-message";
 import WrapperComponent from "../components/WrapperComponent";
-import {launchImageLibrary} from "react-native-image-picker";
-import {getCurrentUser, updateUserField, updateUserImage} from "../firebase/firebaseAPI";
+import { launchImageLibrary } from "react-native-image-picker";
+import { getCurrentUser, updateUserField, updateUserImage } from "../firebase/firebaseAPI";
 import UserButton from "../components/UserButton";
 import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfoModal } from '../modals/';
 import UserNameAndIcon from "../components/UserNameAndIcon";
-import SupportModal from "../modals/SupportModal";
-import {unregisterIndieDevice} from "../notifications/index";
+import { SupportModal } from "../modals";
+import { unregisterIndieDevice } from "../notifications/index";
 
 
 const Profile =({user, setUser}) =>{

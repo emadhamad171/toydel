@@ -1,9 +1,9 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import {notificationProps} from "../helpers/types";
+import {notificationPropsType} from "../helpers/types";
 
-function NotificationComponent({id, title, description,photoURL, isIndividual, isRevised, iconName, iconProps, ...props}:notificationProps) {
+function NotificationComponent({id, title, description,photoURL, isIndividual, isRevised, iconName, iconProps, ...props}:notificationPropsType) {
     return (<>
         <View style={{...notify.container, borderColor: isRevised ? '#b7b7b7' : '#d333ff'}}>
             <Icon name={iconName} style={notify.icon} color={isRevised ? '#b7b7b7' : '#d333ff'} size={44} {...iconProps}/>

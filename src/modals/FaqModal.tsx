@@ -1,5 +1,5 @@
-import {FlatList, Text, View} from "react-native";
-import {useState} from "react";
+import { FlatList, Text, View } from "react-native";
+import { useState } from "react";
 import UserButton from "../components/UserButton";
 const AnswerComponent =({text, isDisplayed})=>{
     return <View style={{display:isDisplayed?'flex': 'none', marginBottom:14,marginHorizontal: 5}}>

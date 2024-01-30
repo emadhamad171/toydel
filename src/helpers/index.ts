@@ -1,5 +1,5 @@
 import Toast from "react-native-toast-message";
-import {loadUser} from "../firebase/firebaseAPI";
+import {loadSpecialItems, loadUser} from "../firebase/firebaseAPI";
 import {db} from "../firebase";
 
 export const screenOptions = {
@@ -47,4 +47,17 @@ export const loadOrCreateUser = async ({userInstance, setUser})=>{
     }
     await db.collection('users').doc(userInstance.uid).set(userCreateInstance);
     setUser(userCreateInstance);
+}
+
+export const loadFavoriteData = async ({setFavoriteList, userID, setFavoriteListIds}) =>{
+    const user = await loadUser({userID});
+    const favoriteList = user[0].favoriteList;
+    const specOps = {
+        filedPath: 'id',
+        opStr: 'in',
+        data: favoriteList
+    }
+    const favoriteListItems = await loadSpecialItems({path: "items", specOps});
+    setFavoriteList(favoriteListItems);
+    setFavoriteListIds(favoriteList);
 }

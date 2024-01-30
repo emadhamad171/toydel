@@ -1,28 +1,15 @@
 import {useEffect, useState} from "react";
 import {FlatList, View} from "react-native";
-import {loadSpecialItems, loadUser, updateItemInDocFromCollection} from "../firebase/firebaseAPI";
-import {auth} from "../firebase";
 import ItemComponent from "../components/ItemComponent";
-
-const loadData = async ({setFavoriteList, userID, setFavoriteListIds}) =>{
-    const user = await loadUser({userID});
-    const favoriteList = user[0].favoriteList;
-    const specOps = {
-        filedPath: 'id',
-        opStr: 'in',
-        data: favoriteList
-    }
-    const favoriteListItems = await loadSpecialItems({path: "items", specOps});
-    setFavoriteList(favoriteListItems);
-    setFavoriteListIds(favoriteList);
-}
+import {loadFavoriteData} from "../helpers";
+import {itemType} from "../helpers/types";
 
 const FavoriteItemsModal = ({user}) =>{
-    const [favoriteToyList, setFavoriteToyList] = useState(null);
+    const [favoriteToyList, setFavoriteToyList] = useState<itemType[]>(null);
     const [favoriteList, setFavoriteListIds] = useState<string[]>(user.favoriteList)
 
     useEffect(() => {
-        loadData({setFavoriteList: setFavoriteToyList, userID: user.id, setFavoriteListIds})
+        loadFavoriteData({setFavoriteList: setFavoriteToyList, userID: user.id, setFavoriteListIds});
     }, []);
 
     const renderItem = ({item}) => {

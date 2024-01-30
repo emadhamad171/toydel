@@ -1,9 +1,9 @@
-import {Text, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import profileStyles from "../styles/profile";
 
-const UserButton = ({placeholder,chevronIcon='chevron-right',iconColor='#000', icon, iconSize=22, iconProps={}, buttonProps={}, onPressAction,iconStyle={borderRadius: 55, backgroundColor: '#eee', alignItems: 'center', width:36,height:36,  justifyContent: 'center'}, buttonStyle = {flexDirection: 'row', alignItems: 'center',gap: 10,width:'100%', paddingHorizontal:16, paddingVertical: 8, borderRadius: 10, backgroundColor:'#dcdada'}})=> {
-    return <TouchableOpacity style={{...buttonStyle}} onPress={onPressAction} {...buttonProps}>
+const UserButton = ({placeholder,chevronIcon='chevron-right',iconColor='#000', icon, iconSize=22, iconProps={}, buttonProps={}, onPressAction,iconStyle=defaultStyle.icon, buttonStyle=defaultStyle.button})=> {
+    return <TouchableOpacity style={buttonStyle} onPress={onPressAction} {...buttonProps}>
 
     <View style={{...iconStyle}}>
     <Icon {...iconProps} style={{padding: 0, margin: 0}} color={iconColor} name={icon} size={iconSize}/>
@@ -14,4 +14,24 @@ const UserButton = ({placeholder,chevronIcon='chevron-right',iconColor='#000', i
     </View>
     </TouchableOpacity>
 }
+const defaultStyle = StyleSheet.create({
+    icon:{
+        borderRadius: 55,
+        backgroundColor: '#eee',
+        alignItems: 'center',
+        width:36,
+        height:36,
+        justifyContent: 'center'
+    },
+    button:{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        width:'100%',
+        paddingHorizontal:16,
+        paddingVertical: 8,
+        borderRadius: 10,
+        backgroundColor:'#dcdada'
+    }
+})
 export default UserButton;

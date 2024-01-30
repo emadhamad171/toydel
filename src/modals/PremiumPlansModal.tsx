@@ -3,6 +3,7 @@ import profileStyles from "../styles/profile";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ContinueButton from "../components/ContinueButton";
 import {useState} from "react";
+import {planType} from "../helpers/types";
 
 const PlanComponent = ({backgroundColor, price, name, description, features, style, PlanSign,...props}:{backgroundColor:string, price:number, name:string, description:string, features:string[], style?:StyleProp<View>, PlanSign?:any})=>{
 
@@ -21,8 +22,8 @@ const PlanComponent = ({backgroundColor, price, name, description, features, sty
         {!!PlanSign && <PlanSign />}
     </View>
 }
-const PlanTopSign = ({backgroundColor, text, iconName,iconSize, style, ...props}:{backgroundColor?:string, text?:'string', iconName?:string,iconSize?:number, style?:any})=>{
-    return <View style={{...profileStyles.defaultPlanSign, backgroundColor: backgroundColor || '#cca732'}}>
+const PlanTopSign = ({backgroundColor, text, iconName,iconSize, style, ...props}:{backgroundColor?:string, text?:string, iconName?:string,iconSize?:number, style?:any})=>{
+    return () => <View style={{...profileStyles.defaultPlanSign, backgroundColor: backgroundColor || '#cca732'}}>
         {!!iconName && <Text style={{marginRight: -2}}><Icon name={iconName} style={{margin: 0, padding: 0}} size={iconSize || 18} /> </Text>}
     </View>
 }
@@ -30,32 +31,53 @@ const PlansModal = ({user}) => {
     //TODO: Get current user plan
     const [currentPlan,setCurrentPlan] = useState(null);
     //TODO: Get plans from database
-    const plans = [
+    const plans: planType[] = [
         {
         price: 400,
         backgroundColor: '#d29f6c',
         name: 'Bronze',
         description: 'Regular plan and blablabla bla blabla blaalb a lab blabla. Some bla bla bla and blablabla.',
         features: ['1 toy per month', 'Change toys some times', 'Big boss required'],
-        Sign: ()=><PlanTopSign iconName={'star-outline'}/>
+        sign: {
+            name: 'star-outline'
+        }
     },{
         price: 960,
         backgroundColor: '#ffe44b',
         name: 'Gold',
         description: 'Regular plan and blablabla bla blabla blaalb a lab blabla. Some bla bla bla and blablabla.',
         features: ['4 toy per month', 'Change toys every week', 'You are big boss'],
-        Sign: ()=><PlanTopSign backgroundColor={"#d66"} iconName={'check-decagram-outline'}/>
+        sign: {
+            name: 'check-decagram-outline',
+            backgroundColor: '#d66',
+        }
     },{
         price: 780,
         backgroundColor: '#d6e1e3',
         name: 'Silver',
         description: 'Regular plan and blablabla bla blabla blaalb a lab blabla. Some bla bla bla and blablabla.',
         features: ['2 toy per month', 'Change toys some times', 'Big boss required'],
-        Sign: ()=><PlanTopSign iconName={'star'}/>
+        sign: {
+            name: 'star',
+        }
     }]
 
     return <View style={{marginTop: 14, paddingBottom: 34}}>
-        <FlatList style={{paddingBottom:14}} data={plans} renderItem={({item})=><PlanComponent backgroundColor={item.backgroundColor} price={item.price} name={item.name} description={item.description} features={item.features} PlanSign={item.Sign} />} />
+        <FlatList
+            style={{paddingBottom:14}}
+            data={plans}
+            renderItem={({item})=>
+                <PlanComponent
+                    backgroundColor={item.backgroundColor}
+                    price={item.price}
+                    name={item.name}
+                    description={item.description}
+                    features={item.features}
+                    PlanSign={PlanTopSign({ iconName:item.sign.name, ...item.sign})}
+                />
+            }
+        />
+
     </View>
 }
 export default PlansModal;

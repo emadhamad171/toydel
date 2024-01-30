@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl, ScrollView} from "react-native";
-import NotificationComponent, {notificationProps} from "../components/NotificationComponent";
+import NotificationComponent, {notificationPropsType} from "../components/NotificationComponent";
 import {SwipeListView} from "react-native-swipe-list-view";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {getIndieNotificationInbox,deleteIndieNotificationInbox} from "../notifications";

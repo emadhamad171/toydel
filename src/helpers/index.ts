@@ -1,7 +1,8 @@
 import Toast from "react-native-toast-message";
 import {loadSpecialItems, loadUser} from "../firebase/firebaseAPI";
 import {db} from "../firebase";
-import {notificationType} from "./types";
+import {itemType, notificationType} from "./types";
+import {defaultPhoto} from "./constants";
 
 export const screenOptions = {
     headerShown: false,
@@ -42,7 +43,7 @@ export const loadOrCreateUser = async ({userInstance, setUser})=>{
         phoneNumber: userInstance?.phoneNumber || '',
         favoriteList: [''],
         plan: 'default',
-        photoURL: userInstance?.photoURL || 'https://firebasestorage.googleapis.com/v0/b/testotp-fabeb.appspot.com/o/noPhotoMini.png?alt=media&token=c137400e-6b63-493e-83ac-d9fab4873ef4',
+        photoURL: userInstance?.photoURL || defaultPhoto,
         bio: 'I Love Toy App!',
         location: null
     }
@@ -67,7 +68,7 @@ export const notificationSample : notificationType = {
     id: "0",
     title: '',
     description: '',
-    photoURL: 'https://firebasestorage.googleapis.com/v0/b/testotp-fabeb.appspot.com/o/noPhotoMini.png?alt=media&token=c137400e-6b63-493e-83ac-d9fab4873ef4',
+    photoURL: defaultPhoto,
     isIndividual: false,
     iconName: '',
 };
@@ -76,4 +77,24 @@ export const notificationStackSample : notificationType[] = [
     notificationSample,
     {...notificationSample, id: '1'},
     {...notificationSample, id: '2'},
+]
+
+export const itemSample : itemType = {
+    brand: 'brand',
+    category: ['category'],
+    description: 'description',
+    id: '0a',
+    isIncludedInPlan: true,
+    name: 'Name',
+    photo: defaultPhoto,
+    price: 400,
+    rate: 4
+}
+
+export const itemsStackSample : itemType[] = [
+    itemSample,
+    {...itemSample, id: '1c'},
+    {...itemSample, id: '2s'},
+    {...itemSample, id: '3d'},
+    {...itemSample, id: '4e'},
 ]

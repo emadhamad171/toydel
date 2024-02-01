@@ -4,15 +4,15 @@ import { auth } from "../firebase";
 import Toast from "react-native-toast-message";
 import WrapperComponent from "../components/WrapperComponent";
 import { launchImageLibrary } from "react-native-image-picker";
-import { getCurrentUser, updateUserField, updateUserImage } from "../firebase/firebaseAPI";
+import { getCurrentUser, updateUserImage } from "../firebase/firebaseAPI";
 import UserButton from "../components/UserButton";
-import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfoModal } from '../modals/';
+import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfoModal, SupportModal } from '../modals/';
 import UserNameAndIcon from "../components/UserNameAndIcon";
-import { SupportModal } from "../modals";
 import { unregisterIndieDevice } from "../notifications/index";
 
 
-const Profile =({user, setUser}) =>{
+const Profile =({user, setUser, params=null, navigation=null}) =>{
+    console.log(params);
     const [CustomModal, setModal] = useState(null);
     const [currentModalName, setModalName] = useState('');
     const [userName, setUserName] = useState(user.displayName);

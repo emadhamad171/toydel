@@ -1,10 +1,12 @@
-import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import React, {Dispatch, SetStateAction, useState} from "react";
+import {FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import ItemComponent from "../components/ItemComponent";
 import {itemType, userType} from "../helpers/types";
 import WrapperComponent from "../components/WrapperComponent";
 import Icon from "react-native-vector-icons/FontAwesome";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons"
+import Stars from "../components/StarsComponent";
+import {defaultPhoto} from "../helpers/constants";
 
 type cartItemType = {
     item: itemType
@@ -13,7 +15,8 @@ type cartItemPropsType = {
     item: cartItemType,
     setItemModal: Dispatch<SetStateAction<any>>,
     setModalName:Dispatch<SetStateAction<string>>,
-    user: userType
+    user: userType,
+    isLoading: boolean,
 };
 
 const AchiveContainer = ({children}) =>{
@@ -28,7 +31,7 @@ const UserItemModal = ({item, user} : {item:itemType, user:userType}) => {
         <View style={{width: 340, height: "100%"}}>
             <Image source={{uri: item.photo}} style={{maxWidth: 340, maxHeight: 340, width:'100%', height:'100%', alignSelf: 'center', borderRadius: 10}} />
             <Text style={{alignSelf:'center', fontSize: 28, fontWeight: '500'}}>
-                {item.name}
+                {item.name + ' '}<Stars rate={item.rate} />
             </Text>
             <View style={{ flexDirection: 'row', justifyContent:'space-around'}}>
                 <AchiveContainer>
@@ -83,7 +86,7 @@ const UserItemModal = ({item, user} : {item:itemType, user:userType}) => {
     </View>)
 }
 
-const CartItem = ({item, setItemModal, setModalName, user}:cartItemPropsType) =>{
+const CartItem = ({item, setItemModal, setModalName, user, isLoading}:cartItemPropsType) =>{
     const onClickClose = () => {
         setItemModal(()=>null);
         setModalName(()=>'');
@@ -96,15 +99,28 @@ const CartItem = ({item, setItemModal, setModalName, user}:cartItemPropsType) =>
     }
     return (
         <View>
-            <ItemComponent item={item.item} user={user} isFavorite={true} isOnStatus onClickMore={onClickMore}  />
+            <ItemComponent item={item.item} isLoading={isLoading} user={user} isFavorite={true} isOnStatus onClickMore={onClickMore}  />
         </View>
     )
+}
+
+const loadData = async ({setLoading}) =>{
+    setTimeout(()=>setLoading(false), 800);
 }
 
 const Cart = ({user}) =>{
     const [ItemModal, setItemModal] = useState(null);
     const [modalName, setModalName] = useState<string>('');
+    const [isLoading, setLoading] = useState(true);
 
+    useEffect(() => {
+        setLoading(false);
+    }, []);
+
+    const onRefresh = async () => {
+        setLoading(true);
+        await loadData({setLoading});
+    }
 
     const data:{item:itemType}[] = [
         {
@@ -115,7 +131,7 @@ const Cart = ({user}) =>{
             id: "string",
             isIncludedInPlan: false,
             name: "Name of Toy",
-            photo: 'https://firebasestorage.googleapis.com/v0/b/testotp-fabeb.appspot.com/o/noPhotoMini.png?alt=media&token=c137400e-6b63-493e-83ac-d9fab4873ef4',
+            photo: defaultPhoto,
             price: 500,
             rate: 5
         }
@@ -123,8 +139,14 @@ const Cart = ({user}) =>{
     ]
     return (<>
         <View style={cartStyle.container}>
-            <Text style={cartStyle.header}>Your toys</Text>
-            <FlatList data={data} renderItem={({item})=><CartItem item={item} user={user} setItemModal={setItemModal} setModalName={setModalName}/>} />
+            <View style={{flexDirection: 'row', flexGrow: 1, justifyContent: 'space-between', alignItems: 'center'}}>
+                <Text style={cartStyle.header}>Your toys</Text>
+                <Text style={cartStyle.subHeader}>{data.length}/{4}</Text>
+            </View>
+            <FlatList data={data}
+                      renderItem={({item})=><CartItem item={item} key={item.item.id} user={user} isLoading={isLoading} setItemModal={setItemModal} setModalName={setModalName}/>}
+                      refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
+            />
         </View>
             <WrapperComponent ItemModal={ItemModal} setModal={setItemModal} modalName={modalName} />
         </>
@@ -133,7 +155,7 @@ const Cart = ({user}) =>{
 
 const cartStyle = StyleSheet.create({
     container: {
-        marginTop: 10,
+        marginTop: 15,
         paddingVertical: 10,
         backgroundColor: '#f3f3f3',
     },
@@ -142,6 +164,13 @@ const cartStyle = StyleSheet.create({
         fontSize: 32,
         fontWeight: "400",
         paddingBottom: 12,
+    },
+    subHeader: {
+        paddingHorizontal: 18,
+        fontSize: 28,
+        fontWeight: "400",
+        paddingBottom: 12,
+        color:'#3d3a3a'
     },
 })
 

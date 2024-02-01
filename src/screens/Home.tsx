@@ -1,14 +1,15 @@
-import { RefreshControl, ScrollView, TouchableOpacity, View, Text, LogBox } from "react-native";
+import {RefreshControl, ScrollView, TouchableOpacity, View, Text, LogBox} from "react-native";
 import Input from "../components/Input";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useCallback, useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import {CommonActions, useNavigation} from "@react-navigation/native";
 import { auth } from "../firebase";
 import { loadUser, loadItems } from '../firebase/firebaseAPI'
 import WrapperComponent from "../components/WrapperComponent";
 import ItemComponent from "../components/ItemComponent";
 import PremiumPlansModal from "../modals/PremiumPlansModal";
+import {itemsStackSample} from "../helpers";
 
 const HeaderComponent = ({setModal, setModalName, user}) =>{
     const navigation = useNavigation();
@@ -21,18 +22,18 @@ const HeaderComponent = ({setModal, setModalName, user}) =>{
         }}>
             <Text>View Plans</Text>
         </TouchableOpacity>
-            <TouchableOpacity >
+            <TouchableOpacity onPress={()=>navigation.navigate({name: 'Profile', params: {modal:1}}as never)}>
                 <MaterialIcon name={'not-listed-location'} size={28} color={"#fff2ee"}/>
             </TouchableOpacity>
         </View>
         <View style={{flexDirection: 'row', gap: 15, marginRight: 10}}>
-            <TouchableOpacity onPress={()=>navigation.navigate('Notifications')}>
+            <TouchableOpacity onPress={()=>navigation.navigate('Notifications' as never)}>
             <Icon name={'bell-outline'} size={28} color={'#362270'}/>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.navigate({name: 'Cart'} as never)}>
                 <Icon name={'cart-outline'} size={28} color={'#362270'}/>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>navigation.navigate('Profile')}>
+            <TouchableOpacity onPress={()=>navigation.navigate({name: 'Profile'} as never)}>
                 <Icon name={'account-outline'} size={28} color={'#362270'}/>
             </TouchableOpacity>
         </View>
@@ -84,7 +85,7 @@ const searchByString = ({fetchedListItems, searchString}) => {
 }
 const Home = () =>{
 const [pageNumber, setPageNumber] = useState(0);
-const [fetchedListItems, setFetchedListItems] = useState([]);
+const [fetchedListItems, setFetchedListItems] = useState(itemsStackSample);
 const [isRefreshing, setRefreshing] = useState(true);
 const [userID, setUserID] = useState(auth.currentUser.uid);
 const [favoriteList, setFavoriteList] = useState<string[]>([]);
@@ -122,7 +123,7 @@ const [searchString, setSearch] = useState('');
                 {
                     searchByString({fetchedListItems, searchString})
                     .filter(item => {if (item.category.some(category => selectedCategories.includes(category)) || selectedCategories.length===0) return item;})
-                    .map(item=><ItemComponent key={item.id} item={item} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)}/>)
+                    .map(item=><ItemComponent key={item.id} item={item} isLoading={isRefreshing} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)}/>)
                 }
             </ScrollView>
         </View>

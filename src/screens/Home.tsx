@@ -22,7 +22,7 @@ const HeaderComponent = ({setModal, setModalName, user}) =>{
         }}>
             <Text>View Plans</Text>
         </TouchableOpacity>
-            <TouchableOpacity onPress={()=>navigation.navigate({name: 'Profile', params: {modal:1}}as never)}>
+            <TouchableOpacity onPress={()=>navigation.navigate('Profile' as never)}>
                 <MaterialIcon name={'not-listed-location'} size={28} color={"#fff2ee"}/>
             </TouchableOpacity>
         </View>

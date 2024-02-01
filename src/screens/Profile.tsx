@@ -11,8 +11,7 @@ import UserNameAndIcon from "../components/UserNameAndIcon";
 import { unregisterIndieDevice } from "../notifications/index";
 
 
-const Profile =({user, setUser, params=null, navigation=null}) =>{
-    console.log(params);
+const Profile =({user, setUser}) =>{
     const [CustomModal, setModal] = useState(null);
     const [currentModalName, setModalName] = useState('');
     const [userName, setUserName] = useState(user.displayName);
@@ -43,8 +42,8 @@ const Profile =({user, setUser, params=null, navigation=null}) =>{
     }
 
     return <><WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
-        <ScrollView style={{flex:1,backgroundColor:'#fff',paddingTop:24}}>
-            <View style={{justifyContent:'center', flex: 1, width:350, alignSelf: 'center', maxWidth: '100%', alignItems: 'center', gap: 25,marginHorizontal:15}}>
+        <ScrollView style={{flex:1,backgroundColor:'#fff',paddingVertical: 42}}>
+            <View style={{justifyContent:'center', flex: 1, width:350, alignSelf: 'center', maxWidth: '100%', alignItems: 'center', gap: 28,marginHorizontal:15}}>
                 <UserNameAndIcon user={user} userName={userName} setUserName={setUserName} updateImage={updateImage}/>
                 <View style={{gap: 5}}>
                     <UserButton icon={'account'} onPressAction={()=>{

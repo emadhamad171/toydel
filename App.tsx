@@ -13,6 +13,7 @@ import Profile from "./src/screens/Profile";
 import registerNNPushToken, { registerIndieID } from './src/notifications';
 import Notifications from "./src/screens/Notifications";
 import {loadOrCreateUser, screenOptions, signInSuccessfulToast, signInWarningToast} from "./src/helpers";
+import Cart from "./src/screens/Cart";
 
 const Tab = createBottomTabNavigator();
 
@@ -35,6 +36,7 @@ export default function App() {
 
     const ProfileScreen = ()=> <Profile user={user} setUser={setUser} />;
     const NotificationScreen = () => <Notifications user={user} />;
+    const CartScreen = () => <Cart user={user} />;
 
     return (<>
             <StatusBar style="auto" hidden={true}/>
@@ -44,7 +46,7 @@ export default function App() {
                 <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{
                         return <Icon name={'apple-keyboard-command'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={Home} />
                 <Tab.Screen name="Cart" options={{tabBarIcon: ({focused})=>{
-                        return <Icon name={'format-list-bulleted'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
+                        return <Icon name={'format-list-bulleted'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={CartScreen} />
                 <Tab.Screen name="Notifications" options={{tabBarIcon: ({focused})=>{
                         return <Icon name={ focused ? 'bell' : 'bell-outline'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={NotificationScreen} />
                 <Tab.Screen name="Profile" options={{tabBarIcon: ({focused})=>{

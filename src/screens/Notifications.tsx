@@ -85,11 +85,12 @@ function Notifications({user}) {
 
 const notifications = StyleSheet.create({
    container: {
+       marginTop: 10,
        paddingVertical: 10,
        backgroundColor: '#f3f3f3',
    },
    header: {
-       paddingHorizontal: 10,
+       paddingHorizontal: 18,
        fontSize: 32,
        fontWeight: "400",
        paddingBottom: 12,

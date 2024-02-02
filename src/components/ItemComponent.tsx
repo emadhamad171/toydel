@@ -41,7 +41,7 @@ const ItemComponent = (
     return <View style={{flexDirection: 'row', alignSelf:'center', margin: 10, borderRadius: 15}}>
         <Skeleton show={isLoading} backgroundColor={"#d4d4d4"} colorMode={'light'} transition={{type: 'timing', duration: 500, delay: 100}} radius={15}>
             <View style={{flexDirection: 'row', alignSelf:'center', borderRadius: 15}}>
-        {!isOnStatus && !isLoading && <TouchableOpacity onPress={handleFavoriteClick} style={{position: 'absolute', zIndex: 4, top: 15, left:15}}><Icon name={isFavorite ? 'heart' : 'heart-outline'} style={{zIndex: 4, borderRadius: 50, padding: 5, backgroundColor: '#ccc'}} color={'#522d7e'} size={22}/></TouchableOpacity>}
+        {!isOnStatus && !isLoading && <TouchableOpacity onPress={handleFavoriteClick} style={{position: 'absolute', zIndex: 4, top: 5, left:5}}><Icon name={isFavorite ? 'heart' : 'heart-outline'} style={{zIndex: 4, borderRadius: 50, padding: 5, backgroundColor: '#ccc'}} color={'#522d7e'} size={22}/></TouchableOpacity>}
         {!isLoading && <Image style={{width: 160, height: 160, borderRadius: 10,borderColor:'#cccccc', borderWidth: 2}} source={{uri: photo}} />}
         <View style={{backgroundColor:'#cccccc',borderColor:'#cccccc', borderWidth: 1, paddingRight: 15, width:'100%', maxWidth: 220, marginLeft: -10, borderTopRightRadius: 15, borderBottomRightRadius: 10, paddingLeft:20, paddingTop: 10}}>
             <Text numberOfLines={1} ellipsizeMode={"tail"} style={{fontSize: 16,color: '#522d7e', alignSelf: 'flex-start'}}>{name}</Text>

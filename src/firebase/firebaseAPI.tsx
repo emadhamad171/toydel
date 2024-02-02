@@ -1,4 +1,4 @@
-import {addDoc, collection, getDocs, query, where} from "firebase/firestore";
+import {addDoc, collection, getDocs, query, where, orderBy, startAfter, endBefore, limit} from "firebase/firestore";
 import {auth, db, fStorage, imgStorage} from "./index";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {updateProfile} from "firebase/auth";
@@ -7,11 +7,76 @@ import {firebaseResponseType, itemType, userType} from "../helpers/types";
 
 export const getCurrentUser = () => auth.currentUser;
 
-export const loadItems = async ({path}) =>{
+export const loadAllItems = async ({path}) =>{
     const dataRef=collection(fStorage, path);
 
     const fetchedData = await getDocs(dataRef);
     return fetchedData.docs.map(el=>{return{...el.data()}});
+}
+export const loadItems = async ({path, firstSnap, orderField='rate'}) =>{
+    const dataRef = collection(fStorage, path);
+    const itemRef = query(dataRef, orderBy(orderField),limit(3),startAfter(firstSnap));
+
+    const itemSnap = await getDocs(itemRef);
+
+    return {
+        data: itemSnap.docs.map(el=>{return{...el.data()}}),
+        snaps: {
+            reloadSnap: async (orderFieldR=orderField)=>{
+                return await loadItems({path, orderField: orderFieldR, firstSnap});
+            },
+            isLastPage: itemSnap.docs.length < 3,
+            lastSnap: itemSnap.docs[itemSnap.docs.length-1],
+            firstSnap: itemSnap.docs[0],
+        }
+    }
+}
+export const firstLoadItems = async ({path, orderField = 'rate'}) =>{
+    const first = query(collection(fStorage, path), orderBy(orderField), limit(3));
+    const itemSnap = await getDocs(first);
+    return {
+        data: itemSnap.docs.map(el=>{return{...el.data()}}),
+        snaps: {
+            reloadSnap: async (orderFieldR=orderField)=>{
+                return await firstLoadItems({path, orderField: orderFieldR,});
+            },
+            lastSnap: itemSnap.docs[itemSnap.docs.length-1],
+            firstSnap: itemSnap.docs[0],
+            isLastPage: itemSnap.docs.length < 3,
+        }
+    }
+}
+export const loadItemsInNextPage = async ({path, orderField = 'rate', lastSnap}) => {
+    const dataRef = collection(fStorage, path);
+    const itemRef = query(dataRef, orderBy(orderField),limit(3),startAfter(lastSnap));
+    const itemSnap = await getDocs(itemRef);
+    return {
+        data: itemSnap.docs.map(el=>{return{...el.data()}}),
+        snaps: {
+            reloadSnap: async (orderFieldR=orderField)=>{
+                return await loadItemsInNextPage({path, orderField: orderFieldR, lastSnap});
+            },
+            lastSnap: itemSnap.docs[itemSnap.docs.length-1],
+            firstSnap: itemSnap.docs[0],
+            isLastPage: itemSnap.docs.length < 3,
+        }
+    }
+}
+export const loadItemsInPreviousPage = async ({path, orderField = 'rate', firstSnap}) => {
+    const dataRef = collection(fStorage, path);
+    const itemRef = query(dataRef, orderBy(orderField),limit(3),endBefore(firstSnap));
+    const itemSnap = await getDocs(itemRef);
+    return {
+        data: itemSnap.docs.map(el=>{return{...el.data()}}),
+        snaps: {
+            reloadSnap: async (orderFieldR=orderField)=>{
+                return await loadItemsInPreviousPage({path, orderField: orderFieldR, firstSnap});
+            },
+            lastSnap: itemSnap.docs[itemSnap.docs.length-1],
+            firstSnap: itemSnap.docs[0],
+            isLastPage: itemSnap.docs.length < 3,
+        }
+    }
 }
 export const loadSpecialItems = async ({path, specOps})  : Promise<userType[] | itemType[] | firebaseResponseType[]> =>{
     const itemRef=query(collection(fStorage, path), where(specOps.filedPath, specOps.opStr, specOps.data));

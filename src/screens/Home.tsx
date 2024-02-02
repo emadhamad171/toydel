@@ -5,7 +5,13 @@ import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useCallback, useEffect, useState } from "react";
 import {CommonActions, useNavigation} from "@react-navigation/native";
 import { auth } from "../firebase";
-import { loadUser, loadItems } from '../firebase/firebaseAPI'
+import {
+    loadUser,
+    loadItems,
+    firstLoadItems,
+    loadItemsInNextPage,
+    loadItemsInPreviousPage
+} from '../firebase/firebaseAPI'
 import WrapperComponent from "../components/WrapperComponent";
 import ItemComponent from "../components/ItemComponent";
 import PremiumPlansModal from "../modals/PremiumPlansModal";
@@ -50,11 +56,20 @@ const SearchComponent = ({ searchString, setSearch }) =>{
     </View>
 }
 
-const loadData = async ({ setListItems, setRefreshing, setFavoriteList, userID}) =>{
+const loadData = async ({ setListItems, setRefreshing, setFavoriteList, userID, isFirst=false, isReload = false, isNext= false, setPointSnap, pointSnap}) =>{
+    if(isNext && pointSnap.isLastPage){
+        setRefreshing(false);
+        return;
+    }
     const user = await loadUser({userID});
-    const listItems = await loadItems({path: 'items'});
+    const path = 'items'
+    const listItems = isFirst ? await firstLoadItems({path}) :
+        isReload ? await pointSnap.reloadSnap() :
+            isNext ? await loadItemsInNextPage({path, lastSnap: pointSnap.lastSnap}) :
+                await loadItemsInPreviousPage({path, firstSnap: pointSnap.firstSnap});
 
-    setListItems(listItems);
+    setListItems(listItems.data);
+    setPointSnap(listItems.snaps);
     setFavoriteList(user[0].favoriteList);
     setRefreshing(false);
 }
@@ -84,7 +99,7 @@ const searchByString = ({fetchedListItems, searchString}) => {
     return fetchedListItems.filter(item=>{return item&&item.name&&(item.name.toLowerCase().includes(searchString.toLowerCase()) ||item.description.toLowerCase().includes(searchString.toLowerCase()) )});
 }
 const Home = () =>{
-const [pageNumber, setPageNumber] = useState(0);
+const [pageNumber, setPageNumber] = useState(1);
 const [fetchedListItems, setFetchedListItems] = useState(itemsStackSample);
 const [isRefreshing, setRefreshing] = useState(true);
 const [userID, setUserID] = useState(auth.currentUser.uid);
@@ -92,14 +107,15 @@ const [favoriteList, setFavoriteList] = useState<string[]>([]);
 const [selectedCategories, setChoosedCategory] = useState<string[]>([]);
 const [CustomModal, setModal] = useState(null);
 const [currentModalName, setModalName] = useState('');
+const [pointSnap, setPointSnap] = useState(null);
 const [searchString, setSearch] = useState('');
     useEffect(() => {
-        loadData({setListItems: setFetchedListItems, setRefreshing, setFavoriteList, userID})
+        loadData({setListItems: setFetchedListItems, setRefreshing, setFavoriteList, userID, isFirst: true, pointSnap, setPointSnap})
     }, []);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        loadData({setListItems: (items)=> {setFetchedListItems(items)},setRefreshing, setFavoriteList, userID});
+        loadData({setListItems: setFetchedListItems,setRefreshing, setFavoriteList, userID, isReload: true, pointSnap, setPointSnap});
     }, []);
 
     return <>
@@ -125,6 +141,48 @@ const [searchString, setSearch] = useState('');
                     .filter(item => {if (item.category.some(category => selectedCategories.includes(category)) || selectedCategories.length===0) return item;})
                     .map(item=><ItemComponent key={item.id} item={item} isLoading={isRefreshing} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)}/>)
                 }
+                <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems:'center', paddingBottom:8, marginVertical: 12}}>
+                    <TouchableOpacity onPress={()=>{
+                        if(pageNumber>1) {
+                            setRefreshing(true);
+                            loadData({
+                                setListItems: (items) => {
+                                    setFetchedListItems(items)
+                                }, setRefreshing, setFavoriteList, userID, pointSnap, setPointSnap
+                            });
+                            setPageNumber((prev) => prev - 1)
+                        }
+                    }}
+                        style={{width:144,height:48,alignItems:'center', justifyContent:'center', paddingVertical:8, paddingHorizontal:16, borderRadius: 15, backgroundColor: '#b37de8'}}>
+                        <Text style={{fontSize:16}}>
+                            Previous Page
+                        </Text>
+                    </TouchableOpacity>
+                    <View style={{flexDirection:'row',gap:4,}}>
+                        <Text style={{color:'#777'}}>
+                            {pageNumber-1}
+                        </Text>
+                        <Text style={{fontSize: 16}}>
+                            {pageNumber}
+                        </Text>
+                        <Text style={{color:'#777'}}>
+                            {pointSnap?.isLastPage ? '' : pageNumber+1}
+                        </Text>
+                    </View>
+                    <TouchableOpacity onPress={()=>{
+                        if(pointSnap.isLastPage){
+                            return;
+                        }
+                        setRefreshing(true);
+                        loadData({setListItems: (items)=> {setFetchedListItems(items)},setRefreshing, setFavoriteList, userID, isNext: true, pointSnap, setPointSnap});
+                        setPageNumber((prev)=>prev+1)
+                    }}
+                        style={{width:144,height:48,alignItems:'center',justifyContent:'center', paddingVertical:8, paddingHorizontal:16, borderRadius: 15, backgroundColor: '#b37de8'}}>
+                        <Text style={{fontSize:16}}>
+                            Next Page
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </ScrollView>
         </View>
     </>

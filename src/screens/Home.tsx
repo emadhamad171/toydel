@@ -116,7 +116,7 @@ const [searchString, setSearch] = useState('');
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         loadData({setListItems: setFetchedListItems,setRefreshing, setFavoriteList, userID, isReload: true, pointSnap, setPointSnap});
-    }, []);
+    }, [pointSnap]);
 
     return <>
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />

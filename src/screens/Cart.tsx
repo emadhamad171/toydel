@@ -1,4 +1,12 @@
-import {FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {
+    FlatList,
+    Image,
+    RefreshControl,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
 import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import ItemComponent from "../components/ItemComponent";
 import {itemType, userType} from "../helpers/types";
@@ -7,7 +15,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons"
 import Stars from "../components/StarsComponent";
 import {defaultPhoto} from "../helpers/constants";
-
+import {normalize, windowHeight, windowWidth} from "../helpers";
 type cartItemType = {
     item: itemType
 }
@@ -20,68 +28,78 @@ type cartItemPropsType = {
 };
 
 const AchiveContainer = ({children}) =>{
-    return <View style={{ flexDirection: 'row', paddingHorizontal: 8, paddingVertical: 5, backgroundColor: '#eee', borderRadius: 25, marginVertical: 6, width:144, alignItems:'center', justifyContent: 'center'}}>
+    return <View style={{ flexDirection: 'row', paddingHorizontal: normalize(8), paddingVertical: normalize(10), backgroundColor: '#eee', borderRadius: 25, marginVertical: normalize(6), maxWidth:normalize(188), width:'50%', alignItems:'center', justifyContent: 'center'}}>
         {children}
     </View>
 }
 
 const UserItemModal = ({item, user} : {item:itemType, user:userType}) => {
     return (
-    <View style={{margin: 24, alignItems: 'center'}}>
-        <View style={{width: 340, height: "100%"}}>
-            <Image source={{uri: item.photo}} style={{maxWidth: 340, maxHeight: 340, width:'100%', height:'100%', alignSelf: 'center', borderRadius: 10}} />
-            <Text style={{alignSelf:'center', fontSize: 28, fontWeight: '500'}}>
-                {item.name + ' '}<Stars rate={item.rate} />
-            </Text>
+    <View style={{alignItems: 'center', justifyContent:'center', flexGrow:1}}>
+        <View style={{width: 340,marginBottom:15}}>
+            <View style={{position:'relative',alignSelf:'center', width: windowWidth*0.9}}>
+            <Image source={{uri: item.photo}} style={{minWidth:170, minHeight:170, width:windowWidth*0.9, height: windowWidth*0.85 <windowHeight*0.45 ? windowWidth*0.85 : windowHeight*0.45, alignSelf: 'center', borderRadius: 10,marginBottom: normalize(10)}} />
+            <View style={{position:'absolute', backgroundColor: '#333',borderRadius:10,padding:1, bottom:normalize(20), left: normalize(5)}}>
+            <Stars rate={item.rate} />
+            </View>
+            </View>
+            {/*<Text style={{alignSelf:'center', fontSize: normalize(32), fontWeight: '500'}}>*/}
+            {/*    {item.name + ' '}<Stars rate={item.rate} />*/}
+            {/*</Text>*/}
+            <View>
             <View style={{ flexDirection: 'row', justifyContent:'space-around'}}>
                 <AchiveContainer>
-                    <Text>Status: </Text>
-                    <Text style={{color:'#0f839d'}}>In usage</Text>
+                    <Text style={cartStyle.smallText}>Status: </Text>
+                    <Text style={cartStyle.smallItemStatus}>In usage</Text>
                 </AchiveContainer>
                 <AchiveContainer>
-                    <Text>Term: </Text>
-                    <Text style={{color:'#0f839d'}}>24.02.2024</Text>
+                    <Text style={cartStyle.smallText}>Term: </Text>
+                    <Text style={cartStyle.smallItemStatus}>24.02.2024</Text>
                 </AchiveContainer>
             </View>
             <View style={{ flexDirection: 'row', justifyContent:'space-around'}}>
                 <AchiveContainer>
-                    <Text>Brand: </Text>
-                    <Text style={{color:'#0f839d'}}>{item.brand}</Text>
+                    <Text style={cartStyle.smallText}>Brand: </Text>
+                    <Text style={cartStyle.smallItemStatus}>{item.brand}</Text>
                 </AchiveContainer>
                 <AchiveContainer>
-                    <Text>Cost: </Text>
-                    <Text style={{color:'#0f839d'}}>{item.price}$ | 150$/m</Text>
+                    <Text style={cartStyle.smallText}>Cost: </Text>
+                    <Text style={cartStyle.smallItemStatus}>{item.price}$ | 150$/m</Text>
                 </AchiveContainer>
             </View>
-            <Text style={{alignSelf:'center',marginVertical: 12}} numberOfLines={4} ellipsizeMode={'tail'}>
+            </View>
+
+            <Text style={{...cartStyle.smallText,alignSelf:'center',marginVertical: normalize(12)}} numberOfLines={4} ellipsizeMode={'tail'}>
                 {item.description}
             </Text>
+            <View>
             <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
-            <TouchableOpacity style={{width: 135, marginTop: 12}}>
-                <View style={{ backgroundColor: '#dbfcfc', borderRadius: 15, paddingHorizontal: 10, paddingVertical:10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
+            <TouchableOpacity style={{width: 135, marginTop: normalize(12)}}>
+                <View style={{ backgroundColor: '#dbfcfc', borderRadius: 15, paddingHorizontal: 10, paddingVertical:normalize(14), alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
                     <Icon name={'exchange'} size={16} style={{padding:0,marginRight: 4}}/>
-                    <Text>
+                    <Text style={cartStyle.smallText}>
                         Change toy
                     </Text>
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity style={{width: 135, marginTop: 12}}>
-                <View style={{ backgroundColor: '#dbfcdd', borderRadius: 15, paddingHorizontal: 10, paddingVertical:10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
+            <TouchableOpacity style={{width: 135, marginTop: normalize(12)}}>
+                <View style={{ backgroundColor: '#dbfcdd', borderRadius: 15, paddingHorizontal: 10, paddingVertical: normalize(14), alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
                     <MIcon name={'teddy-bear'} size={18} style={{padding:0,marginRight: 4}}/>
-                    <Text>
+                    <Text style={cartStyle.smallText}>
                         Buy toy
                     </Text>
                 </View>
             </TouchableOpacity>
             </View>
-            <TouchableOpacity style={{ marginTop: 12}}>
-                <View style={{ backgroundColor: '#d3d3d3', borderRadius: 15, paddingHorizontal: 10, paddingVertical:10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
+            <TouchableOpacity style={{ marginTop: normalize(12)}}>
+                <View style={{ backgroundColor: '#d3d3d3', borderRadius: 15, paddingHorizontal: 10, paddingVertical: normalize(14), alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
                     <MIcon name={'chart-box-outline'} size={18} style={{padding:0,marginRight: 4}}/>
-                    <Text>
+                    <Text style={cartStyle.smallText}>
                         View statistic
                     </Text>
                 </View>
             </TouchableOpacity>
+        </View>
         </View>
     </View>)
 }
@@ -127,7 +145,7 @@ const Cart = ({user}) =>{
         item: {
             brand: "Big Bang",
             category: ["Fun"],
-            description: "Description of toy and even more. Some description about toy, some description about price, some description about toy price and other stuff idk.",
+            description: "Description of toy and even more. Some description about toy, some description about price, some description about toy price and other stuff idk. Some description about toy, some description about price, some description about toy price and other stuff idk. Some description about toy, some description about price, some description about toy price and other stuff idk. Some description about toy, some description about price, some description about toy price and other stuff idk. Some description about toy, some description about price, some description about toy price and other stuff idk. Some description about toy, some description about price, some description about toy price and other stuff idk.Some description about toy, some description about price, some description about toy price and other stuff idk.",
             id: "string",
             isIncludedInPlan: false,
             name: "Name of Toy",
@@ -172,6 +190,13 @@ const cartStyle = StyleSheet.create({
         paddingBottom: 12,
         color:'#3d3a3a'
     },
+    smallText: {
+        fontSize: normalize(16)
+    },
+    smallItemStatus:{
+        color:'#0f839d',
+        fontSize: normalize(16)
+    }
 })
 
 export default Cart;

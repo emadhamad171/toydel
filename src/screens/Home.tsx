@@ -51,7 +51,7 @@ const SearchComponent = ({ searchString, setSearch }) =>{
         <View style={{flexDirection: 'row', position:'relative', maxWidth: 330,display: 'flex',alignSelf: 'center'}}>
         <Input placeholder={"Find your toy."} onChangeAction={(text:string)=>{
             setSearch(()=>text);
-        }} value={searchString} style={{backgroundColor: '#c9aaff',borderRadius: 10, width: 330, padding: 10, borderColor: '#f11'}} />
+        }} value={searchString} style={{backgroundColor: '#c9aaff',borderRadius: 10, maxWidth: 330, width: '100%', padding: 10, borderColor: '#f11'}} />
             <TouchableOpacity><Icon name={'magnify'} size={24} style={{position:'absolute', right: 5, bottom: '25%'}}/></TouchableOpacity>
         </View>
     </View>
@@ -148,7 +148,6 @@ const Home = () =>{
 const [pageNumber, setPageNumber] = useState(1);
 const [fetchedListItems, setFetchedListItems] = useState(itemsStackSample);
 const [isRefreshing, setRefreshing] = useState(true);
-const [userID, setUserID] = useState(auth.currentUser.uid);
 const [favoriteList, setFavoriteList] = useState<string[]>([]);
 const [selectedCategories, setChoosedCategory] = useState<string[]>([]);
 const [CustomModal, setModal] = useState(null);
@@ -165,19 +164,19 @@ const [searchedListItems, setSearchedItems] = useState(itemsStackSample);
     }, [searchString, selectedCategories,fetchedListItems, pageNumber]);
 
     useEffect(() => {
-        loadData({setListItems: setFetchedListItems, setRefreshing, setFavoriteList, userID})
+        loadData({setListItems: setFetchedListItems, setRefreshing, setFavoriteList, userID: auth.currentUser.uid})
     }, []);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         setPageNumber(1);
-        loadData({setListItems: setFetchedListItems,setRefreshing, setFavoriteList, userID});
+        loadData({setListItems: setFetchedListItems,setRefreshing, setFavoriteList, userID: auth.currentUser.uid});
     }, []);
 
     return <>
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
         <View style={{paddingBottom: 50}}>
-            <HeaderComponent setModal={setModal} setModalName={setModalName} user={userID} />
+            <HeaderComponent setModal={setModal} setModalName={setModalName} user={auth.currentUser.uid} />
             <FlatList
                 refreshControl={ <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} /> }
                 data={displayedListItems}

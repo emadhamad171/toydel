@@ -5,7 +5,7 @@ import {SwipeListView} from "react-native-swipe-list-view";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {getIndieNotificationInbox,deleteIndieNotificationInbox} from "../notifications";
 import {notificationType} from "../helpers/types";
-import {notificationStackSample} from "../helpers";
+import {normalize, notificationStackSample} from "../helpers";
 
 const getFormatedNotifications = (el:any) : notificationType => {
     const pushData = JSON.parse(el.pushData);
@@ -56,7 +56,7 @@ function Notifications({user}) {
         <View style={notifications.container}>
             <Text style={notifications.header}>Notifications</Text>
             <SwipeListView
-                style={{paddingVertical: 24, maxHeight: '92%'}}
+                style={{paddingVertical: normalize(12), maxHeight: '92%'}}
                 data={data}
                 refreshControl={
                     <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
@@ -85,7 +85,7 @@ function Notifications({user}) {
 
 const notifications = StyleSheet.create({
    container: {
-       marginTop: 10,
+       marginTop: normalize(10),
        paddingVertical: 10,
        backgroundColor: '#f3f3f3',
    },

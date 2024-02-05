@@ -3,7 +3,9 @@ import {loadSpecialItems, loadUser} from "../firebase/firebaseAPI";
 import {db} from "../firebase";
 import {itemType, notificationType} from "./types";
 import {defaultPhoto} from "./constants";
-
+import {Dimensions, PixelRatio} from "react-native";
+export const {width: windowWidth, height: windowHeight} = Dimensions.get("window");
+export  const normalize = (fontSize) => Math.round(PixelRatio.roundToNearestPixel(windowHeight/1080*fontSize));
 export const screenOptions = {
     headerShown: false,
     tabBarShowLabel:false,
@@ -51,7 +53,7 @@ export const loadOrCreateUser = async ({userInstance, setUser})=>{
     setUser(userCreateInstance);
 }
 
-export const loadFavoriteData = async ({setFavoriteList, userID, setFavoriteListIds}) =>{
+export const loadFavoriteData = async ({setFavoriteList, userID, setFavoriteListIds, setLoading}) =>{
     const user = await loadUser({userID});
     const favoriteList = user[0].favoriteList;
     const specOps = {
@@ -62,6 +64,7 @@ export const loadFavoriteData = async ({setFavoriteList, userID, setFavoriteList
     const favoriteListItems = await loadSpecialItems({path: "items", specOps});
     setFavoriteList(favoriteListItems);
     setFavoriteListIds(favoriteList);
+    setLoading(false);
 }
 
 export const notificationSample : notificationType = {

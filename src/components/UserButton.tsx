@@ -1,6 +1,7 @@
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import profileStyles from "../styles/profile";
+import {normalize} from "../helpers";
 
 const UserButton = ({placeholder,chevronIcon='chevron-right',iconColor='#000', icon, iconSize=22, iconProps={}, buttonProps={}, onPressAction,iconStyle=defaultStyle.icon, buttonStyle=defaultStyle.button})=> {
     return <TouchableOpacity style={buttonStyle} onPress={onPressAction} {...buttonProps}>
@@ -26,10 +27,10 @@ const defaultStyle = StyleSheet.create({
     button:{
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
+        gap: normalize(10),
         width:'100%',
-        paddingHorizontal:16,
-        paddingVertical: 8,
+        paddingHorizontal:normalize(18),
+        paddingVertical: normalize(10),
         borderRadius: 10,
         backgroundColor:'#dcdada'
     }

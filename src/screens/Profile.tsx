@@ -9,6 +9,7 @@ import UserButton from "../components/UserButton";
 import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfoModal, SupportModal } from '../modals/';
 import UserNameAndIcon from "../components/UserNameAndIcon";
 import { unregisterIndieDevice } from "../notifications/index";
+import {normalize} from "../helpers";
 
 
 const Profile =({user, setUser}) =>{
@@ -42,8 +43,8 @@ const Profile =({user, setUser}) =>{
     }
 
     return <><WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
-        <ScrollView style={{flex:1,backgroundColor:'#fff',paddingVertical: 42}}>
-            <View style={{justifyContent:'center', flex: 1, width:350, alignSelf: 'center', maxWidth: '100%', alignItems: 'center', gap: 28,marginHorizontal:15}}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center',paddingBottom:40}} style={{flex:1, backgroundColor:'#fff',paddingBottom:50,paddingVertical:12}}>
+            <View style={{ maxWidth:350, alignSelf: 'center', width: '95%', alignItems: 'center', gap: normalize(28), marginHorizontal:15}}>
                 <UserNameAndIcon user={user} userName={userName} setUserName={setUserName} updateImage={updateImage}/>
                 <View style={{gap: 5}}>
                     <UserButton icon={'account'} onPressAction={()=>{

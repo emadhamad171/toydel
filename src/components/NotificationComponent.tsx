@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, Image} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {notificationPropsType} from "../helpers/types";
 import { Skeleton } from 'moti/skeleton';
+import {normalize} from "../helpers";
 
 function NotificationComponent({id, isRefreshing, title, description,photoURL, isIndividual, isRevised, iconName, iconProps, ...props}:notificationPropsType) {
     return (<View style={{ marginBottom: 10 }}>
@@ -27,6 +28,7 @@ function NotificationComponent({id, isRefreshing, title, description,photoURL, i
 const notify = StyleSheet.create({
    container: {
         flexDirection: 'row',
+       alignItems:'center',
         backgroundColor: '#f3f3f3',
         flexGrow: 1,
         paddingHorizontal: 16,
@@ -39,10 +41,10 @@ const notify = StyleSheet.create({
      marginLeft: 14
    },
    header: {
-       fontSize: 24,
+       fontSize: normalize(32),
    },
    descriptions: {
-       fontSize: 18,
+       fontSize: normalize(24),
    },
    icon: {
        padding:0,

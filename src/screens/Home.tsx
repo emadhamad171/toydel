@@ -10,12 +10,13 @@ import {
     loadItems,
     firstLoadItems,
     loadItemsInNextPage,
-    loadItemsInPreviousPage
+    loadItemsInPreviousPage, loadAllItems
 } from '../firebase/firebaseAPI'
 import WrapperComponent from "../components/WrapperComponent";
 import ItemComponent from "../components/ItemComponent";
 import PremiumPlansModal from "../modals/PremiumPlansModal";
 import {itemsStackSample} from "../helpers";
+import {itemType} from "../helpers/types";
 
 const HeaderComponent = ({setModal, setModalName, user}) =>{
     const navigation = useNavigation();
@@ -56,24 +57,22 @@ const SearchComponent = ({ searchString, setSearch }) =>{
     </View>
 }
 
-const loadData = async ({ setListItems, setRefreshing, setFavoriteList, userID, isFirst=false, isReload = false, isNext= false, setPointSnap, pointSnap}) =>{
-    if(isNext && pointSnap.isLastPage){
-        setRefreshing(false);
-        return;
-    }
+const loadData = async ({ setListItems, setRefreshing, setFavoriteList, userID}) =>{
     const user = await loadUser({userID});
     const path = 'items'
-    const listItems = isFirst ? await firstLoadItems({path}) :
-        isReload ? await pointSnap.reloadSnap() :
-            isNext ? await loadItemsInNextPage({path, lastSnap: pointSnap.lastSnap}) :
-                await loadItemsInPreviousPage({path, firstSnap: pointSnap.firstSnap});
+    const listItems = await loadAllItems({path});
 
-    setListItems(listItems.data);
-    setPointSnap(listItems.snaps);
+    setListItems(listItems);
     setFavoriteList(user[0].favoriteList);
     setRefreshing(false);
 }
 
+const getDisplayedList = ({fetchedListItems, page} : {fetchedListItems : itemType[], page: number}) => {
+    const data = fetchedListItems;
+    data.splice(0,(page-1)*3);
+    data.splice(page*3, fetchedListItems.length-1);
+    return data;
+}
 const CategoryItem = ({ name, isSelected, onPressAction }) => {
     return <TouchableOpacity onPress={()=>onPressAction(isSelected)}><Text style={{fontSize: 18}}> <Icon name={isSelected? 'checkbox-marked-outline' : 'checkbox-blank-outline'} size={24}/> {name}</Text></TouchableOpacity>
 }
@@ -107,16 +106,26 @@ const [favoriteList, setFavoriteList] = useState<string[]>([]);
 const [selectedCategories, setChoosedCategory] = useState<string[]>([]);
 const [CustomModal, setModal] = useState(null);
 const [currentModalName, setModalName] = useState('');
-const [pointSnap, setPointSnap] = useState(null);
 const [searchString, setSearch] = useState('');
+const [displayedListItems, setDisplayedListItems] = useState(itemsStackSample);
+const [searchedListItems, setSearchedItems] = useState(itemsStackSample);
+
     useEffect(() => {
-        loadData({setListItems: setFetchedListItems, setRefreshing, setFavoriteList, userID, isFirst: true, pointSnap, setPointSnap})
+        const searchedItems = searchByString({fetchedListItems, searchString})
+            .filter(item => {if (item.category.some(category => selectedCategories.includes(category)) || selectedCategories.length===0) return item;});
+        setSearchedItems(searchedItems);
+        setDisplayedListItems(getDisplayedList( {fetchedListItems: searchedItems, page: pageNumber}));
+    }, [searchString, selectedCategories,fetchedListItems, pageNumber]);
+
+    useEffect(() => {
+        loadData({setListItems: setFetchedListItems, setRefreshing, setFavoriteList, userID})
     }, []);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        loadData({setListItems: setFetchedListItems,setRefreshing, setFavoriteList, userID, isReload: true, pointSnap, setPointSnap});
-    }, [pointSnap]);
+        setPageNumber(1);
+        loadData({setListItems: setFetchedListItems,setRefreshing, setFavoriteList, userID});
+    }, []);
 
     return <>
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
@@ -137,19 +146,11 @@ const [searchString, setSearch] = useState('');
                     </TouchableOpacity>
                 </View>
                 {
-                    searchByString({fetchedListItems, searchString})
-                    .filter(item => {if (item.category.some(category => selectedCategories.includes(category)) || selectedCategories.length===0) return item;})
-                    .map(item=><ItemComponent key={item.id} item={item} isLoading={isRefreshing} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)}/>)
+                    displayedListItems.map(item=><ItemComponent key={item.id} item={item} isLoading={isRefreshing} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)}/>)
                 }
                 <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems:'center', paddingBottom:8, marginVertical: 12}}>
                     <TouchableOpacity onPress={()=>{
                         if(pageNumber>1) {
-                            setRefreshing(true);
-                            loadData({
-                                setListItems: (items) => {
-                                    setFetchedListItems(items)
-                                }, setRefreshing, setFavoriteList, userID, pointSnap, setPointSnap
-                            });
                             setPageNumber((prev) => prev - 1)
                         }
                     }}
@@ -160,21 +161,17 @@ const [searchString, setSearch] = useState('');
                     </TouchableOpacity>
                     <View style={{flexDirection:'row',gap:4,}}>
                         <Text style={{color:'#777'}}>
-                            {pageNumber-1}
+                            {pageNumber-1 ? pageNumber-1 : ''}
                         </Text>
                         <Text style={{fontSize: 16}}>
                             {pageNumber}
                         </Text>
                         <Text style={{color:'#777'}}>
-                            {pointSnap?.isLastPage ? '' : pageNumber+1}
+                            {searchedListItems.length<pageNumber*3 ? '' : pageNumber+1}
                         </Text>
                     </View>
                     <TouchableOpacity onPress={()=>{
-                        if(pointSnap.isLastPage){
-                            return;
-                        }
-                        setRefreshing(true);
-                        loadData({setListItems: (items)=> {setFetchedListItems(items)},setRefreshing, setFavoriteList, userID, isNext: true, pointSnap, setPointSnap});
+                        if(searchedListItems.length<pageNumber*3) return;
                         setPageNumber((prev)=>prev+1)
                     }}
                         style={{width:144,height:48,alignItems:'center',justifyContent:'center', paddingVertical:8, paddingHorizontal:16, borderRadius: 15, backgroundColor: '#b37de8'}}>

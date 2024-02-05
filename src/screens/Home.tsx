@@ -1,4 +1,4 @@
-import {RefreshControl, ScrollView, TouchableOpacity, View, Text, LogBox} from "react-native";
+import {RefreshControl, ScrollView, TouchableOpacity, View, Text, LogBox, FlatList} from "react-native";
 import Input from "../components/Input";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
@@ -97,6 +97,53 @@ const FilterModal = ({ setModal, setSelectedCategory, selectedCategories }) =>{
 const searchByString = ({fetchedListItems, searchString}) => {
     return fetchedListItems.filter(item=>{return item&&item.name&&(item.name.toLowerCase().includes(searchString.toLowerCase()) ||item.description.toLowerCase().includes(searchString.toLowerCase()) )});
 }
+const SearchAndFilterComponent = ({setSearch, searchString, setModal, selectedCategories, setChoosedCategory, setModalName}) => {
+    return <>
+        <SearchComponent setSearch={setSearch} searchString={searchString}/>
+        <View style={{flexDirection:'row', flexGrow: 1, alignItems: 'center',justifyContent: 'space-between'}}>
+            <Text style={{marginTop:10,marginLeft: 10, fontSize: 18}}>Toys</Text>
+            <TouchableOpacity style={{alignSelf: 'flex-end', flexDirection:'row',alignItems:'center', marginRight: 15, marginTop:10, borderWidth:1,padding:5, borderRadius: 10}} onPress={()=>{
+                setModal(()=>{return ()=><FilterModal setModal={setModal} selectedCategories={selectedCategories} setSelectedCategory={setChoosedCategory}/>})
+                setModalName("Filter");
+            }}>
+                <Text> <Icon name={'filter-variant'} size={24}/> </Text>
+                <Text>Filter</Text>
+            </TouchableOpacity>
+        </View>
+    </>
+}
+const PageButtonsComponent = ({pageNumber, setPageNumber,searchedListItems}) => <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems:'center', paddingBottom:8, marginVertical: 12}}>
+    <TouchableOpacity onPress={()=>{
+        if(pageNumber>1) {
+            setPageNumber((prev) => prev - 1)
+        }
+    }}
+                      style={{width:144,height:48,alignItems:'center', justifyContent:'center', paddingVertical:8, paddingHorizontal:16, borderRadius: 15, backgroundColor: '#b37de8'}}>
+        <Text style={{fontSize:16}}>
+            Previous Page
+        </Text>
+    </TouchableOpacity>
+    <View style={{flexDirection:'row',gap:4,}}>
+        <Text style={{color:'#777'}}>
+            {pageNumber-1 ? pageNumber-1 : ''}
+        </Text>
+        <Text style={{fontSize: 16}}>
+            {pageNumber}
+        </Text>
+        <Text style={{color:'#777'}}>
+            {searchedListItems.length<pageNumber*3 ? '' : pageNumber+1}
+        </Text>
+    </View>
+    <TouchableOpacity onPress={()=>{
+        if(searchedListItems.length<pageNumber*3) return;
+        setPageNumber((prev)=>prev+1)
+    }}
+                      style={{width:144,height:48,alignItems:'center',justifyContent:'center', paddingVertical:8, paddingHorizontal:16, borderRadius: 15, backgroundColor: '#b37de8'}}>
+        <Text style={{fontSize:16}}>
+            Next Page
+        </Text>
+    </TouchableOpacity>
+</View>
 const Home = () =>{
 const [pageNumber, setPageNumber] = useState(1);
 const [fetchedListItems, setFetchedListItems] = useState(itemsStackSample);
@@ -131,56 +178,13 @@ const [searchedListItems, setSearchedItems] = useState(itemsStackSample);
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
         <View style={{paddingBottom: 50}}>
             <HeaderComponent setModal={setModal} setModalName={setModalName} user={userID} />
-            <ScrollView refreshControl={
-                <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
-            }>
-                <SearchComponent setSearch={setSearch} searchString={searchString}/>
-                <View style={{flexDirection:'row', flexGrow: 1, alignItems: 'center',justifyContent: 'space-between'}}>
-                    <Text style={{marginTop:10,marginLeft: 10, fontSize: 18}}>Toys</Text>
-                    <TouchableOpacity style={{alignSelf: 'flex-end', flexDirection:'row',alignItems:'center', marginRight: 15, marginTop:10, borderWidth:1,padding:5, borderRadius: 10}} onPress={()=>{
-                        setModal(()=>{return ()=><FilterModal setModal={setModal} selectedCategories={selectedCategories} setSelectedCategory={setChoosedCategory}/>})
-                        setModalName("Filter");
-                    }}>
-                        <Text> <Icon name={'filter-variant'} size={24}/> </Text>
-                        <Text>Filter</Text>
-                    </TouchableOpacity>
-                </View>
-                {
-                    displayedListItems.map(item=><ItemComponent key={item.id} item={item} isLoading={isRefreshing} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)}/>)
-                }
-                <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems:'center', paddingBottom:8, marginVertical: 12}}>
-                    <TouchableOpacity onPress={()=>{
-                        if(pageNumber>1) {
-                            setPageNumber((prev) => prev - 1)
-                        }
-                    }}
-                        style={{width:144,height:48,alignItems:'center', justifyContent:'center', paddingVertical:8, paddingHorizontal:16, borderRadius: 15, backgroundColor: '#b37de8'}}>
-                        <Text style={{fontSize:16}}>
-                            Previous Page
-                        </Text>
-                    </TouchableOpacity>
-                    <View style={{flexDirection:'row',gap:4,}}>
-                        <Text style={{color:'#777'}}>
-                            {pageNumber-1 ? pageNumber-1 : ''}
-                        </Text>
-                        <Text style={{fontSize: 16}}>
-                            {pageNumber}
-                        </Text>
-                        <Text style={{color:'#777'}}>
-                            {searchedListItems.length<pageNumber*3 ? '' : pageNumber+1}
-                        </Text>
-                    </View>
-                    <TouchableOpacity onPress={()=>{
-                        if(searchedListItems.length<pageNumber*3) return;
-                        setPageNumber((prev)=>prev+1)
-                    }}
-                        style={{width:144,height:48,alignItems:'center',justifyContent:'center', paddingVertical:8, paddingHorizontal:16, borderRadius: 15, backgroundColor: '#b37de8'}}>
-                        <Text style={{fontSize:16}}>
-                            Next Page
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
+            <FlatList
+                refreshControl={ <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} /> }
+                data={displayedListItems}
+                renderItem={({item})=><ItemComponent key={item.id} item={item} isLoading={isRefreshing} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)} />}
+                ListHeaderComponent={()=><SearchAndFilterComponent setSearch={setSearch} searchString={searchString} setModal={setModal} setModalName={setModalName} setChoosedCategory={setChoosedCategory} selectedCategories={selectedCategories}/>}
+                ListFooterComponent={()=><PageButtonsComponent pageNumber={pageNumber} setPageNumber={setPageNumber} searchedListItems={searchedListItems} />}
+            />
         </View>
     </>
 }

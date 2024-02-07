@@ -1,4 +1,5 @@
 import {StyleSheet} from "react-native";
+import {normalize, windowWidth} from "../helpers";
 
 export const styles = StyleSheet.create({
     body: {
@@ -11,18 +12,20 @@ export const styles = StyleSheet.create({
     },
     authContainer: {
         width: '100%',
-        height: '65%',
+        height: 600,
         paddingTop: 20,
         alignItems: 'center',
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
-        gap: 5,
+        gap: normalize(5),
         backgroundColor: '#9e44cb',
     },
     logoContainer: {
-        marginVertical: 'auto',
         width: '100%',
-        height: '35%',
+        maxHeight: '35%',
+        paddingVertical: 32,
+        flexDirection: 'column',
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -63,7 +66,8 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 10,
         borderRadius: 25,
-        width: 330,
+        width: normalize(520),
+        maxWidth: windowWidth*0.85,
         backgroundColor: '#367dc7'
     },
     continueButtonText: {

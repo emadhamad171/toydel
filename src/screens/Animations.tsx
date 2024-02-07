@@ -1,5 +1,6 @@
 import {Animated} from "react-native";
 import Toast from "react-native-toast-message";
+import {normalize, windowHeight} from "../helpers";
 
 export const hideAuthScreen = ({posBody}) => {
     Animated.spring(posBody,{
@@ -27,13 +28,13 @@ export const showAuth = ({topPos, marginTop}) =>{
 
 export const showLoading = ({topPos, marginTop, afterAnimate = ()=>{}}) =>{
     Animated.spring(topPos,{
-            toValue: 650,
+            toValue: normalize(windowHeight),
             speed:1.5,
             useNativeDriver: false,
         }
     ).start(()=>{afterAnimate()});
     Animated.spring(marginTop,{
-            toValue: 270,
+            toValue: normalize(windowHeight/2),
             speed:1.5,
             useNativeDriver: false,
         }

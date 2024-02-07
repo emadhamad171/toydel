@@ -13,7 +13,7 @@ import PhoneNumberInput from "../components/PhoneNumberInput";
 import {styles} from '../styles/authorization';
 import {useFirebaseLogin as useFirebaseOTPLogin} from "@itzsunny/firebase-login";
 import {auth, firebaseConfig} from "../firebase";
-import {signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCredential} from 'firebase/auth';
+import {signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCredential, sendEmailVerification} from 'firebase/auth';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 import ContinueButton from "../components/ContinueButton";
@@ -21,6 +21,7 @@ import {GoogleAuthProvider} from 'firebase/auth'
 import Input from "../components/Input";
 
 import {GOOGLE_WEB_CLIENT_ID} from 'react-native-dotenv'
+import {normalize} from "../helpers";
 
 const wait = async () =>{
     return await new Promise((resolve)=>{setTimeout(()=>{resolve(1);}, 600)});
@@ -58,7 +59,7 @@ const FooterText = () => {
 }
 const LineSectionDivider = () => {
     return (
-        <View style={{flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 15}}>
+        <View style={{flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: normalize(12)}}>
             <LineView width={130} color={'#d0d3da'}/>
             <Text style={{alignSelf: 'center', textAlign: 'center', textAlignVertical: 'center', fontSize: 16}}>or
                 with</Text>
@@ -68,7 +69,7 @@ const LineSectionDivider = () => {
 }
 const LogoSection = ({marginTop}) => {
     return (
-        <Animated.View style={{...styles.logoContainer, marginVertical: marginTop}}>
+        <Animated.View style={{...styles.logoContainer, marginTop: marginTop}}>
             <View style={styles.logoTextContainer}>
                 <Text style={styles.logoText}>ToyDel </Text>
                 <Icon name={"teddy-bear"} style={styles.logoIcon} size={52}/>
@@ -78,8 +79,8 @@ const LogoSection = ({marginTop}) => {
 }
 const AuthScreen = () => {
 //************ Component Config ***************/
-    const topPos = useRef(new Animated.Value(650)).current;
-    const marginTop = useRef(new Animated.Value(270)).current;
+    const topPos = useRef(new Animated.Value(normalize(650))).current;
+    const marginTop = useRef(new Animated.Value(normalize(270))).current;
 
     const [loginType, setLoginType] = useState('phone');
     const [isRegister, setRegister] = useState(false);
@@ -153,19 +154,15 @@ const AuthScreen = () => {
         //***************** Authorization with Email *********************
         showLoading({topPos,marginTop});
         await wait();
-        const cred = isRegister ? await createUserWithEmailAndPassword(auth, email,password).then().catch((e)=>{
-            const errorCode= e.code;
-            hideLoading({topPos,marginTop});
-            switch (errorCode) {
-                //TODO: Process error code of registration
-                case 'auth/email-already-in-use':
-                    console.log('User already exist');
-                    break;
-                default:
-                    console.log('Something went wrong.');
-                    break;
+        let cred;
+        try {
+            if(isRegister){
+                cred = await createUserWithEmailAndPassword(auth, email,password);
+                await sendEmailVerification(cred.user);
             }
-        }) : await signInWithEmailAndPassword(auth,email,password).then().catch(async (e)=>{
+            await signInWithEmailAndPassword(auth,email,password);
+            hideLoading({topPos,marginTop});
+        } catch (e){
             const errorCode= e.code;
             hideLoading({topPos,marginTop});
             switch (errorCode) {
@@ -176,11 +173,19 @@ const AuthScreen = () => {
                 case 'auth/user-not-found':
                     console.log('User in`t registered.');
                     break;
+                case 'auth/email-already-in-use':
+                    console.log('User already exist');
+                    break;
                 default:
+                    console.log(errorCode, e);
                     console.log('Something went wrong.');
                     break;
             }
-        });
+        }
+
+        if(isRegister){
+
+        }
     }
 
     //***************** Google Authorization *********************
@@ -250,7 +255,6 @@ const AuthScreen = () => {
                 <View style={{alignItems: 'center', justifyContent: 'space-between', flexGrow: 1}}>
                     <OtherLoginWayButton loginType={loginType} setLoginType={setLoginType}/>
                     {recaptcha}
-                    <FooterText/>
                 </View>
             </Animated.View>
         </Animated.View>);

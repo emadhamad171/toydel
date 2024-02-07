@@ -14,22 +14,30 @@ import registerNNPushToken, { registerIndieID } from './src/notifications';
 import Notifications from "./src/screens/Notifications";
 import {loadOrCreateUser, screenOptions, signInSuccessfulToast, signInWarningToast} from "./src/helpers";
 import Cart from "./src/screens/Cart";
+import {notificationAppToken, notificationAppId} from 'react-native-dotenv'
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
     const [user, setUser] = useState(null);
-    registerNNPushToken(19000, 'l5ddGPLeP7FdsO5c8gy4Dl');
+    const [isUserVerified, setUserVerify] = useState(false);
+    registerNNPushToken(notificationAppId, notificationAppToken);
     useEffect(() => {
         onAuthStateChanged(auth, (userInstance) => {
             if(!!userInstance){
-                registerIndieID(userInstance.uid, 19000, 'l5ddGPLeP7FdsO5c8gy4Dl');
-                loadOrCreateUser({userInstance, setUser}).then(()=>{
-                    signInSuccessfulToast();
-                }).catch((e)=>{
-                    signInWarningToast();
-                    console.log(e);
-                });
+                if(!!userInstance?.emailVerified || !!userInstance?.phoneNumber) {
+                    setUserVerify(true);
+                    registerIndieID(userInstance.uid, notificationAppId, notificationAppToken);
+                    loadOrCreateUser({userInstance, setUser}).then(() => {
+                        signInSuccessfulToast();
+                    }).catch((e) => {
+                        signInWarningToast();
+                        console.log(e);
+                    });
+                } else {
+                    auth.signOut().then(()=>
+                        Toast.show({type: 'info', text1:'User registered', text2: 'Check your email to verify it.'}))
+                }
             }
         });
     }, []);
@@ -40,7 +48,7 @@ export default function App() {
 
     return (<>
             <StatusBar style="auto" hidden={true}/>
-        {user ?
+        {user && isUserVerified ?
         <NavigationContainer>
             <Tab.Navigator initialRouteName={'Profile'} screenOptions={screenOptions}>
                 <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{

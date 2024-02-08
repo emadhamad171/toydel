@@ -4,16 +4,15 @@ import {normalize, windowWidth} from "../helpers";
 export const styles = StyleSheet.create({
     body: {
         width: '100%',
-        height: '100%',
-        position: 'absolute',
-        left: 0,
+        flex: 1,
         backgroundColor: "#e3aeff",
         justifyContent: 'space-between',
     },
     authContainer: {
         width: '100%',
-        height: 600,
         paddingTop: 20,
+        marginBottom: -50,
+        paddingBottom: 120,
         alignItems: 'center',
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
@@ -22,7 +21,6 @@ export const styles = StyleSheet.create({
     },
     logoContainer: {
         width: '100%',
-        maxHeight: '35%',
         paddingVertical: 32,
         flexDirection: 'column',
         flexGrow: 1,

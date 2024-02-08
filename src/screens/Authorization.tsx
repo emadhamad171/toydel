@@ -22,6 +22,7 @@ import Input from "../components/Input";
 
 import {GOOGLE_WEB_CLIENT_ID} from 'react-native-dotenv'
 import {normalize} from "../helpers";
+import {SafeAreaView} from "moti";
 
 const wait = async () =>{
     return await new Promise((resolve)=>{setTimeout(()=>{resolve(1);}, 600)});
@@ -69,7 +70,7 @@ const LineSectionDivider = () => {
 }
 const LogoSection = ({marginTop}) => {
     return (
-        <Animated.View style={{...styles.logoContainer, marginTop: marginTop}}>
+        <Animated.View style={{...styles.logoContainer, marginBottom: marginTop}}>
             <View style={styles.logoTextContainer}>
                 <Text style={styles.logoText}>ToyDel </Text>
                 <Icon name={"teddy-bear"} style={styles.logoIcon} size={52}/>
@@ -79,7 +80,7 @@ const LogoSection = ({marginTop}) => {
 }
 const AuthScreen = () => {
 //************ Component Config ***************/
-    const topPos = useRef(new Animated.Value(normalize(650))).current;
+    const topPos = useRef(new Animated.Value(normalize(-750))).current;
     const marginTop = useRef(new Animated.Value(normalize(270))).current;
 
     const [loginType, setLoginType] = useState('phone');
@@ -215,11 +216,11 @@ const AuthScreen = () => {
     }
 
     return (
-        <Animated.View style={{...styles.body }}>
-
+        <View style={{...styles.body }}>
+        <SafeAreaView style={styles.body}>
             <LogoSection marginTop={marginTop}/>
 
-            <Animated.View style={{...styles.authContainer, transform: [{translateY: topPos}]}}>
+            <Animated.View style={{...styles.authContainer, marginBottom: topPos, }}>
                 <Text style={styles.headerText}>Welcome</Text>
                 <Text style={styles.subHeaderText}>Let's {isRegister ? 'start' : 'continue'} with
                     your {loginType === 'email' ? 'email' : "phone number"}</Text>
@@ -257,7 +258,8 @@ const AuthScreen = () => {
                     {recaptcha}
                 </View>
             </Animated.View>
-        </Animated.View>);
+        </SafeAreaView>
+        </View>);
 }
 
 //<EmailInput setIsPasswordSame={setIsPasswordSame} isEmailValid={isValidEmail} isPasswordSame={isPasswordSame} isRegister={isRegister}

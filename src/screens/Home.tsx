@@ -17,10 +17,11 @@ import ItemComponent from "../components/ItemComponent";
 import PremiumPlansModal from "../modals/PremiumPlansModal";
 import {itemsStackSample} from "../helpers";
 import {itemType} from "../helpers/types";
+import {SafeAreaView} from "moti";
 
 const HeaderComponent = ({setModal, setModalName, user}) =>{
     const navigation = useNavigation();
-    return <View style={{backgroundColor: '#a333ff',width: '100%', paddingVertical: 10, paddingHorizontal:10, flexDirection: 'row', justifyContent:'space-between'}}>
+    return <View style={{backgroundColor: '#a333ff',width: '100%', paddingTop: 70, transform: [{translateY: -70}],position: 'absolute', zIndex:2, paddingHorizontal:10, flexDirection: 'row', justifyContent:'space-between'}}>
         <View style={{flexDirection: 'row', gap: 15, marginLeft: 5}}>
         <Icon name={'teddy-bear'} size={32} color={"#4f0bb2"}/>
         <TouchableOpacity style={{alignSelf:'center', backgroundColor: '#c29cff', borderRadius: 5, padding: 5}} onPress={()=>{
@@ -47,7 +48,7 @@ const HeaderComponent = ({setModal, setModalName, user}) =>{
     </View>
 }
 const SearchComponent = ({ searchString, setSearch }) =>{
-    return <View style={{backgroundColor: '#a333ff', borderBottomStartRadius:10, borderBottomEndRadius:10,width: '100%', paddingBottom: 50, paddingTop:30}}>
+    return <View style={{backgroundColor: '#a333ff', borderBottomStartRadius:10, borderBottomEndRadius:10,width: '100%', paddingBottom: 50, paddingTop:60}}>
         <View style={{flexDirection: 'row', position:'relative', maxWidth: 330,display: 'flex',alignSelf: 'center'}}>
         <Input placeholder={"Find your toy."} onChangeAction={(text:string)=>{
             setSearch(()=>text);
@@ -173,19 +174,21 @@ const [searchedListItems, setSearchedItems] = useState(itemsStackSample);
         loadData({setListItems: setFetchedListItems,setRefreshing, setFavoriteList, userID: auth.currentUser.uid});
     }, []);
 
-    return <>
+    return <View style={{flex: 1}}>
+        <SafeAreaView>
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
-        <View style={{paddingBottom: 50}}>
+        <View style={{}}>
             <HeaderComponent setModal={setModal} setModalName={setModalName} user={auth.currentUser.uid} />
             <FlatList
-                refreshControl={ <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} /> }
+                refreshControl={ <RefreshControl style={{backgroundColor: '#a333ff'}} refreshing={isRefreshing} onRefresh={onRefresh} /> }
                 data={displayedListItems}
                 renderItem={({item})=><ItemComponent key={item.id} item={item} isLoading={isRefreshing} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)} />}
                 ListHeaderComponent={()=><SearchAndFilterComponent setSearch={setSearch} searchString={searchString} setModal={setModal} setModalName={setModalName} setChoosedCategory={setChoosedCategory} selectedCategories={selectedCategories}/>}
                 ListFooterComponent={()=><PageButtonsComponent pageNumber={pageNumber} setPageNumber={setPageNumber} searchedListItems={searchedListItems} />}
             />
         </View>
-    </>
+        </SafeAreaView>
+    </View>
 }
 
 export default Home;

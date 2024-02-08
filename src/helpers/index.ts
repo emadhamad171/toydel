@@ -10,7 +10,8 @@ export const screenOptions = {
     headerShown: false,
     tabBarShowLabel:false,
     tabBarStyle: {
-        height: 50
+        height: 70,
+        paddingVertical: 5
     }
 };
 export const signInSuccessfulToast = () =>{

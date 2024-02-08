@@ -38,7 +38,7 @@ const ItemComponent = (
     const handleFavoriteClick = () => {
         isFavorite ? removeItemFromFavoriteList() : addItemToFavoriteList();
     }
-    return <View style={{flexDirection: 'row', alignSelf:'center', marginVertical: 10, borderRadius: 15}}>
+    return <TouchableOpacity onPress={()=>{}} style={{flexDirection: 'row', alignSelf:'center', marginVertical: 10, borderRadius: 15}}>
         <Skeleton show={isLoading} backgroundColor={"#d4d4d4"} colorMode={'light'} transition={{type: 'timing', duration: 500, delay: 100}} radius={15}>
             <View style={{flexDirection: 'row', alignSelf:'center', borderRadius: 15}}>
         {!isOnStatus && !isLoading && <TouchableOpacity onPress={handleFavoriteClick} style={{position: 'absolute', zIndex: 4, top: 5, left:5}}><Icon name={isFavorite ? 'heart' : 'heart-outline'} style={{zIndex: 4, borderRadius: 50, padding: 5, backgroundColor: '#ccc'}} color={'#522d7e'} size={22}/></TouchableOpacity>}
@@ -66,6 +66,6 @@ const ItemComponent = (
         </View>
             </View>
         </Skeleton>
-    </View>
+    </TouchableOpacity>
 }
 export default ItemComponent;

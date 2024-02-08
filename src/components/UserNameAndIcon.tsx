@@ -12,7 +12,7 @@ const UserNameAndIcon = ({user, userName, setUserName, updateImage})=>{
     const [isUserNameChanged, handleUsernameChange] = useState(false);
     const [isUserNameValid, handleUserNameValid] = useState(true);
 
-    const isValidName = (name:string) =>name?.length>0 && (name.length<12 || name.length < user.displayName.length);
+    const isValidName = (name:string) =>(name.length<12 || name.length < user.displayName.length);
 
     useEffect(() => {
         handleUsernameChange(userName!==user.displayName);
@@ -20,13 +20,14 @@ const UserNameAndIcon = ({user, userName, setUserName, updateImage})=>{
     }, [userName]);
 
     const handleUserNameChangeSubmit = () =>{
-        if(isUserNameChanged && isUserNameValid) {
+        if(isUserNameChanged && isUserNameValid && userName.length) {
             updateUserName({name: userName});
             Toast.show({type:'success', text1:'Name changed!', swipeable: true, visibilityTime:800});
+            handleUsernameChange(false);
             userNameInput.current.blur();
         } else {
-            if(!isUserNameValid) {
-                setUserName(user.displayName);
+            if(!isUserNameValid || !userName.length) {
+                setUserName(user.displayName || 'Set Name');
                 Toast.show({type:'info', text1:'Name isn`t valid!', swipeable: true, visibilityTime:800});
                 return;
             }

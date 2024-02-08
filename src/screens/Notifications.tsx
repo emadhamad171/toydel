@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {getIndieNotificationInbox,deleteIndieNotificationInbox} from "../notifications";
 import {notificationType} from "../helpers/types";
 import {normalize, notificationStackSample} from "../helpers";
+import {SafeAreaView} from "moti";
 
 const getFormatedNotifications = (el:any) : notificationType => {
     const pushData = JSON.parse(el.pushData);
@@ -54,6 +55,7 @@ function Notifications({user}) {
 
     return (
         <View style={notifications.container}>
+            <SafeAreaView style={notifications.container}>
             <Text style={notifications.header}>Notifications</Text>
             <SwipeListView
                 style={{paddingVertical: normalize(12), maxHeight: '92%'}}
@@ -79,6 +81,7 @@ function Notifications({user}) {
                     />
                     }
             />
+            </SafeAreaView>
         </View>
     );
 }

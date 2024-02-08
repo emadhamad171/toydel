@@ -16,6 +16,7 @@ import MIcon from "react-native-vector-icons/MaterialCommunityIcons"
 import Stars from "../components/StarsComponent";
 import {defaultPhoto} from "../helpers/constants";
 import {normalize, windowHeight, windowWidth} from "../helpers";
+import {SafeAreaView} from "moti";
 type cartItemType = {
     item: itemType
 }
@@ -35,7 +36,7 @@ const AchiveContainer = ({children}) =>{
 
 const UserItemModal = ({item, user} : {item:itemType, user:userType}) => {
     return (
-    <View style={{alignItems: 'center', justifyContent:'center', flexGrow:1}}>
+    <SafeAreaView style={{alignItems: 'center', justifyContent:'center', flexGrow:1}}>
         <View style={{width: 340,marginBottom:15}}>
             <View style={{position:'relative',alignSelf:'center', width: windowWidth*0.9}}>
             <Image source={{uri: item.photo}} style={{minWidth:170, minHeight:170, width:windowWidth*0.9, height: windowWidth*0.85 <windowHeight*0.45 ? windowWidth*0.85 : windowHeight*0.45, alignSelf: 'center', borderRadius: 10,marginBottom: normalize(10)}} />
@@ -101,7 +102,7 @@ const UserItemModal = ({item, user} : {item:itemType, user:userType}) => {
             </TouchableOpacity>
         </View>
         </View>
-    </View>)
+    </SafeAreaView>)
 }
 
 const CartItem = ({item, setItemModal, setModalName, user, isLoading}:cartItemPropsType) =>{
@@ -155,8 +156,8 @@ const Cart = ({user}) =>{
         }
         }
     ]
-    return (<>
-        <View style={cartStyle.container}>
+    return (<View style={{flex: 1}}>
+        <SafeAreaView style={cartStyle.container}>
             <View style={{flexDirection: 'row', flexGrow: 1, justifyContent: 'space-between', alignItems: 'center'}}>
                 <Text style={cartStyle.header}>Your toys</Text>
                 <Text style={cartStyle.subHeader}>{data.length}/{4}</Text>
@@ -165,9 +166,9 @@ const Cart = ({user}) =>{
                       renderItem={({item})=><CartItem item={item} key={item.item.id} user={user} isLoading={isLoading} setItemModal={setItemModal} setModalName={setModalName}/>}
                       refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
             />
-        </View>
+        </SafeAreaView>
             <WrapperComponent ItemModal={ItemModal} setModal={setItemModal} modalName={modalName} />
-        </>
+        </View>
     );
 }
 

@@ -10,6 +10,7 @@ import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfo
 import UserNameAndIcon from "../components/UserNameAndIcon";
 import { unregisterIndieDevice } from "../notifications/index";
 import {normalize} from "../helpers";
+import {SafeAreaView} from "moti";
 
 
 const Profile =({user, setUser}) =>{
@@ -42,8 +43,10 @@ const Profile =({user, setUser}) =>{
         Toast.show({type: 'success', text1: 'Sign out successful'});
     }
 
-    return <><WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
-        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center',paddingBottom:40}} style={{flex:1, backgroundColor:'#fff',paddingBottom:50,paddingVertical:12}}>
+    return <>
+        <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
+        <SafeAreaView style={{flex:1, backgroundColor:'#fff'}}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center',paddingVertical: normalize(20)}} style={{flex:1, backgroundColor:'#fff'}}>
             <View style={{ maxWidth:350, alignSelf: 'center', width: '95%', alignItems: 'center', gap: normalize(28), marginHorizontal:15}}>
                 <UserNameAndIcon user={user} userName={userName} setUserName={setUserName} updateImage={updateImage}/>
                 <View style={{gap: 5}}>
@@ -82,7 +85,9 @@ const Profile =({user, setUser}) =>{
                 </View>
                 <UserButton icon={'logout'} onPressAction={onPressLogout} placeholder={"Logout"} />
             </View>
-        </ScrollView></>;
+        </ScrollView>
+        </SafeAreaView>
+    </>;
 }
 
 export default Profile;

@@ -55,7 +55,8 @@ export const styles = StyleSheet.create({
         color: '#0d0117',
         borderRadius: 10,
         width: '100%',
-        padding: 10,
+        paddingVertical: normalize(16),
+        paddingHorizontal: normalize(14),
         borderColor: '#f11'
     },
     continueButton: {

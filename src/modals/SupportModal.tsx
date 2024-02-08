@@ -23,7 +23,7 @@ const setSupport = ({supportInfo})=> {
 const getSupport =`(function() {
 setTimeout(()=>{
   const ids = window.localStorage.getItem('@@lc_ids');
-  const token = window.localStorage.getItem('@@lc_auth_token:5273fef3-1326-4aba-9f8b-4331c9697529');
+  const token = window.localStorage.getItem('@@lc_auth_token:50c6cd15-ed8c-44db-bf6d-9ca5df4833e1');
   const data123 = {lc_ids: ids, auth_token: token};
   const pData = JSON.stringify(data123);
   window.ReactNativeWebView.postMessage(pData);
@@ -49,7 +49,7 @@ const SupportModal = ({user}) => {
     return <WebView
         ref={WebViewRef}
         incognito={!!!user?.supportInfo?.auth_token}
-        source={{ uri: 'https://secure.livechatinc.com/customer/action/open_chat?license_id=17063451' }}
+        source={{ uri: 'https://secure.livechatinc.com/customer/action/open_chat?license_id=17159016' }}
         style={{ flex: 1 }}
         onMessage={(payload)=>{onMessage({payload: payload, user})}}
         injectedJavaScriptBeforeContentLoaded={_injectaccesstokenonload()}

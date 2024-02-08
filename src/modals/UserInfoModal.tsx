@@ -9,6 +9,7 @@ import ContinueButton from "../components/ContinueButton";
 import UserNameAndIcon from "../components/UserNameAndIcon";
 
 import LocationInput from "../components/LocationInput";
+import {normalize} from "../helpers";
 
 const HeaderText = ({text,style, ...props}:{text:string, style?:any})=>{
 
@@ -27,7 +28,7 @@ const InfoModal = ({props}) =>{
     }
     return <>
     <ScrollView style={{flex: 1}} keyboardShouldPersistTaps={'handled'}>
-    <View style={{gap: 15, flex: 1,justifyContent:'center', marginTop:14}}>
+    <View style={{gap: 15, flex: 1,justifyContent:'center', marginTop:14,paddingHorizontal: 12}}>
 
         <UserNameAndIcon user={user} userName={userModalName} setUserName={handleModalNameChange} updateImage={updateImage}/>
 
@@ -48,7 +49,7 @@ const InfoModal = ({props}) =>{
 
     <View>
     <HeaderText text={"Bio"} />
-    <Input onChangeAction={(text:string)=>{setUserBio(text)}} placeholder={user?.bio || 'Bio'} multiline={true} style={{...styles.emailInput, backgroundColor: '#eee'}}/>
+    <Input onChangeAction={(text:string)=>{setUserBio(text)}} placeholder={user?.bio || 'Bio'} multiline={true} style={{...styles.emailInput, backgroundColor: '#eee', paddingBottom: normalize(32), paddingTop: normalize(12)}}/>
     </View>
 
     <ContinueButton text={"Save"} style={{backgroundColor:'#7c108d',marginTop: 5}} handleContinueClick={()=>{

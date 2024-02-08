@@ -175,8 +175,8 @@ const [searchedListItems, setSearchedItems] = useState(itemsStackSample);
     }, []);
 
     return <View style={{flex: 1}}>
-        <SafeAreaView>
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
+        <SafeAreaView>
         <View style={{}}>
             <HeaderComponent setModal={setModal} setModalName={setModalName} user={auth.currentUser.uid} />
             <FlatList

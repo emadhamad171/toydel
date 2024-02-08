@@ -47,7 +47,7 @@ export default function App() {
     const CartScreen = () => <Cart user={user} />;
 
     return (<>
-            <StatusBar style="auto"/>
+            <StatusBar style="auto" hidden/>
         {user && isUserVerified ?
         <NavigationContainer>
             <Tab.Navigator initialRouteName={'Profile'} screenOptions={screenOptions}>

@@ -6,12 +6,17 @@ import {defaultPhoto} from "./constants";
 import {Dimensions, PixelRatio} from "react-native";
 export const {width: windowWidth, height: windowHeight} = Dimensions.get("window");
 export  const normalize = (fontSize) => Math.round(PixelRatio.roundToNearestPixel(windowHeight/1080*fontSize));
+
+export const wait = async () =>{
+    return await new Promise((resolve)=>{setTimeout(()=>{resolve(1);}, 600)});
+}
+
 export const screenOptions = {
     headerShown: false,
     tabBarShowLabel:false,
     tabBarStyle: {
-        height: 70,
-        paddingVertical: 5
+        height: normalize(75),
+        paddingVertical: normalize(10)
     }
 };
 export const signInSuccessfulToast = () =>{

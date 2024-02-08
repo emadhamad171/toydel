@@ -54,5 +54,4 @@ export const hideLoading =({topPos, marginTop}) =>{
             useNativeDriver: false,
         }
     ).start();
-    Toast.show({type: 'error', text1: "Something went wrong.", text2: "Try again!",topOffset: 10})
 }

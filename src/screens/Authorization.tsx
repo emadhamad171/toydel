@@ -21,12 +21,8 @@ import {GoogleAuthProvider} from 'firebase/auth'
 import Input from "../components/Input";
 
 import {GOOGLE_WEB_CLIENT_ID} from 'react-native-dotenv'
-import {normalize} from "../helpers";
+import {normalize, signInWarningToast, wait} from "../helpers";
 import {SafeAreaView} from "moti";
-
-const wait = async () =>{
-    return await new Promise((resolve)=>{setTimeout(()=>{resolve(1);}, 600)});
-}
 
 const GoogleButton = ({handleGoogleClick}) => {
     return (
@@ -130,6 +126,7 @@ const AuthScreen = () => {
             }
         } catch (e) {
             hideLoading({topPos, marginTop});
+            signInWarningToast();
             setWrongCode(true);
         }
         return;
@@ -165,6 +162,8 @@ const AuthScreen = () => {
             hideLoading({topPos,marginTop});
         } catch (e){
             const errorCode= e.code;
+
+            signInWarningToast();
             hideLoading({topPos,marginTop});
             switch (errorCode) {
                 //TODO: Process error code of authorization
@@ -211,6 +210,7 @@ const AuthScreen = () => {
             await signInWithCredential(auth, googleCredential);
         } catch (e){
             hideLoading({topPos,marginTop})
+            signInWarningToast();
             console.log(e);
         }
     }
@@ -235,9 +235,9 @@ const AuthScreen = () => {
                     </View>}
 
                 {loginType === 'email' && <View style={{gap: 10, width: 320}}>
-                    <Input style={{...styles.emailInput, borderWidth: isValidEmail ? 0 : 1}} placeholderTextColor={'#864cb4'} placeholder={'email@example.com'} onChangeAction={setEmail} />
+                    <Input style={{...styles.emailInput, borderWidth: isValidEmail ? 0 : 1}} onSubmitEditing={()=>{}} placeholderTextColor={'#864cb4'} placeholder={'email@example.com'} onChangeAction={setEmail} />
                     <Input style={{...styles.emailInput, borderWidth: isPasswordSame ? 0 : 1}} placeholderTextColor={'#864cb4'} placeholder={'Password'} onChangeAction={setPassword} secureTextEntry={true}/>
-                    {isRegister && <Input style={{...styles.emailInput, borderWidth: isPasswordSame ? 0 : 1}} placeholderTextColor={'#864cb4'} placeholder={'Confirm password'} onChangeAction={setConfirmPassword} secureTextEntry={true}/>}
+                    {isRegister && <Input style={{...styles.emailInput, borderWidth: isPasswordSame ? 0 : 1}}  placeholderTextColor={'#864cb4'} placeholder={'Confirm password'} onChangeAction={setConfirmPassword} secureTextEntry={true}/>}
                     <TouchableOpacity>
                         <Text style={{marginTop: -5, marginLeft: 5}} onPress={()=>{
                             setRegister(!isRegister);
@@ -262,8 +262,6 @@ const AuthScreen = () => {
         </View>);
 }
 
-//<EmailInput setIsPasswordSame={setIsPasswordSame} isEmailValid={isValidEmail} isPasswordSame={isPasswordSame} isRegister={isRegister}
-//                                 setRegister={setRegister} onChangeEmail={(text:string)=>{setEmail(text);}} onChangeConfirmPassword={(text:string)=>{setConfirmPassword(text)}} onChangePassword={(text:string)=>{setPassword(text)}}/>
 const LineView = ({width, color = '#000'}) => {
     return <View style={{height: 1, width: width, backgroundColor: color, marginTop: 2}}></View>
 }

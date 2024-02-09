@@ -2,22 +2,18 @@ import {RefreshControl, ScrollView, TouchableOpacity, View, Text, LogBox, FlatLi
 import Input from "../components/Input";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
-import { useCallback, useEffect, useState } from "react";
-import {CommonActions, useNavigation} from "@react-navigation/native";
-import { auth } from "../firebase";
+import React, { useCallback, useEffect, useState } from "react";
+import {useNavigation} from "@react-navigation/native";
 import {
-    loadUser,
-    loadItems,
-    firstLoadItems,
-    loadItemsInNextPage,
-    loadItemsInPreviousPage, loadAllItems
+    loadUser,loadAllItems
 } from '../firebase/firebaseAPI'
 import WrapperComponent from "../components/WrapperComponent";
 import ItemComponent from "../components/ItemComponent";
 import PremiumPlansModal from "../modals/PremiumPlansModal";
 import {itemsStackSample} from "../helpers";
-import {itemType} from "../helpers/types";
+import {itemType, userType} from "../helpers/types";
 import {SafeAreaView} from "moti";
+import ItemModal from "../modals/ItemModal";
 
 const HeaderComponent = ({setModal, setModalName, user}) =>{
     const navigation = useNavigation();
@@ -145,7 +141,7 @@ const PageButtonsComponent = ({pageNumber, setPageNumber,searchedListItems}) => 
         </Text>
     </TouchableOpacity>
 </View>
-const Home = () =>{
+const Home = ({user}:{user:userType}) =>{
 const [pageNumber, setPageNumber] = useState(1);
 const [fetchedListItems, setFetchedListItems] = useState(itemsStackSample);
 const [isRefreshing, setRefreshing] = useState(true);
@@ -165,24 +161,33 @@ const [searchedListItems, setSearchedItems] = useState(itemsStackSample);
     }, [searchString, selectedCategories,fetchedListItems, pageNumber]);
 
     useEffect(() => {
-        loadData({setListItems: setFetchedListItems, setRefreshing, setFavoriteList, userID: auth.currentUser.uid})
+        loadData({setListItems: setFetchedListItems, setRefreshing, setFavoriteList, userID: user.id})
     }, []);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         setPageNumber(1);
-        loadData({setListItems: setFetchedListItems,setRefreshing, setFavoriteList, userID: auth.currentUser.uid});
+        loadData({setListItems: setFetchedListItems,setRefreshing, setFavoriteList, userID: user.id});
     }, []);
+
+    const itemOnClick = ({item}) => {
+        return ()=> {
+            setModalName(() => item.name);
+            setModal(() => {
+                return () => <ItemModal user={user} item={item} isOwned/>
+            })
+        }
+    }
 
     return <View style={{flex: 1}}>
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
         <SafeAreaView>
         <View style={{}}>
-            <HeaderComponent setModal={setModal} setModalName={setModalName} user={auth.currentUser.uid} />
+            <HeaderComponent setModal={setModal} setModalName={setModalName} user={user.id} />
             <FlatList
                 refreshControl={ <RefreshControl style={{backgroundColor: '#a333ff'}} refreshing={isRefreshing} onRefresh={onRefresh} /> }
                 data={displayedListItems}
-                renderItem={({item})=><ItemComponent key={item.id} item={item} isLoading={isRefreshing} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)} />}
+                renderItem={({item})=><ItemComponent key={item.id} item={item} isLoading={isRefreshing} setFavoriteToyList={setFavoriteList} isFavorite={favoriteList && favoriteList.includes(item.id)} onClickMore={itemOnClick({item})} />}
                 ListHeaderComponent={()=><SearchAndFilterComponent setSearch={setSearch} searchString={searchString} setModal={setModal} setModalName={setModalName} setChoosedCategory={setChoosedCategory} selectedCategories={selectedCategories}/>}
                 ListFooterComponent={()=><PageButtonsComponent pageNumber={pageNumber} setPageNumber={setPageNumber} searchedListItems={searchedListItems} />}
             />

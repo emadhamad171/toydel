@@ -1,4 +1,5 @@
 import {StyleSheet} from "react-native";
+import {normalize} from "../helpers";
 
 export default StyleSheet.create({
     body: {
@@ -122,3 +123,30 @@ export default StyleSheet.create({
         padding: 5
     },
 });
+export const cartStyle = StyleSheet.create({
+    container: {
+        marginTop: 15,
+        paddingVertical: 10,
+        backgroundColor: '#f3f3f3',
+    },
+    header: {
+        paddingHorizontal: 18,
+        fontSize: 32,
+        fontWeight: "400",
+        paddingBottom: 12,
+    },
+    subHeader: {
+        paddingHorizontal: 18,
+        fontSize: 28,
+        fontWeight: "400",
+        paddingBottom: 12,
+        color:'#3d3a3a'
+    },
+    smallText: {
+        fontSize: normalize(16)
+    },
+    smallItemStatus:{
+        color:'#0f839d',
+        fontSize: normalize(16)
+    }
+})

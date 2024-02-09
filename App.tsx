@@ -15,14 +15,25 @@ import Notifications from "./src/screens/Notifications";
 import {loadOrCreateUser, screenOptions, signInSuccessfulToast, signInWarningToast} from "./src/helpers";
 import Cart from "./src/screens/Cart";
 import {notificationAppToken, notificationAppId} from 'react-native-dotenv'
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Onboarding from "./src/screens/Onboarding";
+const getOnboarded = async () => {
+    const onboardedStatus = await AsyncStorage.getItem('onboardedStatus');
+    if(!onboardedStatus){
+        await AsyncStorage.setItem('onboardedStatus', "true");
+        return false;
+    }
+    return true;
+}
 const Tab = createBottomTabNavigator();
 
 export default function App() {
     const [user, setUser] = useState(null);
     const [isUserVerified, setUserVerify] = useState(false);
+    const [isOnboarded, setOnboarded] = useState(false);
     registerNNPushToken(notificationAppId, notificationAppToken);
     useEffect(() => {
+        getOnboarded().then(setOnboarded);
         onAuthStateChanged(auth, (userInstance) => {
             if(!!userInstance){
                 if(!!userInstance?.emailVerified || !!userInstance?.phoneNumber) {
@@ -45,23 +56,26 @@ export default function App() {
     const ProfileScreen = ()=> <Profile user={user} setUser={setUser} />;
     const NotificationScreen = () => <Notifications user={user} />;
     const CartScreen = () => <Cart user={user} />;
-
+    const HomeScreen = () => <Home user={user} />;
+    const OnboardingScreen = () => <Onboarding setOnboarded={setOnboarded}/>
     return (<>
             <StatusBar style="auto" hidden/>
-        {user && isUserVerified ?
-        <NavigationContainer>
-            <Tab.Navigator initialRouteName={'Profile'} screenOptions={screenOptions}>
-                <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{
-                        return <Icon name={'apple-keyboard-command'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={Home} />
-                <Tab.Screen name="Cart" options={{tabBarIcon: ({focused})=>{
+        {
+            user && isUserVerified ?<NavigationContainer>
+                <Tab.Navigator initialRouteName={isOnboarded ? 'Profile' : 'Onboarding'} screenOptions={screenOptions}>
+                    {!isOnboarded && <Tab.Screen name={'Onboarding'} options={{tabBarStyle: {display:'none'}}} component={OnboardingScreen}/>}
+                    <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{
+                        return <Icon name={'apple-keyboard-command'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={HomeScreen} />
+                    <Tab.Screen name="Cart" options={{tabBarIcon: ({focused})=>{
                         return <Icon name={'format-list-bulleted'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={CartScreen} />
-                <Tab.Screen name="Notifications" options={{tabBarIcon: ({focused})=>{
+                    <Tab.Screen name="Notifications" options={{tabBarIcon: ({focused})=>{
                         return <Icon name={ focused ? 'bell' : 'bell-outline'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={NotificationScreen} />
-                <Tab.Screen name="Profile" options={{tabBarIcon: ({focused})=>{
-                    return <Icon name={'account'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
-            </Tab.Navigator>
-        </NavigationContainer>
-            : <Authorization />}
+                    <Tab.Screen name="Profile" options={{tabBarIcon: ({focused})=>{
+                        return <Icon name={'account'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={ProfileScreen} />
+                </Tab.Navigator>
+            </NavigationContainer>
+            : <Authorization />
+        }
             <Toast />
         </>
     );

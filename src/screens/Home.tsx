@@ -142,16 +142,16 @@ const PageButtonsComponent = ({pageNumber, setPageNumber,searchedListItems}) => 
     </TouchableOpacity>
 </View>
 const Home = ({user}:{user:userType}) =>{
-const [pageNumber, setPageNumber] = useState(1);
-const [fetchedListItems, setFetchedListItems] = useState(itemsStackSample);
-const [isRefreshing, setRefreshing] = useState(true);
-const [favoriteList, setFavoriteList] = useState<string[]>([]);
+const [pageNumber, setPageNumber] = useState<number>(1);
+const [fetchedListItems, setFetchedListItems] = useState<itemType[]>(itemsStackSample);
+const [isRefreshing, setRefreshing] = useState<boolean>(true);
+const [favoriteList, setFavoriteList] = useState<string[]>(user.favoriteList);
 const [selectedCategories, setChoosedCategory] = useState<string[]>([]);
 const [CustomModal, setModal] = useState(null);
-const [currentModalName, setModalName] = useState('');
-const [searchString, setSearch] = useState('');
-const [displayedListItems, setDisplayedListItems] = useState(itemsStackSample);
-const [searchedListItems, setSearchedItems] = useState(itemsStackSample);
+const [currentModalName, setModalName] = useState<string>('');
+const [searchString, setSearch] = useState<string>('');
+const [displayedListItems, setDisplayedListItems] = useState<itemType[]>(itemsStackSample);
+const [searchedListItems, setSearchedItems] = useState<itemType[]>(itemsStackSample);
 
     useEffect(() => {
         const searchedItems = searchByString({fetchedListItems, searchString})
@@ -170,11 +170,11 @@ const [searchedListItems, setSearchedItems] = useState(itemsStackSample);
         loadData({setListItems: setFetchedListItems,setRefreshing, setFavoriteList, userID: user.id});
     }, []);
 
-    const itemOnClick = ({item}) => {
+    const itemOnClick = ({item}:{item:itemType}) => {
         return ()=> {
             setModalName(() => item.name);
             setModal(() => {
-                return () => <ItemModal user={user} item={item} isOwned/>
+                return () => <ItemModal setModal={setModal} setModalName={setModalName} user={user} item={item} isOwned={user?.ownedList && user.ownedList.some((el)=>{if(item.id===el.id) return item;})}/>
             })
         }
     }

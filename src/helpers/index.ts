@@ -1,7 +1,7 @@
 import Toast from "react-native-toast-message";
 import {loadSpecialItems, loadUser} from "../firebase/firebaseAPI";
 import {db} from "../firebase";
-import {itemType, notificationType} from "./types";
+import {itemType, notificationType, userType} from "./types";
 import {defaultPhoto} from "./constants";
 import {Dimensions, PixelRatio} from "react-native";
 export const {width: windowWidth, height: windowHeight} = Dimensions.get("window");
@@ -44,12 +44,13 @@ export const loadOrCreateUser = async ({userInstance, setUser})=>{
         setUser(user[0]);
         return;
     }
-    const userCreateInstance = {
+    const userCreateInstance :userType = {
         id: userInstance.uid,
         displayName: userInstance?.displayName || 'Set Name',
         email: userInstance?.email || '',
         phoneNumber: userInstance?.phoneNumber || '',
         favoriteList: [''],
+        ownedList: [],
         plan: 'default',
         photoURL: userInstance?.photoURL || defaultPhoto,
         bio: 'I Love Toy App!',

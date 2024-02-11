@@ -27,6 +27,15 @@ export type supprotInfoType = {
     lc_ids: string
 }
 
+export type ownedItemStatusType = 'in usage' | 'in delivery';
+export type userTierType = 'default' | 'gold' | 'silver';
+
+export type ownedItemType = {
+  id: string,
+  endDate: string,
+  status: ownedItemStatusType,
+}
+
 export type userType = {
     id: string,
     email?: string,
@@ -34,7 +43,8 @@ export type userType = {
     location: GooglePlaceData | null,
     displayName: string,
     favoriteList: string[],
-    plan: 'default' | 'silver' | 'gold',
+    ownedList: ownedItemType[],
+    plan: userTierType,
     photoURL: string,
     bio: string,
     supportInfo?: supprotInfoType

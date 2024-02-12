@@ -15,13 +15,13 @@ import {itemType, userType} from "../helpers/types";
 import {SafeAreaView} from "moti";
 import ItemModal from "../modals/ItemModal";
 
-const HeaderComponent = ({setModal, setModalName, user}) =>{
+const HeaderComponent = ({setModal, setModalName, user,updateUser}) =>{
     const navigation = useNavigation();
     return <View style={{backgroundColor: '#a333ff',width: '100%', paddingTop: 70, transform: [{translateY: -70}],position: 'absolute', zIndex:2, paddingHorizontal:10, flexDirection: 'row', justifyContent:'space-between'}}>
         <View style={{flexDirection: 'row', gap: 15, marginLeft: 5}}>
         <Icon name={'teddy-bear'} size={32} color={"#4f0bb2"}/>
         <TouchableOpacity style={{alignSelf:'center', backgroundColor: '#c29cff', borderRadius: 5, padding: 5}} onPress={()=>{
-            setModal(()=>{return ()=><PremiumPlansModal user={user} />})
+            setModal(()=>{return ()=><PremiumPlansModal user={user} updateUser={updateUser} />})
             setModalName("Plans");
         }}>
             <Text>View Plans</Text>
@@ -141,7 +141,7 @@ const PageButtonsComponent = ({pageNumber, setPageNumber,searchedListItems}) => 
         </Text>
     </TouchableOpacity>
 </View>
-const Home = ({user}:{user:userType}) =>{
+const Home = ({user,updateUser}:{user:userType, updateUser:()=>void}) =>{
 const [pageNumber, setPageNumber] = useState<number>(1);
 const [fetchedListItems, setFetchedListItems] = useState<itemType[]>(itemsStackSample);
 const [isRefreshing, setRefreshing] = useState<boolean>(true);
@@ -174,7 +174,7 @@ const [searchedListItems, setSearchedItems] = useState<itemType[]>(itemsStackSam
         return ()=> {
             setModalName(() => item.name);
             setModal(() => {
-                return () => <ItemModal setModal={setModal} setModalName={setModalName} user={user} item={item} isOwned={user?.ownedList && user.ownedList.some((el)=>{if(item.id===el.id) return item;})}/>
+                return () => <ItemModal setModal={setModal} setModalName={setModalName} user={user} item={item} updateUser={updateUser} isOwned={user?.ownedList && user.ownedList.some((el)=>{if(item.id===el.id) return item;})}/>
             })
         }
     }
@@ -183,7 +183,7 @@ const [searchedListItems, setSearchedItems] = useState<itemType[]>(itemsStackSam
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
         <SafeAreaView>
         <View style={{}}>
-            <HeaderComponent setModal={setModal} setModalName={setModalName} user={user.id} />
+            <HeaderComponent setModal={setModal} setModalName={setModalName} user={user.id} updateUser={updateUser}/>
             <FlatList
                 refreshControl={ <RefreshControl style={{backgroundColor: '#a333ff'}} refreshing={isRefreshing} onRefresh={onRefresh} /> }
                 data={displayedListItems}

@@ -28,7 +28,7 @@ export type supprotInfoType = {
 }
 
 export type ownedItemStatusType = 'in usage' | 'in delivery';
-export type userTierType = 'default' | 'gold' | 'silver';
+export type userTierType = 'default' |'bronze' | 'gold' | 'silver';
 
 export type ownedItemType = {
   id: string,
@@ -50,9 +50,16 @@ export type userType = {
     supportInfo?: supprotInfoType
 }
 
+export type itemReviewType = {
+    rate: number,
+    reviewerName: string,
+    reviewerPhotoURL: string
+}
+
 export type itemType = {
     brand: string,
     category: string[],
+    reviews?: itemReviewType[],
     description: string,
     id: string,
     isIncludedInPlan: boolean,
@@ -75,7 +82,7 @@ export type iconInfoType = {
 export type planType = {
     price: number,
     backgroundColor: string,
-    name: string,
+    name: userTierType,
     description: string,
     features: string[],
     sign: iconInfoType

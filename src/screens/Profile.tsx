@@ -13,7 +13,7 @@ import {normalize} from "../helpers";
 import {SafeAreaView} from "moti";
 
 
-const Profile =({user, setUser}) =>{
+const Profile =({user, setUser,updateUser}) =>{
     const [CustomModal, setModal] = useState(null);
     const [currentModalName, setModalName] = useState('');
     const [userName, setUserName] = useState(user.displayName);
@@ -67,7 +67,7 @@ const Profile =({user, setUser}) =>{
                 </View>
                 <View style={{gap: 5}}>
                     <UserButton icon={'layers'} onPressAction={()=>{
-                        setModal(()=>{return ()=><PremiumPlansModal user={user} />})
+                        setModal(()=>{return ()=><PremiumPlansModal user={user} updateUser={updateUser}/>})
                         setModalName("Plans");
                     }} placeholder={"Plans"} />
                     <UserButton icon={'heart'} iconSize={24} onPressAction={()=>{

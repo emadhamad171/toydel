@@ -51,10 +51,10 @@ const ViewReviewsButton = () =>
     </TouchableOpacity>;
 
 
-const PlansModalButton = ({user,setModal,setModalName}:{user:userType, setModal:React.Dispatch<SetStateAction<any>>, setModalName:React.Dispatch<SetStateAction<string>>}) => {
+const PlansModalButton = ({user,setModal,setModalName,updateUser}:{user:userType, setModal:React.Dispatch<SetStateAction<any>>, setModalName:React.Dispatch<SetStateAction<string>>,updateUser: ()=>void}) => {
     const onOpenPlansClick = () => {
         setModalName('Plans');
-        setModal(()=>{return ()=><PremiumPlansModal user={user} />});
+        setModal(()=>{return ()=><PremiumPlansModal user={user} updateUser={updateUser} />});
     }
 
     return <TouchableOpacity onPress={onOpenPlansClick} style={{marginTop: normalize(12)}}>
@@ -76,10 +76,10 @@ const PlansModalButton = ({user,setModal,setModalName}:{user:userType, setModal:
     </TouchableOpacity>;
 }
 
-export default ({item, user, isOwned, setModal, setModalName} : {item:itemType, user:userType, isOwned ?:boolean, setModal: React.Dispatch<SetStateAction<any>>, setModalName:React.Dispatch<SetStateAction<string>>}) => {
+export default ({item, user, isOwned, setModal, setModalName,updateUser} : {item:itemType, user:userType, isOwned ?:boolean, setModal: React.Dispatch<SetStateAction<any>>, setModalName:React.Dispatch<SetStateAction<string>>, updateUser: ()=>void}) => {
     return (
         <SafeAreaView style={{alignItems: 'center', justifyContent:'center', flexGrow:1}}>
-            <ScrollView contentContainerStyle={{marginTop: normalize(64), marginBottom: normalize(12), width: windowWidth}}>
+            <ScrollView contentContainerStyle={{marginTop: normalize(64), marginBottom: normalize(12), width: windowWidth, paddingBottom: normalize(120)}}>
                 <View style={{position:'relative',alignSelf:'center', width: windowWidth*0.9}}>
                     <Image source={{uri: item.photo}} style={{minWidth:170, minHeight:170, width:windowWidth*0.9, height: windowWidth*0.85 <windowHeight*0.45 ? windowWidth*0.85 : windowHeight*0.45, alignSelf: 'center', borderRadius: 10,marginBottom: normalize(10)}} />
                     <View style={{position:'absolute', backgroundColor: '#333',borderRadius:10,padding:1, bottom:normalize(20), left: normalize(5)}}>
@@ -115,8 +115,8 @@ export default ({item, user, isOwned, setModal, setModalName} : {item:itemType, 
                     {item.description}
                 </Text>
                 <View>
-                    { user.plan === 'default' ? <PlansModalButton user={user} setModal={setModal} setModalName={setModalName} /> :
-                    <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
+                    { user.plan === 'default' ? <PlansModalButton user={user} setModal={setModal} setModalName={setModalName} updateUser={updateUser} /> :
+                        <View style={{flexDirection:'row', justifyContent: 'space-between', marginHorizontal: normalize(24),}}>
                         <ChageToyButton />
                         <BuyToyButton />
                     </View>

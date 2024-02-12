@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import Authorization from "./src/screens/Authorization";
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import Toast from "react-native-toast-message";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./src/firebase";
@@ -17,6 +17,7 @@ import Cart from "./src/screens/Cart";
 import {notificationAppToken, notificationAppId} from 'react-native-dotenv'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Onboarding from "./src/screens/Onboarding";
+import {userType} from "./src/helpers/types";
 const getOnboarded = async () => {
     const onboardedStatus = await AsyncStorage.getItem('onboardedStatus');
     if(!onboardedStatus){
@@ -28,7 +29,10 @@ const getOnboarded = async () => {
 const Tab = createBottomTabNavigator();
 
 export default function App() {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<userType>(null);
+    const updateUser = useCallback(()=>{
+            loadOrCreateUser({userInstance: {uid: user?.id}, setUser});
+    }, [user]);
     const [isUserVerified, setUserVerify] = useState(false);
     const [isOnboarded, setOnboarded] = useState(false);
     registerNNPushToken(notificationAppId, notificationAppToken);
@@ -53,10 +57,10 @@ export default function App() {
         });
     }, []);
 
-    const ProfileScreen = ()=> <Profile user={user} setUser={setUser} />;
+    const ProfileScreen = ()=> <Profile user={user} setUser={setUser} updateUser={updateUser} />;
     const NotificationScreen = () => <Notifications user={user} />;
     const CartScreen = () => <Cart user={user} />;
-    const HomeScreen = () => <Home user={user} />;
+    const HomeScreen = () => <Home user={user} updateUser={updateUser} />;
     const OnboardingScreen = () => <Onboarding setOnboarded={setOnboarded}/>
     return (<>
             <StatusBar style="auto" hidden/>

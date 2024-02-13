@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 navigator.geolocation = require('@react-native-community/geolocation');
+//navigator.geolocation = require('react-native-geolocation-service');
 
 const GOOGLE_PLACES_API_KEY = 'AIzaSyA1rodPwSRHxjRlxM6hc1R9fCeoL9202tA';
 

@@ -32,7 +32,7 @@ export const showLoading = ({topPos, marginTop, afterAnimate = ()=>{}}) =>{
             speed:1.5,
             useNativeDriver: false,
         }
-    ).start(()=>{afterAnimate()});
+    ).start();
     Animated.spring(marginTop,{
             toValue: normalize(windowHeight*0.35),
             speed:1.5,

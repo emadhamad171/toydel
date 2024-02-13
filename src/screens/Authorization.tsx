@@ -13,7 +13,7 @@ import PhoneNumberInput from "../components/PhoneNumberInput";
 import {styles} from '../styles/authorization';
 import {useFirebaseLogin as useFirebaseOTPLogin} from "@itzsunny/firebase-login";
 import {auth, firebaseConfig} from "../firebase";
-import {signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCredential, sendEmailVerification} from 'firebase/auth';
+import {signInWithEmailAndPassword, sendPasswordResetEmail, createUserWithEmailAndPassword, signInWithCredential, sendEmailVerification} from 'firebase/auth';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 import ContinueButton from "../components/ContinueButton";
@@ -34,10 +34,11 @@ const GoogleButton = ({handleGoogleClick}) => {
         </TouchableOpacity>
     );
 }
-const OtherLoginWayButton = ({loginType, setLoginType}) => {
+const OtherLoginWayButton = ({loginType, setLoginType, setRecovery}) => {
     return (
         <TouchableOpacity style={styles.otherWayButton} onPress={() => {
             setLoginType(loginType !== 'email' ? "email" : 'phone');
+            setRecovery(false);
         }}>
             <Icon name={loginType !== 'email' ? "gmail" : 'phone'} size={28}
                   style={{marginLeft: 10, position: 'absolute', left: 10, top: 6.5}}/>
@@ -81,6 +82,7 @@ const AuthScreen = () => {
 
     const [loginType, setLoginType] = useState('phone');
     const [isRegister, setRegister] = useState(false);
+    const [isRecovery, setRecovery] = useState(false);
 
     useEffect(() => {
         showAuth({topPos, marginTop});
@@ -140,11 +142,30 @@ const AuthScreen = () => {
     const [isPasswordSame, setIsPasswordSame] = useState(true);
     const emailValidator =/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 
-    const handleContinueEmailClick = async () => {
+    const validateEmail = () => {
         //**************** Email & Password Validation ***************/
         const emailValidation = emailValidator.test(email);
         setValidEmail(emailValidation);
-        if(!emailValidation) return;
+        return emailValidation;
+    }
+
+    const handleContinueRecoveryPasswordClick = async ()=> {
+        if(!validateEmail()) return;
+
+        showLoading({topPos,marginTop});
+        try{
+            await sendPasswordResetEmail(auth,email);
+            Toast.show({type: 'success', text1: 'Successful', text2: 'Password reset link was sent to your email.'});
+            setRecovery(false);
+            showAuth({topPos, marginTop});
+        } catch (e){
+            Toast.show(({type: 'error',text1: 'Something went wrong!', text2: e.code}));
+        }
+
+    }
+    const handleContinueEmailClick = async () => {
+        //**************** Email & Password Validation ***************/
+        if(!validateEmail()) return;
         const passwordIsSame = password === confirmPassword || !isRegister;
         setIsPasswordSame(passwordIsSame);
         if(!passwordIsSame) return;
@@ -203,14 +224,19 @@ const AuthScreen = () => {
             try {
                 googleUser = await GoogleSignin.signInSilently();
             } catch (e){
-                googleUser = await GoogleSignin.signIn();
+                try {
+                    googleUser = await GoogleSignin.signIn();
+                } catch (e) {
+                    signInWarningToast(e.code);
+                }
             }
             const {idToken} = googleUser;
             const googleCredential = GoogleAuthProvider.credential(idToken);
             await signInWithCredential(auth, googleCredential);
         } catch (e){
             hideLoading({topPos,marginTop})
-            signInWarningToast();
+            signInWarningToast(e.code);
+            throw new Error(e); //Rethrow error for debugging.
             console.log(e);
         }
     }
@@ -222,7 +248,7 @@ const AuthScreen = () => {
 
             <Animated.View style={{...styles.authContainer, marginBottom: topPos, }}>
                 <Text style={styles.headerText}>Welcome</Text>
-                <Text style={styles.subHeaderText}>Let's {isRegister ? 'start' : 'continue'} with
+                <Text style={styles.subHeaderText}>Let's {isRegister ? 'start' : isRecovery ? 'reset password' : 'continue'} with
                     your {loginType === 'email' ? 'email' : "phone number"}</Text>
 
                 {loginType === 'phone' &&
@@ -234,10 +260,11 @@ const AuthScreen = () => {
                         <Icon name={'key'} size={36} color={'#48218c'} style={{marginLeft: -48}}/>
                     </View>}
 
-                {loginType === 'email' && <View style={{gap: 10, width: 320}}>
+                {loginType === 'email' && !isRecovery ? <View style={{gap: 10, width: 320}}>
                     <Input style={{...styles.emailInput, borderWidth: isValidEmail ? 0 : 1}} onSubmitEditing={()=>{}} placeholderTextColor={'#864cb4'} placeholder={'email@example.com'} onChangeAction={setEmail} />
                     <Input style={{...styles.emailInput, borderWidth: isPasswordSame ? 0 : 1}} placeholderTextColor={'#864cb4'} placeholder={'Password'} onChangeAction={setPassword} secureTextEntry={true}/>
                     {isRegister && <Input style={{...styles.emailInput, borderWidth: isPasswordSame ? 0 : 1}}  placeholderTextColor={'#864cb4'} placeholder={'Confirm password'} onChangeAction={setConfirmPassword} secureTextEntry={true}/>}
+                    <View style={{flexDirection: 'row', justifyContent:'space-between', marginBottom: 2}}>
                     <TouchableOpacity>
                         <Text style={{marginTop: -5, marginLeft: 5}} onPress={()=>{
                             setRegister(!isRegister);
@@ -247,14 +274,51 @@ const AuthScreen = () => {
                             {isRegister ? "Login" : "Register"}
                         </Text>
                     </TouchableOpacity>
+                        {
+                            !isRegister && <TouchableOpacity onPress={()=>{
+                                showLoading({topPos,marginTop, afterAnimate: ()=>{
+                                            setRecovery(true);
+                                            showAuth({topPos,marginTop});
+                                    }});
+                            }}>
+                            <Text style={{marginTop: -5}}>
+                                Forgot password?
+                            </Text>
+                            </TouchableOpacity>
+                        }
+                    </View>
+                </View> : loginType==='email'&& <View style={{gap: 10, width: 320}}>
+                    <Input style={{...styles.emailInput, borderWidth: isValidEmail ? 0 : 1}} onSubmitEditing={()=>{}} placeholderTextColor={'#864cb4'} placeholder={'email@example.com'} onChangeAction={setEmail} />
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                        <TouchableOpacity>
+                        <Text style={{marginTop: -5, marginLeft: 5}} onPress={()=>{
+                            setRegister(false);
+                            setRecovery(false);
+                            setIsPasswordSame(true);
+                            setConfirmPassword('');
+                        }}>
+                            Login
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                        <Text style={{marginTop: -5, marginLeft: 5}} onPress={()=>{
+                            setRegister(true);
+                            setRecovery(false);
+                            setIsPasswordSame(true);
+                            setConfirmPassword('');
+                        }}>
+                            Register
+                        </Text>
+                    </TouchableOpacity>
+                    </View>
                 </View>}
-                <ContinueButton handleContinueClick={loginType ==='phone' ? handleContinueOTPClick : handleContinueEmailClick} />
+                <ContinueButton handleContinueClick={loginType ==='phone' ? handleContinueOTPClick : isRecovery ? handleContinueRecoveryPasswordClick : handleContinueEmailClick} />
                 <LineSectionDivider/>
 
                 <GoogleButton handleGoogleClick={handleContinueGoogleClick}/>
 
                 <View style={{alignItems: 'center', justifyContent: 'space-between', flexGrow: 1}}>
-                    <OtherLoginWayButton loginType={loginType} setLoginType={setLoginType}/>
+                    <OtherLoginWayButton loginType={loginType} setLoginType={setLoginType} setRecovery={setRecovery}/>
                     {recaptcha}
                 </View>
             </Animated.View>

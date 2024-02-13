@@ -28,11 +28,11 @@ export const signInSuccessfulToast = () =>{
         swipeable: true
     });
 }
-export const signInWarningToast = () =>{
+export const signInWarningToast = (text = 'Try again') =>{
     Toast.show({
         type: 'error',
         text1: 'Something went wrong.',
-        text2: 'Try again',
+        text2: text,
         position: 'top',
         swipeable: true
     });

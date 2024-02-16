@@ -4,9 +4,22 @@ import {normalize, windowWidth} from "../helpers";
 import {SafeAreaView} from "moti";
 import {useRef, useState} from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
+import {updateUserOnboarding} from "../store/slices/userSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {getCurrentUser, updateUserField} from "../firebase/firebaseAPI";
+import {RootState} from "../store";
 
 const itemFix = { itemVisiblePercentThreshold: 150 };
-export default ({setOnboarded})=>{
+export default ()=>{
+    const user = useSelector((state:RootState)=>state.user.user);
+    const dispatch = useDispatch();
+    const setOnboarded = ()=>{
+        updateUserField({updatedField: {isOnboarded: true}, userID: user.id}).then((data)=>{
+            dispatch(updateUserOnboarding());
+        }).catch(e=>{
+            dispatch(updateUserOnboarding());
+        });
+    }
     const [currentPage, setCurrentPage] = useState(0);
     const flatList = useRef(null);
     const navigation = useNavigation();
@@ -34,7 +47,7 @@ export default ({setOnboarded})=>{
     }
     const onSkip = () => {
         navigation.navigate('Profile' as never)
-        setOnboarded(true);
+        setOnboarded();
     }
     const onNextPage = () => {
         flatList.current.scrollToIndex({

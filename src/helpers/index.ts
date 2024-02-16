@@ -60,10 +60,8 @@ export const updateImage = async({setUserImage})=>{
 }
 
 export const loadOrCreateUser = async ({userInstance})=>{
-    // const dispatch = useDispatch();
-    const user = await loadUser({userID: userInstance.uid})[0];
-    if (user?.length){
-        // dispatch(setUser(user));
+    const user = (await loadUser({userID: userInstance.uid}))[0];
+    if (user){
         return user;
     }
     const userCreateInstance :userType = {

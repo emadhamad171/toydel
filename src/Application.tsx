@@ -38,17 +38,18 @@ export default function Application() {
             if(!!userInstance?.emailVerified || !!userInstance?.phoneNumber) {
                 onUserSignIn({userInstance})
             } else {
+                if(!!userInstance){
                 auth.signOut().then(()=>
                     Toast.show({type: 'info', text1:'User registered', text2: 'Check your email to verify it.'}))
+                    }
             }
         });
     }, []);
-    const OnboardingScreen = () => <Onboarding setOnboarded={()=>{dispatch(updateUserOnboarding())}}/>
 
     return user && (!!auth.currentUser.emailVerified || !!user?.phoneNumber) ?
         <NavigationContainer>
             <Tab.Navigator initialRouteName={user.isOnboarded ? 'Profile' : 'Onboarding'} screenOptions={screenOptions}>
-                {!user.isOnboarded && <Tab.Screen name={'Onboarding'} options={{tabBarStyle: {display:'none'}}} component={OnboardingScreen}/>}
+                {!user.isOnboarded && <Tab.Screen name={'Onboarding'} options={{tabBarStyle: {display:'none'}}} component={Onboarding}/>}
                 <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{
                     return <Icon name={'apple-keyboard-command'} size={24} color={focused ? '#555' : '#aaa'} />;}}} component={Home} />
                 <Tab.Screen name="Cart" options={{tabBarIcon: ({focused})=>{

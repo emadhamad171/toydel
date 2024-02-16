@@ -1,16 +1,9 @@
-import { ScrollView, View } from "react-native";
-import { useEffect, useState } from "react";
-import { auth } from "../firebase";
-import Toast from "react-native-toast-message";
-import WrapperComponent from "../components/WrapperComponent";
-import { launchImageLibrary } from "react-native-image-picker";
-import { getCurrentUser, updateUserImage } from "../firebase/firebaseAPI";
-import UserButton from "../components/UserButton";
-import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfoModal, SupportModal } from '../modals/';
-import UserNameAndIcon from "../components/UserNameAndIcon";
-import { unregisterIndieDevice } from "../notifications/index";
-import {normalize} from "../helpers";
-import {SafeAreaView} from "moti";
+import { ScrollView, View,SafeAreaView} from "react-native";
+import { useState } from "react";
+import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfoModal, SupportModal, SettingsModal} from '../modals/';
+import { onPressLogout} from "../firebase/firebaseAPI";
+import {WrapperComponent, UserNameAndIcon, UserButton} from "../components";
+import {normalize, updateImage} from "../helpers";
 
 
 const Profile =({user, setUser,updateUser}) =>{
@@ -19,39 +12,16 @@ const Profile =({user, setUser,updateUser}) =>{
     const [userName, setUserName] = useState(user.displayName);
     const [userImage, setUserImage] = useState(user.photoURL);
 
-    const updateImage = async()=>{
-        try {
-            const userInstance = getCurrentUser();
-            const options:any = {
-                selectionLimit: 1,
-                mediaType: 'photo',
-                includeBase64: true,
-            };
-            const res = await launchImageLibrary(options);
-            const uri = res?.assets && res.assets[0].uri;
-            uri && await updateUserImage({userInstance, uri});
-            uri && setUserImage(uri);
-        } catch (e){
-            console.log(e);
-        }
-    }
-
-    const onPressLogout = async () => {
-        await unregisterIndieDevice(auth.currentUser.uid, 19000, 'l5ddGPLeP7FdsO5c8gy4Dl');
-        await auth.signOut();
-        setUser(null);
-        Toast.show({type: 'success', text1: 'Sign out successful'});
-    }
 
     return <>
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
         <SafeAreaView style={{flex:1, backgroundColor:'#fff'}}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center',paddingVertical: normalize(20)}} style={{flex:1, backgroundColor:'#fff'}}>
             <View style={{ maxWidth:350, alignSelf: 'center', width: '95%', alignItems: 'center', gap: normalize(28), marginHorizontal:15}}>
-                <UserNameAndIcon user={user} userName={userName} setUserName={setUserName} updateImage={updateImage}/>
+                <UserNameAndIcon user={user} userName={userName} setUserName={setUserName} updateImage={()=>updateImage({setUserImage})}/>
                 <View style={{gap: 5}}>
                     <UserButton icon={'account'} onPressAction={()=>{
-                        setModal(()=>{return ()=><UserInfoModal props={{user, setUserName, userName, userInfo: user,setUserImage,userImage,updateImage}}/>})
+                        setModal(()=>{return ()=><UserInfoModal props={{user, setUserName, userName, userInfo: user,setUserImage,userImage,updateImage: ()=>updateImage({setUserImage})}}/>})
                         setModalName("Personal Info");
                     }} placeholder={"Personal Info"} />
 
@@ -81,9 +51,12 @@ const Profile =({user, setUser,updateUser}) =>{
                         setModal(()=>{return ()=><SupportModal user={user} />})
                         setModalName("Support Chat");
                     }} placeholder={"Support"} />
-                    <UserButton icon={''} iconSize={24} onPressAction={onPressLogout} placeholder={""} />
+                    <UserButton icon={'cog-outline'} iconSize={24} onPressAction={()=>{
+                        setModal(()=>{return ()=><SettingsModal />})
+                        setModalName("Settings");
+                    }} placeholder={"Settings"} />
                 </View>
-                <UserButton icon={'logout'} onPressAction={onPressLogout} placeholder={"Logout"} />
+                <UserButton icon={'logout'} onPressAction={()=>onPressLogout({setUser: setUser})} placeholder={"Logout"} />
             </View>
         </ScrollView>
         </SafeAreaView>

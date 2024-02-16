@@ -4,6 +4,15 @@ import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {updateProfile} from "firebase/auth";
 import {v4} from 'uuid'
 import {firebaseResponseType, itemType, userType} from "../helpers/types";
+import {unregisterIndieDevice} from "../notifications";
+import Toast from "react-native-toast-message";
+
+export const onPressLogout = async ({setUser}) => {
+    await unregisterIndieDevice(auth.currentUser.uid, 19000, 'l5ddGPLeP7FdsO5c8gy4Dl');
+    await auth.signOut();
+    setUser(null);
+    Toast.show({type: 'success', text1: 'Sign out successful'});
+}
 
 export const getCurrentUser = () => auth.currentUser;
 
@@ -84,8 +93,8 @@ export const loadSpecialItems = async ({path, specOps})  : Promise<userType[] | 
     const specialItems = fetchedData.docs.map((el)=>{return {...el.data()}});
     return specialItems;
 }
-export const loadUser = async ({userID}) : Promise<userType[] | firebaseResponseType[]> =>{
-    const userRef= query(collection(fStorage, "users"), where('id','==',userID));
+export const loadUser = async ({userID}:{userID ?: string}) : Promise<userType[] | firebaseResponseType[]> =>{
+    const userRef= query(collection(fStorage, "users"), where('id','==',userID || getCurrentUser()));
     const fetchedUser = await getDocs(userRef);
     return fetchedUser.docs.map(el=>{return{...el.data()}});
 }

@@ -1,5 +1,4 @@
 import { StatusBar } from 'expo-status-bar';
-import Authorization from "./src/screens/Authorization";
 import React, {useState, useEffect, useCallback} from 'react';
 import Toast from "react-native-toast-message";
 import { onAuthStateChanged } from "firebase/auth";
@@ -8,27 +7,27 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import 'react-native-gesture-handler';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import Home from "./src/screens/Home";
-import Profile from "./src/screens/Profile";
 import registerNNPushToken, { registerIndieID } from './src/notifications';
-import Notifications from "./src/screens/Notifications";
-import {loadOrCreateUser, screenOptions, signInSuccessfulToast, signInWarningToast} from "./src/helpers";
-import Cart from "./src/screens/Cart";
+import {
+    Authorization,
+    Cart,
+    Home,
+    Notifications,
+    Onboarding,
+    Profile
+} from './src/screens'
+import {loadOrCreateUser, screenOptions, signInSuccessfulToast, signInWarningToast,getOnboarded} from "./src/helpers";
 import {notificationAppToken, notificationAppId} from 'react-native-dotenv'
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Onboarding from "./src/screens/Onboarding";
 import {userType} from "./src/helpers/types";
-const getOnboarded = async () => {
-    const onboardedStatus = await AsyncStorage.getItem('onboardedStatus');
-    if(!onboardedStatus){
-        await AsyncStorage.setItem('onboardedStatus', "true");
-        return false;
-    }
-    return true;
-}
+import {Provider,useSelector, useDispatch} from "react-redux";
+import {store,RootState} from "./src/store";
+
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+    // const user = useSelector((state:RootState)=>state.user.user);
+
+
     const [user, setUser] = useState<userType>(null);
     const updateUser = useCallback(()=>{
             loadOrCreateUser({userInstance: {uid: user?.id}, setUser});
@@ -41,7 +40,6 @@ export default function App() {
         onAuthStateChanged(auth, (userInstance) => {
             if(!!userInstance){
                 if(!!userInstance?.emailVerified || !!userInstance?.phoneNumber) {
-                    setUserVerify(true);
                     registerIndieID(userInstance.uid, notificationAppId, notificationAppToken);
                     loadOrCreateUser({userInstance, setUser}).then(() => {
                         signInSuccessfulToast();
@@ -62,10 +60,10 @@ export default function App() {
     const CartScreen = () => <Cart user={user} />;
     const HomeScreen = () => <Home user={user} updateUser={updateUser} />;
     const OnboardingScreen = () => <Onboarding setOnboarded={setOnboarded}/>
-    return (<>
+    return (<Provider store={store}>
             <StatusBar style="auto" hidden/>
         {
-            user && isUserVerified ?<NavigationContainer>
+            user && (!!auth.currentUser.emailVerified || !!user?.phoneNumber) ?<NavigationContainer>
                 <Tab.Navigator initialRouteName={isOnboarded ? 'Profile' : 'Onboarding'} screenOptions={screenOptions}>
                     {!isOnboarded && <Tab.Screen name={'Onboarding'} options={{tabBarStyle: {display:'none'}}} component={OnboardingScreen}/>}
                     <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{
@@ -81,6 +79,6 @@ export default function App() {
             : <Authorization />
         }
             <Toast />
-        </>
+        </Provider>
     );
 }

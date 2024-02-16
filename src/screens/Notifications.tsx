@@ -58,7 +58,7 @@ function Notifications({user}) {
             <SafeAreaView style={notifications.container}>
             <Text style={notifications.header}>Notifications</Text>
             <SwipeListView
-                style={{paddingVertical: normalize(12), maxHeight: '92%'}}
+                style={{paddingVertical: normalize(12), height: '100%'}}
                 data={data}
                 refreshControl={
                     <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />

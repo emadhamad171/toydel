@@ -4,12 +4,14 @@ import PremiumPlansModal from "./PremiumPlansModal";
 import ReviewsModal from "./ReviewsModal";
 import UserInfoModal from "./UserInfoModal";
 import SupportModal from "./SupportModal";
+import SettingsModal from "./SettingsModal";
 
-module.exports = {
+export {
     FaqModal,
     FavoriteItemsModal,
     PremiumPlansModal,
     ReviewsModal,
     SupportModal,
-    UserInfoModal
+    UserInfoModal,
+    SettingsModal
 }

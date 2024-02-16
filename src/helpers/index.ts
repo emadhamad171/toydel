@@ -1,9 +1,13 @@
 import Toast from "react-native-toast-message";
-import {loadSpecialItems, loadUser} from "../firebase/firebaseAPI";
+import {getCurrentUser, loadSpecialItems, loadUser, updateUserImage} from "../firebase/firebaseAPI";
 import {db} from "../firebase";
 import {itemType, notificationType, userType} from "./types";
 import {defaultPhoto} from "./constants";
 import {Dimensions, PixelRatio} from "react-native";
+import {launchImageLibrary} from "react-native-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useDispatch} from "react-redux";
+import {setUser} from "../store/slices/userSlice";
 export const {width: windowWidth, height: windowHeight} = Dimensions.get("window");
 export  const normalize = (fontSize) => Math.round(PixelRatio.roundToNearestPixel(windowHeight/1080*fontSize));
 
@@ -38,10 +42,38 @@ export const signInWarningToast = (text = 'Try again') =>{
     });
 }
 
+export const getOnboarded = async () => {
+    const onboardedStatus = await AsyncStorage.getItem('onboardedStatus');
+    if(!onboardedStatus){
+        await AsyncStorage.setItem('onboardedStatus', "true");
+        return false;
+    }
+    return true;
+}
+
+export const updateImage = async({setUserImage})=>{
+    try {
+        const userInstance = getCurrentUser();
+        const options:any = {
+            selectionLimit: 1,
+            mediaType: 'photo',
+            includeBase64: true,
+        };
+        const res = await launchImageLibrary(options);
+        const uri = res?.assets && res.assets[0].uri;
+        uri && await updateUserImage({userInstance, uri});
+        uri && setUserImage(uri);
+    } catch (e){
+        console.log(e);
+    }
+}
+
 export const loadOrCreateUser = async ({userInstance, setUser})=>{
-    const user = await loadUser({userID: userInstance.uid});
+    // const dispatch = useDispatch();
+    const user = await loadUser({userID: userInstance.uid})[0];
     if (user?.length){
-        setUser(user[0]);
+        // dispatch(setUser(user));
+        setUser(user);
         return;
     }
     const userCreateInstance :userType = {

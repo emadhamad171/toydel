@@ -1,5 +1,5 @@
 import {View, SafeAreaView} from "react-native";
-import ChangeThemeButton from "../components/ChangeThemeButton";
+import {ChangeThemeButton} from "../components";
 
 
 

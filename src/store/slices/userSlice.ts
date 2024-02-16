@@ -21,7 +21,7 @@ export const userSlice = createSlice({
         setUser: (state,action: PayloadAction<userType>)=>{
             state.user = action.payload;
         },
-        updateUser: (state, action) => {
+        updateUser: (state) => {
             loadUser({}).then((user)=>{
                 state.user = user[0];
             });
@@ -32,12 +32,18 @@ export const userSlice = createSlice({
         updateUserName: (state, action) => {
             state.user.displayName = action.payload;
         },
+        updateUserFavoriteList: (state,action)=>{
+            state.user.favoriteList = action.payload;
+        },
+        updateUserOnboarding: (state)=>{
+            state.user.isOnboarded = true;
+        },
         logoutUser: (state)=>{
             state.user = null;
         }
     },
 })
 
-export const { setUser, logoutUser, updateUserPhoto, updateUserName, updateUser } = userSlice.actions
+export const { setUser, logoutUser, updateUserPhoto, updateUserName, updateUser,updateUserFavoriteList,updateUserOnboarding } = userSlice.actions
 
 export default userSlice.reducer

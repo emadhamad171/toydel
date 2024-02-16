@@ -1,4 +1,5 @@
 import {GooglePlaceData} from "react-native-google-places-autocomplete";
+import {Dispatch, SetStateAction} from "react";
 
 export type notificationPropsType = {
     id?: number,
@@ -47,8 +48,30 @@ export type userType = {
     plan: userTierType,
     photoURL: string,
     bio: string,
-    supportInfo?: supprotInfoType
+    supportInfo?: supprotInfoType,
+    isOnboarded?: boolean,
 }
+
+export type cartItemType = {
+    item: itemType
+}
+export type cartItemPropsType = {
+    item: cartItemType,
+    setItemModal: Dispatch<SetStateAction<any>>,
+    setModalName:Dispatch<SetStateAction<string>>,
+    user: userType | firebaseResponseType,
+    isLoading: boolean,
+};
+
+export type itemComponentPropsType = {
+    setFavoriteToyList?: Dispatch<SetStateAction<string[]>>,
+    item: itemType | firebaseResponseType,
+    isFavorite: boolean,
+    isOnStatus?: boolean,
+    isLoading?: boolean,
+    user?: userType | null,
+    onClickMore?: ()=>void,
+};
 
 export type itemReviewType = {
     rate: number,

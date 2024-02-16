@@ -42,15 +42,6 @@ export const signInWarningToast = (text = 'Try again') =>{
     });
 }
 
-export const getOnboarded = async () => {
-    const onboardedStatus = await AsyncStorage.getItem('onboardedStatus');
-    if(!onboardedStatus){
-        await AsyncStorage.setItem('onboardedStatus', "true");
-        return false;
-    }
-    return true;
-}
-
 export const updateImage = async({setUserImage})=>{
     try {
         const userInstance = getCurrentUser();
@@ -68,13 +59,12 @@ export const updateImage = async({setUserImage})=>{
     }
 }
 
-export const loadOrCreateUser = async ({userInstance, setUser})=>{
+export const loadOrCreateUser = async ({userInstance})=>{
     // const dispatch = useDispatch();
     const user = await loadUser({userID: userInstance.uid})[0];
     if (user?.length){
         // dispatch(setUser(user));
-        setUser(user);
-        return;
+        return user;
     }
     const userCreateInstance :userType = {
         id: userInstance.uid,
@@ -86,10 +76,11 @@ export const loadOrCreateUser = async ({userInstance, setUser})=>{
         plan: 'default',
         photoURL: userInstance?.photoURL || defaultPhoto,
         bio: 'I Love Toy App!',
-        location: null
+        location: null,
+        isOnboarded: false,
     }
     await db.collection('users').doc(userInstance.uid).set(userCreateInstance);
-    setUser(userCreateInstance);
+    return userCreateInstance;
 }
 
 export const loadFavoriteData = async ({setFavoriteList, userID, setFavoriteListIds, setLoading}) =>{

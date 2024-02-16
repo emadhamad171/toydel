@@ -6,23 +6,14 @@ import {
 } from "react-native";
 import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import ItemComponent from "../components/ItemComponent";
-import {itemType, userType} from "../helpers/types";
+import {cartItemPropsType, itemType, userType} from "../helpers/types";
 import WrapperComponent from "../components/WrapperComponent";
 import {defaultPhoto} from "../helpers/constants";
 import {SafeAreaView} from "moti";
 import ItemModal from "../modals/ItemModal";
 import {cartStyle} from "../styles";
-type cartItemType = {
-    item: itemType
-}
-type cartItemPropsType = {
-    item: cartItemType,
-    setItemModal: Dispatch<SetStateAction<any>>,
-    setModalName:Dispatch<SetStateAction<string>>,
-    user: userType,
-    isLoading: boolean,
-};
-
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../store";
 
 const CartItem = ({item, setItemModal, setModalName, user, isLoading}:cartItemPropsType) =>{
     const onClickMore = () => {
@@ -42,7 +33,9 @@ const loadData = async ({setLoading}) =>{
     setTimeout(()=>setLoading(false), 800);
 }
 
-const Cart = ({user}) =>{
+const Cart = () =>{
+    const user = useSelector((state:RootState)=>state.user.user);
+    const dispatch = useDispatch();
     const [ItemModal, setItemModal] = useState(null);
     const [modalName, setModalName] = useState<string>('');
     const [isLoading, setLoading] = useState(true);

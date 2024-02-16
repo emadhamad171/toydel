@@ -76,7 +76,7 @@ const PlansModalButton = ({user,setModal,setModalName,updateUser}:{user:userType
     </TouchableOpacity>;
 }
 
-export default ({item, user, isOwned, setModal, setModalName,updateUser} : {item:itemType, user:userType, isOwned ?:boolean, setModal: React.Dispatch<SetStateAction<any>>, setModalName:React.Dispatch<SetStateAction<string>>, updateUser: ()=>void}) => {
+export default ({item, user, isOwned, setModal, setModalName,updateUser} : {item:itemType, user:any, isOwned ?:boolean, setModal?: React.Dispatch<SetStateAction<any>>, setModalName?:React.Dispatch<SetStateAction<string>>, updateUser?: ()=>void}) => {
     return (
         <SafeAreaView style={{alignItems: 'center', justifyContent:'center', flexGrow:1}}>
             <ScrollView contentContainerStyle={{marginTop: normalize(64), marginBottom: normalize(12), width: windowWidth, paddingBottom: normalize(120)}}>

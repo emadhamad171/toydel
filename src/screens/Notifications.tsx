@@ -7,6 +7,8 @@ import {getIndieNotificationInbox,deleteIndieNotificationInbox} from "../notific
 import {notificationType} from "../helpers/types";
 import {normalize, notificationStackSample} from "../helpers";
 import {SafeAreaView} from "moti";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../store";
 
 const getFormatedNotifications = (el:any) : notificationType => {
     const pushData = JSON.parse(el.pushData);
@@ -41,7 +43,10 @@ const loadNotifications = ({setData, uid,setRefreshing}) => {
         .then(data=>{setData(()=>data.map(getFormatedNotifications))})
         .finally(()=>setRefreshing(false));
 }
-function Notifications({user}) {
+function Notifications() {
+    const user = useSelector((state:RootState)=>state.user.user);
+    const dispatch = useDispatch();
+
     const [data, setData] = useState<notificationType[]>(notificationStackSample);
     const [isRefreshing, setRefreshing] = useState<boolean>(true);
 

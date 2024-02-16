@@ -4,9 +4,15 @@ import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfo
 import { onPressLogout} from "../firebase/firebaseAPI";
 import {WrapperComponent, UserNameAndIcon, UserButton} from "../components";
 import {normalize, updateImage} from "../helpers";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../store";
+import {setUser, updateUser} from "../store/slices/userSlice";
 
 
-const Profile =({user, setUser,updateUser}) =>{
+const Profile =() =>{
+    const user = useSelector((state:RootState)=>state.user.user);
+    const dispatch = useDispatch();
+
     const [CustomModal, setModal] = useState(null);
     const [currentModalName, setModalName] = useState('');
     const [userName, setUserName] = useState(user.displayName);
@@ -37,7 +43,7 @@ const Profile =({user, setUser,updateUser}) =>{
                 </View>
                 <View style={{gap: 5}}>
                     <UserButton icon={'layers'} onPressAction={()=>{
-                        setModal(()=>{return ()=><PremiumPlansModal user={user} updateUser={updateUser}/>})
+                        setModal(()=>{return ()=><PremiumPlansModal user={user} updateUser={()=>{dispatch(updateUser())}}/>})
                         setModalName("Plans");
                     }} placeholder={"Plans"} />
                     <UserButton icon={'heart'} iconSize={24} onPressAction={()=>{
@@ -56,7 +62,7 @@ const Profile =({user, setUser,updateUser}) =>{
                         setModalName("Settings");
                     }} placeholder={"Settings"} />
                 </View>
-                <UserButton icon={'logout'} onPressAction={()=>onPressLogout({setUser: setUser})} placeholder={"Logout"} />
+                <UserButton icon={'logout'} onPressAction={()=>onPressLogout({setUser: ()=>{dispatch(setUser(null))}})} placeholder={"Logout"} />
             </View>
         </ScrollView>
         </SafeAreaView>

@@ -14,6 +14,9 @@ import {itemsStackSample} from "../helpers";
 import {itemType, userType} from "../helpers/types";
 import {SafeAreaView} from "moti";
 import ItemModal from "../modals/ItemModal";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../store";
+import {updateUser, updateUserFavoriteList} from "../store/slices/userSlice";
 
 const HeaderComponent = ({setModal, setModalName, user,updateUser}) =>{
     const navigation = useNavigation();
@@ -141,17 +144,28 @@ const PageButtonsComponent = ({pageNumber, setPageNumber,searchedListItems}) => 
         </Text>
     </TouchableOpacity>
 </View>
-const Home = ({user,updateUser}:{user:userType, updateUser:()=>void}) =>{
-const [pageNumber, setPageNumber] = useState<number>(1);
-const [fetchedListItems, setFetchedListItems] = useState<itemType[]>(itemsStackSample);
-const [isRefreshing, setRefreshing] = useState<boolean>(true);
-const [favoriteList, setFavoriteList] = useState<string[]>(user.favoriteList);
-const [selectedCategories, setChoosedCategory] = useState<string[]>([]);
-const [CustomModal, setModal] = useState(null);
-const [currentModalName, setModalName] = useState<string>('');
-const [searchString, setSearch] = useState<string>('');
-const [displayedListItems, setDisplayedListItems] = useState<itemType[]>(itemsStackSample);
-const [searchedListItems, setSearchedItems] = useState<itemType[]>(itemsStackSample);
+const Home = () =>{
+    const user = useSelector((state:RootState)=>state.user.user);
+    const dispatch = useDispatch();
+    const updateUserInfo = () =>{
+        dispatch(updateUser());
+    };
+
+    //~~~~~~Base config~~~~~~~~~
+    const [pageNumber, setPageNumber] = useState<number>(1);
+    const [fetchedListItems, setFetchedListItems] = useState<itemType[]>(itemsStackSample);
+    const [isRefreshing, setRefreshing] = useState<boolean>(true);
+    const [displayedListItems, setDisplayedListItems] = useState<itemType[]>(itemsStackSample);
+    const [favoriteList,setFavoriteList] = useState(user.favoriteList);
+
+    //~~~~~~~Filter Props~~~~~~~
+    const [selectedCategories, setChoosedCategory] = useState<string[]>([]);
+    const [searchString, setSearch] = useState<string>('');
+    const [searchedListItems, setSearchedItems] = useState<itemType[]>(itemsStackSample);
+
+    //~~~~~~~Modals~~~~~~
+    const [CustomModal, setModal] = useState(null);
+    const [currentModalName, setModalName] = useState<string>('');
 
     useEffect(() => {
         const searchedItems = searchByString({fetchedListItems, searchString})
@@ -174,7 +188,7 @@ const [searchedListItems, setSearchedItems] = useState<itemType[]>(itemsStackSam
         return ()=> {
             setModalName(() => item.name);
             setModal(() => {
-                return () => <ItemModal setModal={setModal} setModalName={setModalName} user={user} item={item} updateUser={updateUser} isOwned={user?.ownedList && user.ownedList.some((el)=>{if(item.id===el.id) return item;})}/>
+                return () => <ItemModal setModal={setModal} setModalName={setModalName} user={user} item={item} updateUser={updateUserInfo} isOwned={user?.ownedList && user.ownedList.some((el)=>{if(item.id===el.id) return item;})}/>
             })
         }
     }
@@ -183,7 +197,7 @@ const [searchedListItems, setSearchedItems] = useState<itemType[]>(itemsStackSam
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
         <SafeAreaView>
         <View style={{}}>
-            <HeaderComponent setModal={setModal} setModalName={setModalName} user={user.id} updateUser={updateUser}/>
+            <HeaderComponent setModal={setModal} setModalName={setModalName} user={user.id} updateUser={updateUserInfo}/>
             <FlatList
                 refreshControl={ <RefreshControl style={{backgroundColor: '#a333ff'}} refreshing={isRefreshing} onRefresh={onRefresh} /> }
                 data={displayedListItems}

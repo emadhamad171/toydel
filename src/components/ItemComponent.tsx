@@ -3,19 +3,9 @@ import {auth} from "../firebase";
 import {Image, Text, TouchableOpacity, View} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {Dispatch, SetStateAction} from "react";
-import {itemType, userType} from "../helpers/types";
+import {itemComponentPropsType, itemType, userType} from "../helpers/types";
 import Stars from "./StarsComponent";
 import {Skeleton} from "moti/skeleton";
-
-type itemComponentPropsType = {
-    setFavoriteToyList?: Dispatch<SetStateAction<string[]>>,
-    item: itemType,
-    isFavorite: boolean,
-    isOnStatus?: boolean,
-    isLoading?: boolean,
-    user?: userType | null,
-    onClickMore?: ()=>void,
-};
 
 const ItemComponent = (
     {setFavoriteToyList,item, isFavorite, isLoading=true, isOnStatus=false, user=null, onClickMore = ()=>{}}: itemComponentPropsType

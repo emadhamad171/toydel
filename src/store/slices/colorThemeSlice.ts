@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import {ColorSchemeName, useColorScheme} from "react-native";
+import {ColorSchemeName} from "react-native";
 
 
 export interface UserState {

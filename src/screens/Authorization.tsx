@@ -23,6 +23,8 @@ import Input from "../components/Input";
 import {GOOGLE_WEB_CLIENT_ID} from 'react-native-dotenv'
 import {normalize, signInWarningToast, wait} from "../helpers";
 import {SafeAreaView} from "moti";
+import {useSelector} from "react-redux";
+import {RootState} from "../store";
 
 const GoogleButton = ({handleGoogleClick}) => {
     return (
@@ -76,6 +78,7 @@ const LogoSection = ({marginTop}) => {
         ;
 }
 const AuthScreen = () => {
+    const isDarkTheme = useSelector((state:RootState)=>state.theme.isDarkTheme);
 //************ Component Config ***************/
     const topPos = useRef(new Animated.Value(normalize(-750))).current;
     const marginTop = useRef(new Animated.Value(normalize(270))).current;
@@ -242,11 +245,11 @@ const AuthScreen = () => {
     }
 
     return (
-        <View style={{...styles.body }}>
-        <SafeAreaView style={styles.body}>
+        <View style={isDarkTheme ? styles.body_dark : styles.body_light}>
+        <SafeAreaView style={isDarkTheme ? styles.body_dark : styles.body_light}>
             <LogoSection marginTop={marginTop}/>
 
-            <Animated.View style={{...styles.authContainer, marginBottom: topPos, }}>
+            <Animated.View style={{...styles.authContainer, marginBottom: topPos}}>
                 <Text style={styles.headerText}>Welcome</Text>
                 <Text style={styles.subHeaderText}>Let's {isRegister ? 'start' : isRecovery ? 'reset password' : 'continue'} with
                     your {loginType === 'email' ? 'email' : "phone number"}</Text>

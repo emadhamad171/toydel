@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import {ColorSchemeName} from "react-native";
+import {setBaseColorTheme} from "../../helpers";
 
 
 export interface UserState {
@@ -17,6 +18,7 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         toggleTheme: (state,)=>{
+            setBaseColorTheme(state.isDarkTheme ? 'light':'dark').then();
             state.theme = state.isDarkTheme ? 'light':'dark';
             state.isDarkTheme = !state.isDarkTheme;
         },

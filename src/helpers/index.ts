@@ -6,8 +6,15 @@ import {defaultPhoto} from "./constants";
 import {Dimensions, PixelRatio} from "react-native";
 import {launchImageLibrary} from "react-native-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {useDispatch} from "react-redux";
-import {setUser} from "../store/slices/userSlice";
+
+export const loadBaseColorTheme = async (baseTheme : string) => {
+    const colorTheme = await AsyncStorage.getItem('colorTheme');
+    if(!colorTheme) await setBaseColorTheme(baseTheme);
+    return colorTheme || baseTheme;
+}
+export const setBaseColorTheme = async (colorTheme = 'dark') => {
+    await AsyncStorage.setItem('colorTheme', colorTheme);
+}
 export const {width: windowWidth, height: windowHeight} = Dimensions.get("window");
 export  const normalize = (fontSize) => Math.round(PixelRatio.roundToNearestPixel(windowHeight/1080*fontSize));
 

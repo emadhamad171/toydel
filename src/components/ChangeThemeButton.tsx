@@ -2,6 +2,9 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import {View, Animated, Text, Platform, TouchableOpacity, useColorScheme} from "react-native";
 import {normalize} from "../helpers";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../store";
+import {toggleTheme} from "../store/slices/colorThemeSlice";
 
 const ButtonContainer =({children, theme})=> <View style={{
     borderRadius: 25,
@@ -48,18 +51,22 @@ const themes = {
     }
 };
 const ChangeThemeButton = ({btnSize = 40}) => {
-    const [isDarkTheme, setTheme]= useState(useColorScheme() === 'dark');
+    const isDarkTheme = useSelector((state:RootState)=>state.theme.isDarkTheme);
+    const dispatch = useDispatch();
+    const toggleColorTheme = () => {
+        dispatch(toggleTheme());
+    }
     const theme= isDarkTheme ? themes.dark : themes.light;
 
     const leftPos = useRef(new Animated.Value(isDarkTheme ? 0 : normalize(70))).current;
     const handleClick = ()=> {
-        setTheme(prevState => !prevState);
+        toggleColorTheme();
         moveButton();
     }
     const moveButton = () =>{
         if(leftPos)
             Animated.spring(leftPos,{
-                    toValue: isDarkTheme ? 0 : normalize(75),
+                    toValue: isDarkTheme ? normalize(75) : 0,
                     useNativeDriver: false,
                 }
             ).start();
@@ -69,7 +76,7 @@ const ChangeThemeButton = ({btnSize = 40}) => {
         <TouchableOpacity onPress={handleClick}>
             <ButtonContainer theme={theme}>
                 <Animated.View style={{transform: [{ translateX: leftPos }]}}>
-                    <StyledIcon theme={theme} callback={handleClick} btnSize={40}/>
+                    <StyledIcon theme={theme} callback={handleClick} btnSize={btnSize}/>
                 </Animated.View>
             </ButtonContainer>
         </TouchableOpacity>

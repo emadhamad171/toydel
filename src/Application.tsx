@@ -8,12 +8,19 @@ import 'react-native-gesture-handler';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { registerIndieID } from './notifications';
 import {Authorization, Cart, Home, Notifications, Onboarding, Profile} from './screens'
-import {loadOrCreateUser, screenOptions, signInSuccessfulToast, signInWarningToast} from "./helpers";
+import {
+    loadBaseColorTheme,
+    loadOrCreateUser,
+    screenOptions,
+    signInSuccessfulToast,
+    signInWarningToast
+} from "./helpers";
 import {notificationAppToken, notificationAppId} from 'react-native-dotenv'
 import {useSelector, useDispatch} from "react-redux";
 import {RootState} from "./store";
-import {setUser, updateUserOnboarding} from "./store/slices/userSlice";
+import {setUser} from "./store/slices/userSlice";
 import {useColorScheme} from "react-native";
+import {setTheme} from "./store/slices/colorThemeSlice";
 
 const Tab = createBottomTabNavigator();
 
@@ -44,6 +51,9 @@ export default function Application() {
                     }
             }
         });
+        loadBaseColorTheme(baseTheme).then(colorTheme => {
+            dispatch(setTheme(colorTheme));
+        })
     }, []);
 
     return user && (!!auth.currentUser.emailVerified || !!user?.phoneNumber) ?

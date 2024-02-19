@@ -1,12 +1,22 @@
 import {StyleSheet} from "react-native";
 import {normalize, windowWidth} from "../helpers";
 
-export const styles = StyleSheet.create({
+const base_styles = StyleSheet.create({
     body: {
         width: '100%',
         flex: 1,
-        backgroundColor: "#e3aeff",
         justifyContent: 'space-between',
+    }
+})
+
+export const styles = StyleSheet.create({
+    body_light: {
+        ...base_styles.body,
+        backgroundColor: "#e3aeff",
+    },
+    body_dark: {
+        ...base_styles.body,
+        backgroundColor: "#e3aeff",
     },
     authContainer: {
         width: '100%',

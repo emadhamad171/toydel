@@ -6,34 +6,33 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import 'react-native-gesture-handler';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { registerIndieID } from './notifications';
 import {Authorization, Cart, Home, Notifications, Onboarding, Profile} from './screens'
 import {
-    loadBaseColorTheme,
-    loadOrCreateUser,
+    loadBaseColorTheme, loadNotificationStatus,
+    loadOrCreateUser, registerNotifications,
     screenOptions,
     signInSuccessfulToast,
     signInWarningToast
 } from "./helpers";
-import {notificationAppToken, notificationAppId} from 'react-native-dotenv'
 import {useSelector, useDispatch} from "react-redux";
 import {RootState} from "./store";
 import {setUser} from "./store/slices/userSlice";
 import {useColorScheme} from "react-native";
-import {setTheme} from "./store/slices/colorThemeSlice";
+import {setNotificationsStatus, setTheme} from "./store/slices/configSlice";
 
 const Tab = createBottomTabNavigator();
 
 export default function Application() {
     const user = useSelector((state:RootState)=>state.user.user);
+    const isNotificationOff = useSelector((state:RootState)=>state.config.notificationOff);
+
     const dispatch = useDispatch();
     const baseTheme = useColorScheme();
-
     const onUserSignIn = ({userInstance}) => {
-        registerIndieID(userInstance.uid, notificationAppId, notificationAppToken);
         loadOrCreateUser({userInstance}).then((user) => {
             dispatch(setUser(user));
             signInSuccessfulToast();
+            !isNotificationOff && registerNotifications();
         }).catch((e) => {
             signInWarningToast();
             console.log(e);
@@ -53,6 +52,9 @@ export default function Application() {
         });
         loadBaseColorTheme(baseTheme).then(colorTheme => {
             dispatch(setTheme(colorTheme));
+        })
+        loadNotificationStatus().then((isNotificationOff)=>{
+            dispatch(setNotificationsStatus(isNotificationOff));
         })
     }, []);
 

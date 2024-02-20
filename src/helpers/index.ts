@@ -1,11 +1,13 @@
 import Toast from "react-native-toast-message";
 import {getCurrentUser, loadSpecialItems, loadUser, updateUserImage} from "../firebase/firebaseAPI";
-import {db} from "../firebase";
+import {auth, db} from "../firebase";
 import {itemType, notificationType, userType} from "./types";
 import {defaultPhoto} from "./constants";
 import {Dimensions, PixelRatio} from "react-native";
 import {launchImageLibrary} from "react-native-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import registerNNPushToken, {registerIndieID} from "../notifications";
+import {notificationAppId, notificationAppToken} from "react-native-dotenv";
 
 export const loadBaseColorTheme = async (baseTheme : string) => {
     const colorTheme = await AsyncStorage.getItem('colorTheme');
@@ -15,6 +17,15 @@ export const loadBaseColorTheme = async (baseTheme : string) => {
 export const setBaseColorTheme = async (colorTheme = 'dark') => {
     await AsyncStorage.setItem('colorTheme', colorTheme);
 }
+
+export const loadNotificationStatus = async () =>{
+    const isNotificationOff = await AsyncStorage.getItem('notificationOff');
+    return isNotificationOff === 'true';
+}
+export const setNotificationStatus = async (status : boolean)=>{
+    await AsyncStorage.setItem('notificationOff', `${status}`);
+}
+
 export const {width: windowWidth, height: windowHeight} = Dimensions.get("window");
 export  const normalize = (fontSize) => Math.round(PixelRatio.roundToNearestPixel(windowHeight/1080*fontSize));
 
@@ -47,6 +58,11 @@ export const signInWarningToast = (text = 'Try again') =>{
         position: 'top',
         swipeable: true
     });
+}
+
+export const registerNotifications = async () =>{
+    await registerIndieID(auth.currentUser.uid, notificationAppId, notificationAppToken);
+    registerNNPushToken(notificationAppId, notificationAppToken);
 }
 
 export const updateImage = async({setUserImage})=>{

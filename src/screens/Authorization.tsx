@@ -78,7 +78,7 @@ const LogoSection = ({marginTop}) => {
         ;
 }
 const AuthScreen = () => {
-    const isDarkTheme = useSelector((state:RootState)=>state.theme.isDarkTheme);
+    const isDarkTheme = useSelector((state:RootState)=>state.config.isDarkTheme);
 //************ Component Config ***************/
     const topPos = useRef(new Animated.Value(normalize(-750))).current;
     const marginTop = useRef(new Animated.Value(normalize(270))).current;

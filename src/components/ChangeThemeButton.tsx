@@ -4,7 +4,7 @@ import {View, Animated, Text, Platform, TouchableOpacity, useColorScheme} from "
 import {normalize} from "../helpers";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../store";
-import {toggleTheme} from "../store/slices/colorThemeSlice";
+import {toggleTheme} from "../store/slices/configSlice";
 
 const ButtonContainer =({children, theme})=> <View style={{
     borderRadius: 25,
@@ -51,7 +51,7 @@ const themes = {
     }
 };
 const ChangeThemeButton = ({btnSize = 40}) => {
-    const isDarkTheme = useSelector((state:RootState)=>state.theme.isDarkTheme);
+    const isDarkTheme = useSelector((state:RootState)=>state.config.isDarkTheme);
     const dispatch = useDispatch();
     const toggleColorTheme = () => {
         dispatch(toggleTheme());

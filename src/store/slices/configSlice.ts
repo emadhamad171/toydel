@@ -6,14 +6,16 @@ import {setBaseColorTheme} from "../../helpers";
 export interface UserState {
     theme: ColorSchemeName,
     isDarkTheme: boolean,
+    notificationOff: boolean,
 }
 
 const initialState: UserState = {
     theme: 'dark',
-    isDarkTheme: true
+    isDarkTheme: true,
+    notificationOff: false
 }
 
-export const userSlice = createSlice({
+export const configSlice = createSlice({
     name: 'theme',
     initialState,
     reducers: {
@@ -25,10 +27,16 @@ export const userSlice = createSlice({
         setTheme: (state, action) =>{
             state.theme = action.payload;
             state.isDarkTheme = action.payload === 'dark';
+        },
+        toggleNotificationsStatus: (state)=>{
+            state.notificationOff = !state.notificationOff;
+        },
+        setNotificationsStatus: (state, action) => {
+            state.notificationOff = action.payload;
         }
     },
 })
 
-export const { toggleTheme,setTheme } = userSlice.actions
+export const { toggleTheme,setTheme, toggleNotificationsStatus,setNotificationsStatus } = configSlice.actions
 
-export default userSlice.reducer
+export default configSlice.reducer

@@ -1,8 +1,7 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useRef } from 'react';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 navigator.geolocation = require('@react-native-community/geolocation');
-//navigator.geolocation = require('react-native-geolocation-service');
 
 const GOOGLE_PLACES_API_KEY = 'AIzaSyA1rodPwSRHxjRlxM6hc1R9fCeoL9202tA';
 
@@ -12,9 +11,8 @@ const GooglePlacesInput = ({placeholder, setLocation}) => {
     return (<GooglePlacesAutocomplete
             nearbyPlacesAPI='GoogleReverseGeocoding'
             ref={ref}
-            placeholder={placeholder || 'location'}
+            placeholder={placeholder}
             onPress={(data, details = null) => {
-                // 'details' is provided when fetchDetails = true
                 setLocation(data);
             }}
             onFail={(error) => console.error(error)}

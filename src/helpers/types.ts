@@ -69,7 +69,7 @@ export type itemComponentPropsType = {
     isFavorite: boolean,
     isOnStatus?: boolean,
     isLoading?: boolean,
-    user?: userType | null,
+    user?: userType | firebaseResponseType| null,
     onClickMore?: ()=>void,
 };
 

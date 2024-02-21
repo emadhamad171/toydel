@@ -8,6 +8,7 @@ import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import React, {SetStateAction} from "react";
 import {cartStyle} from "../styles";
 import PremiumPlansModal from "./PremiumPlansModal";
+import {SupportModal} from "./index";
 export const AchiveContainer = ({children}) =>{
     return <View style={{ flexDirection: 'row', paddingHorizontal: normalize(8), paddingVertical: normalize(10), backgroundColor: '#eee', borderRadius: 25, marginVertical: normalize(6), maxWidth:normalize(188), width:'50%', alignItems:'center', justifyContent: 'center'}}>
         {children}
@@ -85,6 +86,12 @@ export default ({item, user, isOwned, setModal, setModalName,updateUser} : {item
                     <View style={{position:'absolute', backgroundColor: '#333',borderRadius:10,padding:1, bottom:normalize(20), left: normalize(5)}}>
                         <Stars rate={item.rate} />
                     </View>
+                    <TouchableOpacity onPress={()=>{
+                        setModalName('Support');
+                        setModal(()=>{return ()=><SupportModal user={user} />})
+                    }} style={{position:'absolute', backgroundColor: '#eee',borderRadius:10,padding:3, top:normalize(12), right: normalize(5)}}>
+                        <MIcon name={'progress-question'} size={normalize(38)} />
+                    </TouchableOpacity>
                 </View>
                 <View>
                     { isOwned&&user.plan!=='default' &&

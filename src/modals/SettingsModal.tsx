@@ -30,15 +30,32 @@ const SettingsModal = () => {
         dispatch(toggleNotificationsStatus());
     }
     return <View style={{flex: 1}}>
-        <SafeAreaView style={{flex: 1, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10}}>
+        <SafeAreaView style={{flex: 1, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: normalize(24), paddingVertical: normalize(32)}}>
+            <View style={{width: '100%', gap: normalize(24)}}>
             <View style={{flexDirection:'row', alignItems:'center',justifyContent: 'space-between', width:'100%'}}>
                 <Text style={{fontSize: normalize(32)}}>
                     Notifications
                 </Text>
                 <ButtonToggle initialState={!isNotificationOff} iconOffName={'bell-cancel-outline'} iconOnName={'bell-outline'} callback={toggleNotifications} />
             </View>
+            <View style={{flexDirection:'row', alignItems:'center',justifyContent: 'space-between', width:'100%'}}>
+                <Text style={{fontSize: normalize(32)}}>
+                    Geolocation
+                </Text>
+                <ButtonToggle initialState={!isNotificationOff} iconOffName={'window-close'} iconOnName={'check'} callback={toggleNotifications} />
+            </View>
+            <View style={{flexDirection:'row', alignItems:'center',justifyContent: 'space-between', width:'100%'}}>
+                <Text style={{fontSize: normalize(32)}}>
+                    Save Data
+                </Text>
+                <ButtonToggle initialState={!isNotificationOff} iconOffName={'window-close'} iconOnName={'check'} callback={toggleNotifications} />
+            </View>
+            </View>
         <ButtonToggle initialState={!isDarkMode} iconOnName={'white-balance-sunny'} iconOffName={'moon-waxing-crescent'} callback={onChangeTheme}/>
         </SafeAreaView>
     </View>
 }
 export default SettingsModal;
+
+
+

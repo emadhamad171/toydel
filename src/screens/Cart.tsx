@@ -19,7 +19,7 @@ const CartItem = ({item, setItemModal, setModalName, user, isLoading}:cartItemPr
     const onClickMore = () => {
         setModalName(()=>item.item.name);
         setItemModal(()=>{
-            return ()=> <ItemModal user={user} item={item.item} isOwned />
+            return ()=> <ItemModal user={user} setModal={setItemModal} setModalName={setModalName} item={item.item} isOwned />
         })
     }
     return (

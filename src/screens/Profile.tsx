@@ -7,12 +7,13 @@ import {normalize, updateImage} from "../helpers";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../store";
 import {setUser, updateUser} from "../store/slices/userSlice";
+import {useNavigation} from "@react-navigation/native";
 
 
 const Profile =() =>{
     const user = useSelector((state:RootState)=>state.user.user);
     const dispatch = useDispatch();
-
+    const navigation = useNavigation();
     const [CustomModal, setModal] = useState(null);
     const [currentModalName, setModalName] = useState('');
     const [userName, setUserName] = useState(user.displayName);
@@ -50,7 +51,9 @@ const Profile =() =>{
                         setModal(()=>{return ()=><FavoriteItemsModal user={user} />});
                         setModalName("Favorite");
                     }} placeholder={"Favorite"} />
-                    <UserButton icon={''} onPressAction={onPressLogout} placeholder={""} />
+                    <UserButton icon={'format-list-bulleted'} onPressAction={()=>{
+                        navigation.navigate('Cart' as never);
+                    }} placeholder={"Owned items"} />
                 </View>
                 <View style={{gap: 5}}>
                     <UserButton icon={'account-question'} onPressAction={()=>{

@@ -45,7 +45,7 @@ export type userType = {
     displayName: string,
     favoriteList: string[],
     ownedList: ownedItemType[],
-    plan: userTierType,
+    plan: planType,
     photoURL: string,
     bio: string,
     supportInfo?: supprotInfoType,
@@ -103,10 +103,11 @@ export type iconInfoType = {
 }
 
 export type planType = {
-    price: number,
-    backgroundColor: string,
+    price?: number,
+    backgroundColor?: string,
     name: userTierType,
-    description: string,
-    features: string[],
-    sign: iconInfoType
+    description?: string,
+    features?: string[],
+    sign?: iconInfoType,
+    numberOfToys: number
 }

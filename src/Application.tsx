@@ -9,7 +9,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {Authorization, Cart, Home, Notifications, Onboarding, Profile} from './screens'
 import {
     loadBaseColorTheme, loadNotificationStatus,
-    loadOrCreateUser, registerNotifications,
+    loadOrCreateUser,
     screenOptions,
     signInSuccessfulToast,
     signInWarningToast
@@ -19,6 +19,8 @@ import {RootState} from "./store";
 import {setUser} from "./store/slices/userSlice";
 import {useColorScheme} from "react-native";
 import {setNotificationsStatus, setTheme} from "./store/slices/configSlice";
+import registerNNPushToken, {registerIndieID} from "./notifications";
+import {notificationAppId, notificationAppToken} from "react-native-dotenv";
 
 const Tab = createBottomTabNavigator();
 
@@ -28,11 +30,14 @@ export default function Application() {
 
     const dispatch = useDispatch();
     const baseTheme = useColorScheme();
-    const onUserSignIn = ({userInstance}) => {
+    const onUserSignIn = async ({userInstance}) => {
         loadOrCreateUser({userInstance}).then((user) => {
             dispatch(setUser(user));
             signInSuccessfulToast();
-            !isNotificationOff && registerNotifications();
+            if(!isNotificationOff){
+                registerIndieID(auth.currentUser.uid, notificationAppId, notificationAppToken);
+                registerNNPushToken(notificationAppId, notificationAppToken);
+            }
         }).catch((e) => {
             signInWarningToast();
             console.log(e);

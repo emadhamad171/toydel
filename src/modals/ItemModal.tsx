@@ -77,7 +77,7 @@ const PlansModalButton = ({user,setModal,setModalName,updateUser}:{user:userType
     </TouchableOpacity>;
 }
 
-export default ({item, user, isOwned, setModal, setModalName,updateUser} : {item:itemType, user:any, isOwned ?:boolean, setModal?: React.Dispatch<SetStateAction<any>>, setModalName?:React.Dispatch<SetStateAction<string>>, updateUser?: ()=>void}) => {
+export default ({item, user, isOwned, setModal, setModalName,updateUser} : {item:itemType, user:userType, isOwned ?:boolean, setModal?: React.Dispatch<SetStateAction<any>>, setModalName?:React.Dispatch<SetStateAction<string>>, updateUser?: ()=>void}) => {
     return (
         <SafeAreaView style={{alignItems: 'center', justifyContent:'center', flexGrow:1}}>
             <ScrollView contentContainerStyle={{marginTop: normalize(64), marginBottom: normalize(12), width: windowWidth, paddingBottom: normalize(120)}}>
@@ -94,7 +94,7 @@ export default ({item, user, isOwned, setModal, setModalName,updateUser} : {item
                     </TouchableOpacity>
                 </View>
                 <View>
-                    { isOwned&&user.plan!=='default' &&
+                    { isOwned&&user.plan.name!=='default' &&
                     <View style={{ flexDirection: 'row', justifyContent:'space-around'}}>
                         <AchiveContainer>
                             <Text style={cartStyle.smallText}>Status: </Text>
@@ -122,7 +122,7 @@ export default ({item, user, isOwned, setModal, setModalName,updateUser} : {item
                     {item.description}
                 </Text>
                 <View>
-                    { user.plan === 'default' ? <PlansModalButton user={user} setModal={setModal} setModalName={setModalName} updateUser={updateUser} /> :
+                    { user.plan.name === 'default' ? <PlansModalButton user={user} setModal={setModal} setModalName={setModalName} updateUser={updateUser} /> :
                         <View style={{flexDirection:'row', justifyContent: 'space-between', marginHorizontal: normalize(24),}}>
                         <ChageToyButton />
                         <BuyToyButton />

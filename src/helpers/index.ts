@@ -1,13 +1,11 @@
 import Toast from "react-native-toast-message";
 import {getCurrentUser, loadSpecialItems, loadUser, updateUserImage} from "../firebase/firebaseAPI";
-import {auth, db} from "../firebase";
+import {db} from "../firebase";
 import {itemType, notificationType, userType} from "./types";
 import {defaultPhoto} from "./constants";
 import {Dimensions, PixelRatio} from "react-native";
 import {launchImageLibrary} from "react-native-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import registerNNPushToken, {registerIndieID} from "../notifications";
-import {notificationAppId, notificationAppToken} from "react-native-dotenv";
 
 export const loadBaseColorTheme = async (baseTheme : string) => {
     const colorTheme = await AsyncStorage.getItem('colorTheme');
@@ -60,11 +58,6 @@ export const signInWarningToast = (text = 'Try again') =>{
     });
 }
 
-export const registerNotifications = async () =>{
-    await registerIndieID(auth.currentUser.uid, notificationAppId, notificationAppToken);
-    registerNNPushToken(notificationAppId, notificationAppToken);
-}
-
 export const updateImage = async({setUserImage})=>{
     try {
         const userInstance = getCurrentUser();
@@ -94,7 +87,10 @@ export const loadOrCreateUser = async ({userInstance})=>{
         phoneNumber: userInstance?.phoneNumber || '',
         favoriteList: [''],
         ownedList: [],
-        plan: 'default',
+        plan: {
+            name: "default",
+            numberOfToys: 0,
+        },
         photoURL: userInstance?.photoURL || defaultPhoto,
         bio: 'I Love Toy App!',
         location: null,

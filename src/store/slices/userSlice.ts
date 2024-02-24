@@ -38,12 +38,15 @@ export const userSlice = createSlice({
         updateUserOnboarding: (state)=>{
             state.user.isOnboarded = true;
         },
+        updateUserField: (state, action)=>{
+            state.user[action.payload.field] = action.payload.value;
+        },
         logoutUser: (state)=>{
             state.user = null;
         }
     },
 })
 
-export const { setUser, logoutUser, updateUserPhoto, updateUserName, updateUser,updateUserFavoriteList,updateUserOnboarding } = userSlice.actions
+export const { setUser, logoutUser, updateUserField, updateUserPhoto, updateUserName, updateUser,updateUserFavoriteList,updateUserOnboarding } = userSlice.actions
 
 export default userSlice.reducer

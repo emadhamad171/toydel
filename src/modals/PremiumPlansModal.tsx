@@ -130,7 +130,7 @@ const Plans = () => {
             subHeader: 'Silver Plan description',
             item: planList.silver,
             price: 200,
-            image: <Image style={{width:windowWidth*0.9, height:windowWidth*0.9}} source={{uri:'https://firebasestorage.googleapis.com/v0/b/testotp-fabeb.appspot.com/o/noPhoto.jpg?alt=media&token=fdae6f63-b7d5-4027-91de-1741d65bf67d'}} />,
+            image: <Image style={{width: normalize(windowWidth), height:normalize(windowWidth*0.9)}} source={{uri:'https://firebasestorage.googleapis.com/v0/b/testotp-fabeb.appspot.com/o/noPhoto.jpg?alt=media&token=fdae6f63-b7d5-4027-91de-1741d65bf67d'}} />,
         },
         {
             RenderedItem: planRenderItem(renderItemProps),
@@ -138,7 +138,7 @@ const Plans = () => {
             subHeader: 'Gold Plan description',
             item: planList.gold,
             price: 300,
-            image: <Image style={{width:windowWidth*0.9, height:windowWidth*0.9}} source={{uri:'https://firebasestorage.googleapis.com/v0/b/testotp-fabeb.appspot.com/o/noPhoto.jpg?alt=media&token=fdae6f63-b7d5-4027-91de-1741d65bf67d'}} />,
+            image: <Image style={{width: normalize(windowWidth), height:normalize(windowWidth*0.9)}} source={{uri:'https://firebasestorage.googleapis.com/v0/b/testotp-fabeb.appspot.com/o/noPhoto.jpg?alt=media&token=fdae6f63-b7d5-4027-91de-1741d65bf67d'}} />,
         }
     ];
     useEffect(() => {

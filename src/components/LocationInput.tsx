@@ -1,9 +1,10 @@
 import React, { useRef } from 'react';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import {googlePlacesKey} from 'react-native-dotenv';
 
 navigator.geolocation = require('@react-native-community/geolocation');
 
-const GOOGLE_PLACES_API_KEY = 'AIzaSyA1rodPwSRHxjRlxM6hc1R9fCeoL9202tA';
+const GOOGLE_PLACES_API_KEY = googlePlacesKey;
 
 const GooglePlacesInput = ({placeholder, setLocation}) => {
     const ref= useRef(null);

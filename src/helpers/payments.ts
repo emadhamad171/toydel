@@ -1,15 +1,12 @@
-import {useCreatePaymentIntentMutation} from "../store/slices/apiSlice";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {SerializedError} from "@reduxjs/toolkit";
 import {
     confirmPlatformPayPayment,
     initPaymentSheet,
-    PaymentIntent,
     PlatformPay,
     presentPaymentSheet
 } from "@stripe/stripe-react-native";
 import Toast from "react-native-toast-message";
-import {Alert} from "react-native";
 
 const price = {
     default: 40000,

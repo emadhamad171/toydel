@@ -206,10 +206,6 @@ const AuthScreen = () => {
                     break;
             }
         }
-
-        if(isRegister){
-
-        }
     }
 
     //***************** Google Authorization *********************

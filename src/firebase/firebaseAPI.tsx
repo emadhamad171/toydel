@@ -1,11 +1,12 @@
-import {addDoc, collection, getDocs, query, where, orderBy, startAfter, endBefore, limit} from "firebase/firestore";
+import {addDoc, collection, getDocs, setDoc, updateDoc, doc, query, where, orderBy, startAfter, endBefore, limit} from "firebase/firestore";
 import {auth, db, fStorage, imgStorage} from "./index";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {updateProfile} from "firebase/auth";
 import {v4} from 'uuid'
-import {firebaseResponseType, itemType, userType} from "../helpers/types";
+import {chatType, firebaseResponseType, itemType, messageType, userType} from "../helpers/types";
 import {unregisterIndieDevice} from "../notifications";
 import Toast from "react-native-toast-message";
+import {formatDate} from "../helpers";
 
 export const onPressLogout = async ({setUser}) => {
     await unregisterIndieDevice(auth.currentUser.uid, 19000, 'l5ddGPLeP7FdsO5c8gy4Dl');
@@ -136,4 +137,61 @@ export const updateUserName = async ({name}) : Promise<void> => {
     const user = getCurrentUser();
     await updateUserField({updatedField: {displayName: name}, userID: user.uid});
     await updateProfile(user,{displayName: name});
+}
+
+export const loadOrCreateChat = async (user: userType | firebaseResponseType): Promise<boolean> => {
+    const newChat = {
+        isActive: false,
+        adminID: '',
+        messages: [],
+        customerName: user.displayName || 'User',
+        photoURL: user.photoURL,
+        date: formatDate(new Date()),
+        id: user.id,
+    };
+    try {
+        const chatData = await getDocs(query(collection(fStorage, "chats"), where('id', '==', user.id)));
+        const chat = chatData.docs.map(el=>{return{...el.data()}})[0]
+        if(!chat){
+            await setDoc(doc(fStorage, "chats", user.id), newChat);
+        } else {
+            if(chat?.isActive) {
+                return true;
+            }
+        }
+    } catch(e) {
+        await setDoc(doc(fStorage, "chats", user.id), newChat);
+    }
+    return false;
+}
+
+export const setChatActive = async (id: string, text: string, user: userType | firebaseResponseType) => {
+    const chatData = await getDocs(query(collection(fStorage, "chats"), where('id', '==', id)));
+    const chat = chatData.docs.map(el=>{return{...el.data()}})[0]
+    const chatMessages = chat.messages;
+    const newMessage: messageType = {
+        text,
+        date: formatDate(new Date()),
+        from: user.displayName,
+        fromUserPhotoURL: user.photoURL,
+        isFromAdmin: false,
+    };
+    await db.collection('chats').doc(id).update({
+        isActive: true,
+        messages: [...chatMessages, newMessage]
+    });
+}
+
+export const sendMessage = async (text: string, chatMessages:messageType[], user: userType | firebaseResponseType, photoURL?: string) => {
+    const newMessage: messageType = {
+        text,
+        date: formatDate(new Date()),
+        from: user.displayName,
+        fromUserPhotoURL: user.photoURL,
+        isFromAdmin: false,
+        photoURL
+    };
+    await db.collection('chats').doc(user.id).update({
+        messages: [...chatMessages, newMessage]
+    });
 }

@@ -1,62 +1,251 @@
-import WebView from "react-native-webview";
-import {updateUserField} from "../firebase/firebaseAPI";
-import {useRef, useState} from "react";
-const onMessage = async ({payload, user}) => {
-    const data = await JSON.parse(payload.nativeEvent.data);
-    await updateUserField({updatedField: {supportInfo: data}, userID: user.id});
-};
-const setSupport = ({supportInfo})=> {
-    return `(function() {
-  window.localStorage.setItem('@@lc_auth_token:5273fef3-1326-4aba-9f8b-4331c9697529','${supportInfo.auth_token}');
-  setTimeout(()=>{
-  const ids = window.localStorage.getItem('@@lc_ids');
-  const token = window.localStorage.getItem('@@lc_auth_token:5273fef3-1326-4aba-9f8b-4331c9697529');
-  const data123 = {lc_ids: ids, auth_token: token};
-  const pData = JSON.stringify(data123);
-  if(token !== '${supportInfo.auth_token}'){
-  window.ReactNativeWebView.postMessage(pData);
-  }
-  },5000)
-})();`;
+import {
+    getCurrentUser,
+    loadOrCreateChat,
+    sendMessage,
+    setChatActive
+    , uploadImage
+} from "../firebase/firebaseAPI";
+import {useEffect, useRef, useState} from "react";
+import {useSelector} from "react-redux";
+import {RootState} from "../store";
+import {useChatById} from "../shared/lib/hooks/useChat";
+import {FlatList, Image, Text, TextInput, TouchableOpacity, View} from "react-native";
+import Toast from "react-native-toast-message";
+import {chatType, messageType} from "../helpers/types";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import {launchImageLibrary} from "react-native-image-picker";
+
+
+const uploadPhoto = async () => {
+    try {
+        const userInstance = getCurrentUser();
+        const options: any = {
+            selectionLimit: 1,
+            mediaType: 'photo',
+            includeBase64: true,
+        };
+
+        const res = await launchImageLibrary(options);
+        const uri = res?.assets && res.assets[0].uri;
+
+        const imageURL = await uploadImage({uri, path: 'chats/pictures/'});
+        return imageURL;
+    } catch (e) {
+        console.log(e);
+    }
+    return '';
 }
 
-const getSupport =`(function() {
-setTimeout(()=>{
-  const ids = window.localStorage.getItem('@@lc_ids');
-  const token = window.localStorage.getItem('@@lc_auth_token:50c6cd15-ed8c-44db-bf6d-9ca5df4833e1');
-  const data123 = {lc_ids: ids, auth_token: token};
-  const pData = JSON.stringify(data123);
-  window.ReactNativeWebView.postMessage(pData);
-  }, 3000);
-})();`;
-const clearStorage =(setCookieClear) => {
-    setTimeout(()=> {
-        setCookieClear(true);
-    }, 500);
-    return `(function() {
-  window.localStorage.clear();
-  })()
-`;
+const ChatItem = (message: messageType) => {
+    const [isOpen, setOpen] = useState(false);
+    if (message?.isFromSystem) {
+        return <View style={{alignSelf: 'center'}}><Text>{!message.isEndMessage && message.text}</Text></View>
+    }
+    return <TouchableOpacity
+        style={{
+            marginHorizontal: 4,
+            padding: 12,
+            marginBottom: 12,
+            backgroundColor: '#d0bee3',
+            borderRadius: 10,
+            maxWidth: '75%',
+            alignItems: `flex-${message?.isFromAdmin ? 'start' : 'end'}`,
+            alignSelf: `flex-${message?.isFromAdmin ? 'start' : 'end'}`,
+        }}
+        onPress={()=>{
+        setOpen((prevState)=>!prevState);
+    }}>
+            <View style={{}}>
+                {
+                    message.photoURL && <Image source={{uri: message.photoURL}} style={{minWidth: 152, minHeight: 152, width: '100%'}}/>
+                }
+            <Text>{message.text}</Text>
+        </View>
+        {isOpen && <Text style={{
+            marginTop: 8,
+            fontSize: 12,
+            alignSelf: `flex-${message?.isFromAdmin ? 'start' : 'end'}`,
+        }}>{isOpen && message.date}</Text> }
+    </TouchableOpacity>
 }
-const SupportModal = ({user}) => {
-    const [isCookieClear, setCookieClear] = useState(false);
-    const WebViewRef = useRef(null);
-    const _injectaccesstokenonload = () =>{
-        const script = user?.supportInfo && user.supportInfo?.auth_token  ? setSupport({supportInfo: user.supportInfo}) : isCookieClear || user.supportInfo?.auth_token ? getSupport : clearStorage(setCookieClear);
-        return script;
+
+const ChatInput = ({chat}:{chat: chatType}) => {
+    const user = useSelector((state: RootState) => state.user.user);
+    const [text, setText] = useState('');
+    const [photoURL, setPhotoURL] = useState('');
+    const [isPhotoShown,setPhotoShown] = useState(false);
+
+    return <View style={{
+        width: "100%",
+        alignItems: 'flex-start',
+        backgroundColor: '#e1dede'
+    }}>
+        {
+            isPhotoShown && photoURL && <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%', padding: 4}}>
+            <TouchableOpacity onPress={()=>{
+                setPhotoURL('');
+                setPhotoShown(false);
+            }} style={{
+                borderRadius: 10,
+                paddingHorizontal: 18,
+                paddingVertical: 9,
+                backgroundColor: '#ffc8c8'
+            }}>
+                <Text>
+                    Remove
+                </Text>
+            </TouchableOpacity>
+                <Image source={{uri: photoURL}} style={{width: 128, height: 128}} />
+                <TouchableOpacity
+                    style={{
+                        borderRadius: 10,
+                        paddingHorizontal: 18,
+                        paddingVertical: 9,
+                        backgroundColor: '#bfb1e7'
+                    }}
+                    onPress={()=>{
+                    uploadPhoto().then((url: string)=>{
+                        setPhotoURL(url);
+                    })
+                }}>
+                    <Text>
+                        Change
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        }
+    <View style={{
+        width: "100%",
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        height: 64,
+        backgroundColor: '#e7d7e8'
+    }}>
+        <View>
+        <TouchableOpacity onPress={()=>{
+            if(photoURL){
+                setPhotoShown((prevState)=>!prevState)
+                return;
+            }
+            uploadPhoto().then((url: string)=>{
+                    setPhotoURL(url);
+                })
+        }}>
+            <Icon size={28} name={'insert-photo'} />
+            {
+                photoURL && <View style={{borderRadius: 50,backgroundColor: '#333', padding: 4, alignItems: 'center', justifyContent: 'center'}}>
+                    <Text style={{color: '#FFF'}}>1</Text>
+                </View>
+            }
+
+        </TouchableOpacity>
+        </View>
+        <TextInput
+            multiline
+            onChangeText={setText}
+            value={text}
+            style={{
+            borderWidth: .5,
+            borderRadius: 5,
+            borderColor: '#796f7a',
+            padding: 5,
+            width: '70%',
+            height: 62
+        }}/>
+
+        <TouchableOpacity onPress={()=>{
+            const textToSend = text.replaceAll('\n', '');
+            if(textToSend.replaceAll(' ', '')) {
+                sendMessage(textToSend, chat?.messages, user, photoURL).then(() => {
+                    setText('');
+                    setPhotoURL('');
+                });
+                return;
+            }
+            Toast.show({type: 'error', text1: 'Message is empty'})
+        }}>
+            <Icon size={28} name={'send'} />
+        </TouchableOpacity>
+    </View>
+    </View>
+}
+
+const Chat = () => {
+    const user = useSelector((state: RootState)=>state.user.user);
+    const chat = useChatById(user);
+    let listRef: any;
+
+    const endMessage : messageType = {
+        text: 'EOC',
+        isFromSystem: true,
+        isEndMessage: true,
+        date: '',
+        from: 'System'
     }
 
-    return <WebView
-        ref={WebViewRef}
-        incognito={!!!user?.supportInfo?.auth_token}
-        source={{ uri: 'https://secure.livechatinc.com/customer/action/open_chat?license_id=17159016' }}
-        style={{ flex: 1 }}
-        onMessage={(payload)=>{onMessage({payload: payload, user})}}
-        injectedJavaScriptBeforeContentLoaded={_injectaccesstokenonload()}
-        injectedJavaScript={_injectaccesstokenonload()}
-    />
-};
+    useEffect(() => {
+        setTimeout(()=>listRef.scrollToEnd({animated: true}), 0)
+    }, [chat, listRef]);
 
+    return <View style={{width: '100%', flex: 1}}>
+        <FlatList
+            ref={(ref)=> {
+                listRef = ref;
+                }
+            }
+            data={chat?.messages ? [...chat.messages, endMessage] : []} renderItem={({item})=><ChatItem {...item}/>} />
+        <ChatInput chat={chat} />
+    </View>;
+}
 
+const SupportChat = () => {
+    const [isLoading, setLoading] = useState(true);
+    const [isChatActive, setActive] = useState(false);
+    const [text, setText] = useState('');
 
-export default SupportModal;
+    const user = useSelector((state: RootState)=>state.user.user);
+
+    useEffect(() => {
+        loadOrCreateChat(user).then((isActive)=>{
+            setLoading(false);
+            setActive(isActive);
+        });
+    }, []);
+    const onClickStart = () => {
+        if(!text){
+            Toast.show({type: 'error', text1: 'Error!', text2: 'First message is empty.'});
+            return;
+        }
+        setLoading(()=>true)
+        setChatActive(user.id, text, user).then(()=>{
+            setLoading(()=>false);
+            setActive(()=>true)
+        });
+    }
+
+    return <View style={{flex: 1, alignItems: isChatActive ? "flex-start" : "center", justifyContent: isChatActive ? "flex-start" : 'center'}}>
+        {
+            isLoading ? <Text>Loading...</Text> :
+                isChatActive ? <Chat /> : <View style={{
+                    width: 280,
+                    gap: 4,
+                    paddingHorizontal: 12,
+                    paddingVertical: 24,
+                    borderRadius: 10,
+                    backgroundColor: '#f3f3f3'
+                }}>
+                    <Text style={{fontSize: 18, alignSelf: 'center', marginBottom: 12}}>Support chat</Text>
+                    <Text>Write your question: </Text>
+                    <TextInput onChangeText={setText} value={text} multiline style={{borderWidth: .4, borderRadius: 5, padding: 5}} />
+                    <TouchableOpacity onPress={onClickStart} style={{padding: 5, alignSelf: 'center', borderRadius: 10, backgroundColor: '#d9acac', marginTop: 12}}>
+                        <Text style={{fontSize: 18}}>
+                            Start chat
+                        </Text>
+                    </TouchableOpacity>
+            </View>
+        }
+    </View>
+}
+
+export default SupportChat;

@@ -1,7 +1,7 @@
 import Toast from "react-native-toast-message";
 import {getCurrentUser, loadSpecialItems, loadUser, updateUserImage} from "../firebase/firebaseAPI";
 import {db} from "../firebase";
-import {itemType, notificationType, userType} from "./types";
+import {chatType, itemType, notificationType, userType} from "./types";
 import {defaultPhoto} from "./constants";
 import {Dimensions, PixelRatio} from "react-native";
 import {launchImageLibrary} from "react-native-image-picker";
@@ -80,6 +80,16 @@ export const loadOrCreateUser = async ({userInstance})=>{
     if (user){
         return user;
     }
+    const newChat: chatType = {
+        isActive: false,
+        adminID: '',
+        messages: [],
+        customerName: user.displayName || 'User',
+        photoURL: user.photoURL,
+        date: formatDate(new Date()),
+        id: user.id,
+    };
+
     const userCreateInstance :userType = {
         id: userInstance.uid,
         displayName: userInstance?.displayName || 'Set Name',
@@ -96,6 +106,8 @@ export const loadOrCreateUser = async ({userInstance})=>{
         location: null,
         isOnboarded: false,
     }
+
+    await db.collection('chats').doc(userInstance.uid).set(newChat);
     await db.collection('users').doc(userInstance.uid).set(userCreateInstance);
     return userCreateInstance;
 }
@@ -148,3 +160,25 @@ export const itemsStackSample : itemType[] = [
     {...itemSample, id: '3d'},
     {...itemSample, id: '4e'},
 ]
+export function formatDate(date:Date) {
+    // Get date components
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const period = hours >= 12 ? 'PM' : 'AM';
+
+    // Adjust hours to 12-hour format
+    const formattedHours = hours % 12 || 12;
+
+    // Add leading zeros if necessary
+    const formattedMonth = month < 10 ? '0' + month : month;
+    const formattedDay = day < 10 ? '0' + day : day;
+    const formattedHoursStr = formattedHours < 10 ? '0' + formattedHours : formattedHours;
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+
+    // Construct the formatted date string
+    return `${formattedMonth}-${formattedDay}-${year} ${formattedHoursStr}:${formattedMinutes}${period}`;
+
+}

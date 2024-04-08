@@ -111,3 +111,26 @@ export type planType = {
     sign?: iconInfoType,
     numberOfToys: number
 }
+
+export type messageType = {
+    text: string,
+    date: string,
+    from: string,
+    photoURL?: string,
+    fromUserPhotoURL?: string,
+    isDelivered?: boolean,
+    isFromAdmin?: boolean,
+    isFromSystem?: boolean,
+    isEndMessage?: boolean,
+    fromAdminID?: string,
+}
+
+export type chatType = {
+    isActive: boolean,
+    adminID: string,
+    messages: messageType[],
+    customerName: string,
+    photoURL?: string,
+    date?: string,
+    id: string,
+}

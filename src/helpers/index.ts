@@ -84,10 +84,10 @@ export const loadOrCreateUser = async ({userInstance})=>{
         isActive: false,
         adminID: '',
         messages: [],
-        customerName: user.displayName || 'User',
-        photoURL: user.photoURL,
+        customerName: userInstance?.displayName || 'User',
+        photoURL: userInstance?.photoURL || '',
         date: formatDate(new Date()),
-        id: user.id,
+        id: userInstance?.uid,
     };
 
     const userCreateInstance :userType = {

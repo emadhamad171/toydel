@@ -10,9 +10,8 @@ import ApplicationFlow from "../processes/app";
 import {LogBox, Platform, View} from 'react-native';
 import * as SplashScreen from "expo-splash-screen";
 import {useFonts} from "@expo-google-fonts/inter";
-import {wait, windowHeight, windowWidth} from "@shared";
+import {wait} from "@shared";
 import {AnimatePresence} from "moti";
-import {View as MView} from "moti/build/components/view";
 import {WelcomeLoading} from "../screens";
 
 LogBox.ignoreAllLogs();
@@ -51,35 +50,10 @@ export default function App(){
             >
                 <View style={{flex: 1, position: 'relative'}}>
                         <AnimatePresence exitBeforeEnter>
-                    {
-                        isLoading && <MView
-                            from={{
-                                opacity: 0,
-                                scale: 1,
-                            }}
-                            animate={{
-                                opacity: 1,
-                                scale: 1,
-                            }}
-                            exit={{
-                                opacity: 0,
-                                scale: 1.2,
-                            }}
-                            exitTransition={{
-                                type: 'timing',
-                                duration: 1000,
-                            }}
-                            style={{
-                                width: windowWidth,
-                                height: windowHeight,
-                                position: 'absolute',
-                                zIndex: 999,
-                            }}
-                        >
-                            <WelcomeLoading closeLoading={()=>setLoading(false)} />
-                        </MView>
-                    }
-                </AnimatePresence>
+                        {
+                            isLoading && <WelcomeLoading closeLoading={()=>setLoading(false)} />
+                        }
+                        </AnimatePresence>
                     {
                         Platform.OS === 'ios' ? <ApplicationFlow />
                             : !isLoading && <ApplicationFlow />

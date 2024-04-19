@@ -4,9 +4,6 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import React, { useCallback, useEffect, useState } from "react";
 import {useNavigation} from "@react-navigation/native";
-import {
-
-} from '@shared'
 import WrapperComponent from "../components/WrapperComponent";
 import ItemComponent from "../components/ItemComponent";
 import PremiumPlansModal from "../modals/PremiumPlansModal";
@@ -200,7 +197,7 @@ const Home = () =>{
         <WrapperComponent ItemModal={CustomModal} setModal={setModal} modalName={currentModalName} />
         <SafeAreaView>
         <View style={{}}>
-            <HeaderComponent setModal={setModal} setModalName={setModalName} user={user.id} updateUser={updateUserInfo}/>
+            <HeaderComponent setModal={setModal} setModalName={setModalName} />
             <FlatList
                 refreshControl={ <RefreshControl style={{backgroundColor: '#a333ff'}} refreshing={isRefreshing} onRefresh={onRefresh} /> }
                 data={displayedListItems}

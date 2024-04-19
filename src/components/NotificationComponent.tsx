@@ -1,9 +1,8 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import {notificationPropsType} from "../helpers/types";
+import {notificationPropsType,normalize} from "@shared";
 import { Skeleton } from 'moti/skeleton';
-import {normalize} from "../helpers";
 
 function NotificationComponent({id, isRefreshing, title, description,photoURL, isIndividual, isRevised, iconName, iconProps, ...props}:notificationPropsType) {
     return (<View style={{ marginBottom: 10 }}>

@@ -3,28 +3,20 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useEffect, useRef, useState} from "react";
 import Toast from 'react-native-toast-message';
 import 'react-native-webview';
-
 import {
     hideLoading,
     showAuth, showLoading
 } from './Animations';
-
 import PhoneNumberInput from "../components/PhoneNumberInput";
 import {styles} from '../styles/authorization';
-import {useFirebaseLogin as useFirebaseOTPLogin} from "@itzsunny/firebase-login";
-import {auth, firebaseConfig} from "../firebase";
 import {signInWithEmailAndPassword, sendPasswordResetEmail, createUserWithEmailAndPassword, signInWithCredential, sendEmailVerification} from 'firebase/auth';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-
 import ContinueButton from "../components/ContinueButton";
 import {GoogleAuthProvider} from 'firebase/auth'
 import Input from "../components/Input";
-
 import {GOOGLE_WEB_CLIENT_ID} from 'react-native-dotenv'
-import {normalize, signInWarningToast, wait} from "../helpers";
+import {normalize, signInWarningToast, wait, useAppSelector,auth, firebaseConfig,useFirebaseLogin as useFirebaseOTPLogin } from "@shared"
 import {SafeAreaView} from "moti";
-import {useSelector} from "react-redux";
-import {RootState} from "../store";
 
 const GoogleButton = ({handleGoogleClick}) => {
     return (
@@ -78,7 +70,7 @@ const LogoSection = ({marginTop}) => {
         ;
 }
 const AuthScreen = () => {
-    const isDarkTheme = useSelector((state:RootState)=>state.config.isDarkTheme);
+    const isDarkTheme = useAppSelector((state)=>state.config.isDarkTheme);
 //************ Component Config ***************/
     const topPos = useRef(new Animated.Value(normalize(-750))).current;
     const marginTop = useRef(new Animated.Value(normalize(270))).current;
@@ -125,6 +117,7 @@ const AuthScreen = () => {
             const verified = await verifyOtp(verificationId, code);
             if(verified) {
                 Toast.show({type: 'success', text1: "Login successfully", text2: 'Enjoy app'});
+                console.log(verified);
             } else {
                 hideLoading({topPos, marginTop});
                 Toast.show({type: 'error', text1: "Wrong OTP code!.", text2: "Try again!",topOffset: 10})

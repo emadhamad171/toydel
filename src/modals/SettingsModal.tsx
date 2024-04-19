@@ -1,19 +1,14 @@
 import {View, SafeAreaView,Text} from "react-native";
 import ButtonToggle from "../components/ButtonToggle";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../store";
-import {toggleNotificationsStatus, toggleTheme} from "../store/slices/configSlice";
-import {normalize} from "../helpers";
-import {registerIndieID, unregisterIndieDevice} from "../notifications";
-import {getCurrentUser} from "../firebase/firebaseAPI";
+import {normalize, registerIndieID, unregisterIndieDevice, getCurrentUser, toggleNotificationsStatus, toggleTheme,useAppDispatch, useAppSelector} from "@shared";
 import {notificationAppId, notificationAppToken} from "react-native-dotenv";
 
 
 
 const SettingsModal = () => {
-    const isDarkMode = useSelector((state:RootState)=>state.config.isDarkTheme);
-    const isNotificationOff = useSelector((state:RootState)=>state.config.notificationOff);
-    const dispatch = useDispatch();
+    const isDarkMode = useAppSelector((state)=>state.config.isDarkTheme);
+    const isNotificationOff = useAppSelector((state)=>state.config.notificationOff);
+    const dispatch = useAppDispatch();
     const onChangeTheme = () => {
         dispatch(toggleTheme());
     }

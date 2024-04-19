@@ -3,12 +3,15 @@ import {View, Text, StyleSheet, TouchableOpacity, RefreshControl } from "react-n
 import NotificationComponent from "../components/NotificationComponent";
 import {SwipeListView} from "react-native-swipe-list-view";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import {getIndieNotificationInbox,deleteIndieNotificationInbox} from "../notifications";
-import {notificationType} from "../helpers/types";
-import {normalize, notificationStackSample} from "../helpers";
+import {
+    getIndieNotificationInbox,
+    deleteIndieNotificationInbox,
+    notificationType,
+    normalize,
+    notificationStackSample,
+    useAppSelector, useAppDispatch
+} from "@shared";
 import {SafeAreaView} from "moti";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../store";
 
 const getFormatedNotifications = (el:any) : notificationType => {
     const pushData = JSON.parse(el.pushData);
@@ -44,8 +47,8 @@ const loadNotifications = ({setData, uid,setRefreshing}) => {
         .finally(()=>setRefreshing(false));
 }
 function Notifications() {
-    const user = useSelector((state:RootState)=>state.user.user);
-    const dispatch = useDispatch();
+    const user = useAppSelector((state)=>state.user.user);
+    const dispatch = useAppDispatch();
 
     const [data, setData] = useState<notificationType[]>(notificationStackSample);
     const [isRefreshing, setRefreshing] = useState<boolean>(true);

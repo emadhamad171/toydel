@@ -1,5 +1,5 @@
 import {StyleSheet} from "react-native";
-import {normalize, windowWidth} from "../helpers";
+import {normalize, windowWidth} from "@shared";
 
 const base_styles = StyleSheet.create({
     body: {

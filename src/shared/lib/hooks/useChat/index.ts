@@ -1,8 +1,6 @@
 import {collection, query, where} from "firebase/firestore";
 import {useCollection} from "react-firebase-hooks/firestore";
-import {chatType, userType} from "../../../../helpers/types";
-import {fStorage} from "../../../../firebase";
-import {loadOrCreateChat} from "../../../../firebase/firebaseAPI";
+import {chatType, userType, fStorage, loadOrCreateChat} from "@shared";
 
 
 export const useChatById : (user: userType)=> chatType = (user) => {

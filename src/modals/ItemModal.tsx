@@ -1,7 +1,6 @@
-import {itemType, userTierType, userType} from "../helpers/types";
+import {itemType, userType, normalize, windowHeight, windowWidth} from "@shared";
 import {SafeAreaView} from "moti";
 import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
-import {normalize, windowHeight, windowWidth} from "../helpers";
 import Stars from "../components/StarsComponent";
 import Icon from "react-native-vector-icons/FontAwesome";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -52,10 +51,10 @@ const ViewReviewsButton = () =>
     </TouchableOpacity>;
 
 
-const PlansModalButton = ({user,setModal,setModalName,updateUser}:{user:userType, setModal:React.Dispatch<SetStateAction<any>>, setModalName:React.Dispatch<SetStateAction<string>>,updateUser: ()=>void}) => {
+const PlansModalButton = ({setModal,setModalName}:{user?:userType, setModal:React.Dispatch<SetStateAction<any>>, setModalName:React.Dispatch<SetStateAction<string>>,updateUser?: ()=>void}) => {
     const onOpenPlansClick = () => {
         setModalName('Plans');
-        setModal(()=>{return ()=><PremiumPlansModal user={user} updateUser={updateUser} />});
+        setModal(()=>{return ()=><PremiumPlansModal />});
     }
 
     return <TouchableOpacity onPress={onOpenPlansClick} style={{marginTop: normalize(12)}}>

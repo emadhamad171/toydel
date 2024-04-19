@@ -1,15 +1,12 @@
-import {ReactElement, useEffect, useRef, useState} from "react";
-import {updateUserField, updateUserName} from "../firebase/firebaseAPI";
-import Toast from "react-native-toast-message";
-import {ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import {useState} from "react";
+import {ScrollView, Text, View} from "react-native";
 import Input from "../components/Input";
 import {styles} from "../styles/authorization";
 import ContinueButton from "../components/ContinueButton";
 import UserNameAndIcon from "../components/UserNameAndIcon";
-
 import LocationInput from "../components/LocationInput";
-import {normalize} from "../helpers";
+
+import {normalize, updateUserField} from "@shared";
 
 const HeaderText = ({text,style, ...props}:{text:string, style?:any})=>{
 
@@ -56,8 +53,8 @@ const InfoModal = ({props}) =>{
         if(!!!user?.bio || (user?.bio !== userBio)) {
             updateUserField({updatedField: {bio: userBio}, userID: user.id});
         }
-        if(!!!user?.location?.description || (user.location.bio !== location.description)) {
-            updateUserField({updatedField: {location}, userID: user.id});
+        if(!!!user?.location || (user.location !== location.description)) {
+            updateUserField({updatedField: {location: location.description}, userID: user.id});
         }
     }}/>
 

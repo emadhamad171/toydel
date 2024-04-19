@@ -4,16 +4,13 @@ import {
     Text,
     View
 } from "react-native";
-import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import ItemComponent from "../components/ItemComponent";
-import {cartItemPropsType, itemType, userType} from "../helpers/types";
 import WrapperComponent from "../components/WrapperComponent";
-import {defaultPhoto} from "../helpers/constants";
-import {SafeAreaView} from "moti";
+import { SafeAreaView } from "moti";
 import ItemModal from "../modals/ItemModal";
-import {cartStyle} from "../styles";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../store";
+import { cartStyle } from "../styles";
+import { useAppSelector,defaultPhoto, useAppDispatch, cartItemPropsType, itemType } from "@shared";
 
 const CartItem = ({item, setItemModal, setModalName, user, isLoading}:cartItemPropsType) =>{
     const onClickMore = () => {
@@ -34,8 +31,8 @@ const loadData = async ({setLoading}) =>{
 }
 
 const Cart = () =>{
-    const user = useSelector((state:RootState)=>state.user.user);
-    const dispatch = useDispatch();
+    const user = useAppSelector((state)=>state.user.user);
+    const dispatch = useAppDispatch();
     const [ItemModal, setItemModal] = useState(null);
     const [modalName, setModalName] = useState<string>('');
     const [isLoading, setLoading] = useState(true);

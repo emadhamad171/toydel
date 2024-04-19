@@ -1,18 +1,15 @@
 import { ScrollView, View,SafeAreaView} from "react-native";
 import { useState } from "react";
 import { FaqModal, FavoriteItemsModal, PremiumPlansModal, ReviewsModal, UserInfoModal, SupportModal, SettingsModal} from '../modals/';
-import { onPressLogout} from "../firebase/firebaseAPI";
+import {onPressLogout, normalize, updateImage, useAppSelector, useAppDispatch, userUpdate, userSet} from "@shared";
 import {WrapperComponent, UserNameAndIcon, UserButton} from "../components";
-import {normalize, updateImage} from "../helpers";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../store";
-import {setUser, updateUser} from "../store/slices/userSlice";
+
 import {useNavigation} from "@react-navigation/native";
 
 
 const Profile =() =>{
-    const user = useSelector((state:RootState)=>state.user.user);
-    const dispatch = useDispatch();
+    const user = useAppSelector((state)=>state.user.user);
+    const dispatch = useAppDispatch();
     const navigation = useNavigation();
     const [CustomModal, setModal] = useState(null);
     const [currentModalName, setModalName] = useState('');
@@ -44,7 +41,7 @@ const Profile =() =>{
                 </View>
                 <View style={{gap: 5}}>
                     <UserButton icon={'layers'} onPressAction={()=>{
-                        setModal(()=>{return ()=><PremiumPlansModal user={user} updateUser={()=>{dispatch(updateUser())}}/>})
+                        setModal(()=>{return ()=><PremiumPlansModal user={user} updateUser={()=>{dispatch(userUpdate())}}/>})
                         setModalName("Plans");
                     }} placeholder={"Plans"} />
                     <UserButton icon={'heart'} iconSize={24} onPressAction={()=>{
@@ -65,7 +62,7 @@ const Profile =() =>{
                         setModalName("Settings");
                     }} placeholder={"Settings"} />
                 </View>
-                <UserButton icon={'logout'} onPressAction={()=>onPressLogout({setUser: ()=>{dispatch(setUser(null))}})} placeholder={"Logout"} />
+                <UserButton icon={'logout'} onPressAction={()=>onPressLogout({setUser: ()=>{dispatch(userSet(null))}})} placeholder={"Logout"} />
             </View>
         </ScrollView>
         </SafeAreaView>

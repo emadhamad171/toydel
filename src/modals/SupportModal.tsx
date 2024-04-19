@@ -1,17 +1,17 @@
+import {useEffect, useState} from "react";
 import {
+    useChatById,
     getCurrentUser,
     loadOrCreateChat,
     sendMessage,
-    setChatActive
-    , uploadImage
-} from "../firebase/firebaseAPI";
-import {useEffect, useRef, useState} from "react";
-import {useSelector} from "react-redux";
-import {RootState} from "../store";
-import {useChatById} from "../shared/lib/hooks/useChat";
+    setChatActive,
+    uploadImage,
+    useAppSelector,
+    chatType,
+    messageType
+} from "@shared";
 import {FlatList, Image, Text, TextInput, TouchableOpacity, View} from "react-native";
 import Toast from "react-native-toast-message";
-import {chatType, messageType} from "../helpers/types";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import {launchImageLibrary} from "react-native-image-picker";
 
@@ -70,7 +70,7 @@ const ChatItem = (message: messageType) => {
 }
 
 const ChatInput = ({chat}:{chat: chatType}) => {
-    const user = useSelector((state: RootState) => state.user.user);
+    const user = useAppSelector((state) => state.user.user);
     const [text, setText] = useState('');
     const [photoURL, setPhotoURL] = useState('');
     const [isPhotoShown,setPhotoShown] = useState(false);
@@ -172,7 +172,7 @@ const ChatInput = ({chat}:{chat: chatType}) => {
 }
 
 const Chat = () => {
-    const user = useSelector((state: RootState)=>state.user.user);
+    const user = useAppSelector((state)=>state.user.user);
     const chat = useChatById(user);
     let listRef: any;
 
@@ -204,7 +204,7 @@ const SupportChat = () => {
     const [isChatActive, setActive] = useState(false);
     const [text, setText] = useState('');
 
-    const user = useSelector((state: RootState)=>state.user.user);
+    const user = useAppSelector((state)=>state.user.user);
 
     useEffect(() => {
         loadOrCreateChat(user).then((isActive)=>{

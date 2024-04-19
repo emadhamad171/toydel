@@ -5,6 +5,8 @@ import Notifications from "./Notifications";
 import Onboarding from "./Onboarding";
 import Profile from "./Profile";
 
+export * from './welcomeLoadingScreen';
+
 export {
     Authorization,
     Cart,

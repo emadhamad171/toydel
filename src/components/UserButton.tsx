@@ -1,7 +1,7 @@
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import profileStyles from "../styles/profile";
-import {normalize} from "../helpers";
+import {normalize} from "@shared";
 
 const UserButton = ({placeholder,chevronIcon='chevron-right',iconColor='#000', icon, iconSize=22, iconProps={}, buttonProps={}, onPressAction,iconStyle=defaultStyle.icon, buttonStyle=defaultStyle.button})=> {
     return <TouchableOpacity style={buttonStyle} onPress={onPressAction} {...buttonProps}>

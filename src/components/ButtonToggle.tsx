@@ -1,7 +1,7 @@
 import {Animated, StyleSheet, TouchableOpacity, View} from "react-native";
 import React, {useRef, useState} from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import {normalize} from "../helpers";
+import {normalize} from "@shared";
 
 const StyledIcon = ({iconName, iconColor, btnSize} :{iconName: string, iconColor:string, btnSize: number}) =>{
     return  <Icon name={iconName} size={normalize(btnSize)} color={iconColor}/>

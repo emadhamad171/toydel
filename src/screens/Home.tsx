@@ -1,30 +1,33 @@
-import {RefreshControl, ScrollView, TouchableOpacity, View, Text, LogBox, FlatList} from "react-native";
+import {RefreshControl, TouchableOpacity, View, Text, FlatList} from "react-native";
 import Input from "../components/Input";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import React, { useCallback, useEffect, useState } from "react";
 import {useNavigation} from "@react-navigation/native";
 import {
-    loadUser,loadAllItems
-} from '../firebase/firebaseAPI'
+
+} from '@shared'
 import WrapperComponent from "../components/WrapperComponent";
 import ItemComponent from "../components/ItemComponent";
 import PremiumPlansModal from "../modals/PremiumPlansModal";
-import {itemsStackSample} from "../helpers";
-import {itemType, userType} from "../helpers/types";
+import {itemsStackSample,
+    loadUser,
+    loadAllItems,
+    userUpdate,
+    useAppDispatch,
+    useAppSelector,
+    itemType,
+} from "@shared";
 import {SafeAreaView} from "moti";
 import ItemModal from "../modals/ItemModal";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../store";
-import {updateUser, updateUserFavoriteList} from "../store/slices/userSlice";
 
-const HeaderComponent = ({setModal, setModalName, user,updateUser}) =>{
+const HeaderComponent = ({setModal, setModalName}) =>{
     const navigation = useNavigation();
     return <View style={{backgroundColor: '#a333ff',width: '100%', paddingTop: 70, transform: [{translateY: -70}],position: 'absolute', zIndex:2, paddingHorizontal:10, flexDirection: 'row', justifyContent:'space-between'}}>
         <View style={{flexDirection: 'row', gap: 15, marginLeft: 5}}>
         <Icon name={'teddy-bear'} size={32} color={"#4f0bb2"}/>
         <TouchableOpacity style={{alignSelf:'center', backgroundColor: '#c29cff', borderRadius: 5, padding: 5}} onPress={()=>{
-            setModal(()=>{return ()=><PremiumPlansModal user={user} updateUser={updateUser} />})
+            setModal(()=>{return ()=><PremiumPlansModal />})
             setModalName("Plans");
         }}>
             <Text>View Plans</Text>
@@ -145,10 +148,10 @@ const PageButtonsComponent = ({pageNumber, setPageNumber,searchedListItems}) => 
     </TouchableOpacity>
 </View>
 const Home = () =>{
-    const user = useSelector((state:RootState)=>state.user.user);
-    const dispatch = useDispatch();
+    const user = useAppSelector((state)=>state.user.user);
+    const dispatch = useAppDispatch();
     const updateUserInfo = () =>{
-        dispatch(updateUser());
+        dispatch(userUpdate());
     };
 
     //~~~~~~Base config~~~~~~~~~

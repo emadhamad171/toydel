@@ -1,20 +1,25 @@
 import {FlatList, Image, Text, TouchableOpacity, View} from "react-native";
 import {useEffect, useRef, useState} from "react";
-import {useCreatePaymentIntentMutation} from "../store/slices/apiSlice";
 import {
     isPlatformPaySupported,
     PlatformPayButton,
     PlatformPay
 } from "@stripe/stripe-react-native";
-import {useDispatch, useSelector} from "react-redux";
-import {updateUserField} from "../store/slices/userSlice";
-import {RootState} from "../store";
+import {
+    useCreatePaymentIntentMutation,
+    normalize,
+    windowWidth,
+    initCardPayment,
+    initPlatformPayment,
+    useAppDispatch,
+    useAppSelector,
+    userUpdateField
+} from "@shared";
 import {SafeAreaView} from "moti";
 import {itemFix, Pagination} from "../components/SliderComponents";
-import {normalize, windowWidth} from "../helpers";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Toast from "react-native-toast-message";
-import {initCardPayment, initPlatformPayment} from "../helpers/payments";
+
 const PlanFeature = ({name}) => {
     return <View style={{flexDirection: 'row'}}>
         <Text style={{fontSize: normalize(24)}}>
@@ -106,12 +111,12 @@ const planList = {
         }
 }
 const Plans = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const flatList = useRef(null);
-    const user = useSelector((state:RootState)=>state.user.user);
+    const user = useAppSelector((state)=>state.user.user);
     const [currentPage, setCurrentPage] = useState(0);
     const updateUserPlan = (plan:string) => {
-        dispatch(updateUserField({updatedField: 'plan', value: plan}))
+        dispatch(userUpdateField({updatedField: 'plan', value: plan}))
     }
     const [createPaymentIntent] = useCreatePaymentIntentMutation();
     const renderItemProps = {userID: user.id, updateUserPlan, createPaymentIntent};

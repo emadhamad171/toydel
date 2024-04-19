@@ -1,5 +1,5 @@
 import {StyleSheet} from "react-native";
-import {normalize} from "../helpers";
+import {normalize} from "@shared";
 
 export default StyleSheet.create({
     body: {

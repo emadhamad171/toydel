@@ -1,23 +1,24 @@
-import {View, Text, Image, FlatList, TouchableOpacity} from 'react-native';
+import {View, Image, FlatList} from 'react-native';
 import {useNavigation} from "@react-navigation/native";
-import {normalize, windowWidth} from "../helpers";
 import {SafeAreaView} from "moti";
 import {useRef, useState} from "react";
-import Icon from "react-native-vector-icons/FontAwesome";
-import {updateUserOnboarding} from "../store/slices/userSlice";
-import {useDispatch, useSelector} from "react-redux";
-import {getCurrentUser, updateUserField} from "../firebase/firebaseAPI";
-import {RootState} from "../store";
 import {defaultPage, itemFix, Pagination} from "../components/SliderComponents";
+import {
+    useAppSelector,
+    updateUserField,
+    userUpdateOnboarding,
+    windowWidth,
+    useAppDispatch
+} from "@shared";
 
 export default ()=>{
-    const user = useSelector((state:RootState)=>state.user.user);
-    const dispatch = useDispatch();
+    const user = useAppSelector((state)=>state.user.user);
+    const dispatch = useAppDispatch();
     const setOnboarded = ()=>{
-        updateUserField({updatedField: {isOnboarded: true}, userID: user.id}).then((data)=>{
-            dispatch(updateUserOnboarding());
-        }).catch(e=>{
-            dispatch(updateUserOnboarding());
+        updateUserField({updatedField: {isOnboarded: true}, userID: user.id}).then(()=>{
+            dispatch(userUpdateOnboarding());
+        }).catch(()=>{
+            dispatch(userUpdateOnboarding());
         });
     }
 

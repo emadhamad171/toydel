@@ -1,16 +1,13 @@
-import {updateItemInDocFromCollection} from "../firebase/firebaseAPI";
-import {auth} from "../firebase";
+import {updateItemInDocFromCollection,auth,itemComponentPropsType} from "@shared";
 import {Image, Text, TouchableOpacity, View} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import {Dispatch, SetStateAction} from "react";
-import {itemComponentPropsType, itemType, userType} from "../helpers/types";
 import Stars from "./StarsComponent";
 import {Skeleton} from "moti/skeleton";
 
 const ItemComponent = (
     {setFavoriteToyList,item, isFavorite, isLoading=true, isOnStatus=false, user=null, onClickMore = ()=>{}}: itemComponentPropsType
 ) =>{
-    const {name, brand, category, id ,description, price, isIncludedInPlan, photo} = item;
+    const {name, brand, category ,description, isIncludedInPlan, photo} = item;
     const removeItemFromFavoriteList = () =>{
         setFavoriteToyList((prevValue)=>{
             const updatedList =prevValue.filter((listItem)=>{ if(listItem !== item.id) return listItem});

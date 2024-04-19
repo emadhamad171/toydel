@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {updateUserName} from "../firebase/firebaseAPI";
+import {updateUserName} from "@shared";
 import Toast from "react-native-toast-message";
 import {Text, TextInput, TouchableOpacity, View} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";

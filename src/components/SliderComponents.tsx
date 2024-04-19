@@ -1,5 +1,5 @@
 import {SafeAreaView} from "moti";
-import {normalize, windowWidth} from "../helpers";
+import {normalize, windowWidth} from "@shared";
 import {FlatList, Text, TouchableOpacity, View} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 

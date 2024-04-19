@@ -1,8 +1,7 @@
 import {useEffect, useState} from "react";
 import {FlatList, View} from "react-native";
 import ItemComponent from "../components/ItemComponent";
-import {itemsStackSample, loadFavoriteData} from "../helpers";
-import {itemType} from "../helpers/types";
+import {itemsStackSample, loadFavoriteData,itemType} from "@shared";
 
 const FavoriteItemsModal = ({user}) =>{
     const [favoriteToyList, setFavoriteToyList] = useState<itemType[]>(itemsStackSample);

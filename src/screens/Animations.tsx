@@ -1,6 +1,5 @@
 import {Animated} from "react-native";
-import Toast from "react-native-toast-message";
-import {normalize, windowHeight} from "../helpers";
+import {normalize, windowHeight} from "@shared";
 
 export const hideAuthScreen = ({posBody}) => {
     Animated.spring(posBody,{

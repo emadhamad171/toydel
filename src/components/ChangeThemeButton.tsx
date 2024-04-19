@@ -1,10 +1,7 @@
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
-import {View, Animated, Text, Platform, TouchableOpacity, useColorScheme} from "react-native";
-import {normalize} from "../helpers";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../store";
-import {toggleTheme} from "../store/slices/configSlice";
+import React, {useRef} from "react";
+import {View, Animated, TouchableOpacity} from "react-native";
+import {useAppDispatch, useAppSelector, toggleTheme, normalize} from "@shared";
 
 const ButtonContainer =({children, theme})=> <View style={{
     borderRadius: 25,
@@ -51,8 +48,8 @@ const themes = {
     }
 };
 const ChangeThemeButton = ({btnSize = 40}) => {
-    const isDarkTheme = useSelector((state:RootState)=>state.config.isDarkTheme);
-    const dispatch = useDispatch();
+    const isDarkTheme = useAppSelector((state)=>state.config.isDarkTheme);
+    const dispatch = useAppDispatch();
     const toggleColorTheme = () => {
         dispatch(toggleTheme());
     }

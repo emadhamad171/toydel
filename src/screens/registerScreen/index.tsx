@@ -5,7 +5,7 @@ import {BottomText} from './ui';
 import {
     appSetLoading,
     auth, ContinueButton, Description,
-    firebaseConfig, Header, RDSSA,
+    firebaseConfig, Header, normalize, RDSSA,
     useAppDispatch,
     useFirebaseLogin as useFirebaseOTPLogin,
 } from "@shared";
@@ -41,9 +41,11 @@ const RegisterScreen = ({setIsLogin, formattedValue, setFormattedValue, setOtpCo
         }}>
             <View style={{gap: 40}}>
             <Header mb={-20}>Реєстрація</Header>
-            <Description>Будь ласка, введіть свій мобільний номер, щоб отримати код підтвердження.</Description>
+            <Description fontSize={normalize(20)}>Будь ласка, введіть свій мобільний номер, щоб отримати код підтвердження.</Description>
+                <View style={{alignSelf: 'center'}}>
             <PhoneNumberInput phoneNumberIsValid={false} phoneInput={phoneInput} value={value} setValue={setValue} setFormattedValue={setFormattedValue} />
-            <ContinueButton onPress={onClickSend}>Зареєструватись</ContinueButton>
+                </View>
+                <ContinueButton onPress={onClickSend}>Відправити</ContinueButton>
             </View>
         </KeyboardAvoidingView>
         <BottomText setIsLogin={setIsLogin}/>

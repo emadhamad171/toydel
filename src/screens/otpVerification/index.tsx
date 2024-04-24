@@ -1,8 +1,8 @@
-import {appSetLoading, auth, firebaseConfig, useAppDispatch, useFirebaseLogin as useFirebaseOTPLogin} from "@shared";
+import {appSetLoading, auth, firebaseConfig, useAppDispatch, useFirebaseLogin as useFirebaseOTPLogin, ContinueButton, Description, Header} from "@shared";
 import {useState} from "react";
 import useTimer from "../../shared/lib/hooks/useTimer";
 import {KeyboardAvoidingView, Text, View} from "react-native";
-import {ContinueButton, Description, Header} from "../registerScreen/ui";
+// import {ContinueButton, Description, Header} from "../registerScreen/ui";
 import {OtpInput} from "react-native-otp-entry";
 
 const VerificationScreen = ({otpCodeId}:{otpCodeId: string}) => {
@@ -17,8 +17,14 @@ const VerificationScreen = ({otpCodeId}:{otpCodeId: string}) => {
 
     const onClickContinue = async () => {
         dispatch(appSetLoading(true));
-        const res = await verifyOtp(otpCodeId, otpCode);
-        console.log(res);
+        try {
+            const res = await verifyOtp(otpCodeId, otpCode);
+
+            console.log(res);
+        } catch (e){
+            console.log(e);
+            setWrongCode(true);
+        }
         dispatch(appSetLoading(false));
     }
 

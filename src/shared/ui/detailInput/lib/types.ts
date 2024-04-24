@@ -10,4 +10,5 @@ export interface DetailInputProps extends  Pick<TextInputProps, 'textContentType
     isValid?: boolean
     setIsValid?: RDSSA<boolean>,
     errorText?: string
+    coloredText?: boolean
 }

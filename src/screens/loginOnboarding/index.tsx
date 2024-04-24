@@ -1,6 +1,6 @@
 import {SetStateAction} from "react";
 import {Image, Platform, SafeAreaView, StatusBar, Text, TouchableOpacity, View} from "react-native";
-import {windowHeight, windowWidth} from "@shared";
+import {ContinueButton, Description, Header, normalize, windowHeight, windowWidth} from "@shared";
 import {MotiView} from "moti";
 
 const LoginOnboardingScreen = ({setIsOnboarding, setIsLogin} :{setIsOnboarding: React.Dispatch<SetStateAction<boolean>>, setIsLogin: React.Dispatch<SetStateAction<boolean>>}) => {
@@ -26,66 +26,42 @@ const LoginOnboardingScreen = ({setIsOnboarding, setIsLogin} :{setIsOnboarding: 
         />
         <View style={{
             justifyContent: 'space-between',
-            marginHorizontal: 20,
-            marginTop: 32,
+            marginHorizontal: normalize(28),
+            marginTop: normalize(44),
             flexGrow: 1
         }}>
             <View style={{
-                gap: 14
+                gap: normalize(16)
             }}>
                 <MotiView>
-                    <Text style={{
-                        fontSize: 28,
-                        fontFamily: 'Cera-Pro-Bold',
-                        lineHeight: 34
-                    }}>
+                    <Header>
                         Грай, обмінюйся,
                         насолоджуйся!
-                    </Text>
+                    </Header>
                 </MotiView>
                 <MotiView>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: 'Manrope',
-                        color: '#2D2D30'
-                    }}>
+                    <Description>
                         Грай, обмінюйся, насолоджуйся! Грай, обмінюйся, насолоджуйся! Грай, обмінюйся, насолоджуйся!
-                    </Text>
+                    </Description>
                 </MotiView>
             </View>
             <View style={{
                 gap: 24
             }}>
-                <TouchableOpacity style={{
-                    backgroundColor: '#7065EB',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    paddingVertical: 16,
-                }}
-                                  onPress={()=>{
-                                      setIsOnboarding(false);
-                                      setIsLogin(false);
-                                  }}>
-                    <Text style={{
-                        textTransform: 'uppercase',
-                        fontFamily: 'Cera-Pro-Black',
-                        letterSpacing: .3,
-                        fontSize: 14,
-                        color: '#FBF7F0'
-                    }}>
-                        Зареєструватись
-                    </Text>
-                </TouchableOpacity>
+                <ContinueButton onPress={()=>{
+                    setIsOnboarding(false);
+                    setIsLogin(false);
+                }} >
+                    Зареєструватись
+                </ContinueButton>
                 <View style={{
                     flexDirection: 'row',
+                    alignItems:'center',
                     gap: 14
                 }}>
-                    <Text style={{
-                        fontFamily: 'Cera-Pro',
-                        color: '#2d2d30'
-                    }}>
+                    <Description fontSize={normalize(20)}>
                         Вже є акаунт?
-                    </Text>
+                    </Description>
                     <TouchableOpacity onPress={()=>{
                         setIsOnboarding(false);
                         setIsLogin(true);
@@ -93,7 +69,8 @@ const LoginOnboardingScreen = ({setIsOnboarding, setIsLogin} :{setIsOnboarding: 
                         <Text style={{
                             fontFamily: 'Cera-Pro-Bold',
                             textDecorationLine: 'underline',
-                            color: '#32207A'
+                            color: '#32207A',
+                            fontSize: normalize(20)
                         }}>
                             Тицьни сюди
                         </Text>

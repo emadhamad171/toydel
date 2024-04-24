@@ -1,9 +1,9 @@
-import {addDoc, collection, getDocs, setDoc, updateDoc, doc, query, where, orderBy, startAfter, endBefore, limit} from "firebase/firestore";
+import {addDoc, collection, getDocs, setDoc, doc, query, where, orderBy, startAfter, endBefore, limit} from "firebase/firestore";
 import {auth, db, fStorage, imgStorage} from "./config";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {updateProfile} from "firebase/auth";
 import {v4} from 'uuid'
-import {unregisterIndieDevice, chatType, firebaseResponseType, itemType, messageType, userType, formatDate} from "@shared";
+import {unregisterIndieDevice, firebaseResponseType, itemType, messageType, userType, formatDate} from "@shared";
 import Toast from "react-native-toast-message";
 
 export const onPressLogout = async ({setUser}) => {
@@ -97,10 +97,12 @@ export const loadUser = async ({userID}:{userID ?: string}) : Promise<userType[]
     const fetchedUser = await getDocs(userRef);
     return fetchedUser.docs.map(el=>{return{...el.data()}});
 }
-export const loadUserByPhoneNumber = async (phoneNumber): Promise<userType> => {
+export const loadUserByPhoneNumber = async (phoneNumber: string): Promise<userType> => {
     const userRef = query(collection(fStorage, "users"), where("phoneNumber", "==", phoneNumber));
     const fetchedUser = await getDocs(userRef);
-    const data:userType = fetchedUser.docs.map(el=>{return{...el.data()}});
+    const data:userType[] = fetchedUser.docs.map(el=>{return{...el.data()}});
+    if(!data.length)
+        throw new Error("USER-NOT-FOUND");
     return data[0];
 }
 export const uploadImage = async ({uri, path}) : Promise<string> => {

@@ -10,7 +10,7 @@ import {
     userSet,
     ContinueButton,
     Description,
-    Header
+    Header, userUpdateField
 } from "@shared";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import {useState} from "react";
@@ -29,7 +29,6 @@ const SetupDetails = () => {
     const [isNameVerified, setNameVerified] = useState(true);
     const [isSurnameVerified, setSurnameVerified] = useState(true);
     const [isAddressVerified, setIsAddressVerified] = useState(true);
-    const [isVerified, setVerified] = useState(true);
 
     const onClickContinue = async () => {
         const emailValid = emailValidator.test(email);
@@ -58,12 +57,18 @@ const SetupDetails = () => {
                     },
                     userID: auth.currentUser.uid
                 })
+                dispatch(userUpdateField({
+                    displayName: `${name} ${surname}`,
+                    location: address,
+                    email: email,
+                    isOnboarded: true
+                }))
             }).catch(e=>console.log(e));
         }
     }
 
     return <SafeAreaView style={{flex: 1, marginHorizontal: normalize(24)}}>
-        <TouchableOpacity style={{position: 'absolute', top: normalize(82), zIndex: 999}} onPress={()=>{
+        <TouchableOpacity style={{position: 'absolute', top: normalize(82), right: normalize(32), zIndex: 999}} onPress={()=>{
             auth.signOut();
             dispatch(userSet(null));
         }}>
@@ -77,7 +82,7 @@ const SetupDetails = () => {
             <DetailInput setIsValid={setEmailVerified} isValid={isEmailVerified} value={email} placeholder={"Електронна пошта"} description={"Ваша елекронна пошта"} onChangeText={setEmail} textContentType={'emailAddress'}/>
             <DetailInput setIsValid={setPasswordVerified} isValid={isPasswordVerified} value={password} placeholder={"Пароль"} description={"Пароль"} onChangeText={setPassword} textContentType={'password'} isPassword/>
             <Description>Пароль має бути щонайменше 6 символів, містити цифри та латинські літери, зокрема великі, і не повинен збігатися з ім'ям та ел. поштою </Description>
-            <ContinueButton mv={normalize(32)} onPress={onClickContinue}>Зареєструватись</ContinueButton>
+            <ContinueButton mv={normalize(16)} onPress={onClickContinue}>Зареєструватись</ContinueButton>
         </View>
     </SafeAreaView>
 }

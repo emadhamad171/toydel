@@ -1,7 +1,7 @@
 import {View} from "react-native";
 import PhoneInput from "../shared/ui/phoneNumberInput/lib/index";
 const PhoneNumberInput = ({phoneNumberIsValid, phoneInput,setFormattedValue,setValue,value}) => {
-    return (<View style={{width:330, alignItems: 'center', justifyContent:'center'}}>
+    return (<View style={{width: 330, alignItems: 'center', justifyContent:'center'}}>
         <PhoneInput
             ref={phoneInput}
             defaultValue={value}

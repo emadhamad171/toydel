@@ -1,6 +1,14 @@
 import {View, SafeAreaView,Text} from "react-native";
 import ButtonToggle from "../components/ButtonToggle";
-import {normalize, registerIndieID, unregisterIndieDevice, getCurrentUser, toggleNotificationsStatus, toggleTheme,useAppDispatch, useAppSelector} from "@shared";
+import {
+    normalize,
+    registerIndieID,
+    unregisterIndieDevice,
+    getCurrentUser,
+    useAppDispatch,
+    useAppSelector,
+    appToggleTheme, appToggleNotificationsStatus
+} from "@shared";
 import {notificationAppId, notificationAppToken} from "react-native-dotenv";
 
 
@@ -10,7 +18,7 @@ const SettingsModal = () => {
     const isNotificationOff = useAppSelector((state)=>state.config.notificationOff);
     const dispatch = useAppDispatch();
     const onChangeTheme = () => {
-        dispatch(toggleTheme());
+        dispatch(appToggleTheme());
     }
     const toggleNotifications = async () =>{
         try {
@@ -22,7 +30,7 @@ const SettingsModal = () => {
         } catch(e){
             console.log(e);
         }
-        dispatch(toggleNotificationsStatus());
+        dispatch(appToggleNotificationsStatus());
     }
     return <View style={{flex: 1}}>
         <SafeAreaView style={{flex: 1, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: normalize(24), paddingVertical: normalize(32)}}>

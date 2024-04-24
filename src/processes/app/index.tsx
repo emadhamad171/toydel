@@ -1,28 +1,27 @@
 import {
+    appSetNotificationsStatus,
+    appSetTheme,
     auth, loadBaseColorTheme, LoadingIndicator, loadNotificationStatus,
     loadOrCreateUser,
     registerIndieID,
-    registerNNPushToken, setNotificationsStatus, setTheme,
-    signInSuccessfulToast, signInWarningToast, useAppDispatch,
+    registerNNPushToken,
+    signInSuccessfulToast, useAppDispatch,
     useAppSelector,
-    userSet, wait
+    userSet
 } from "@shared";
 import {notificationAppId, notificationAppToken} from "react-native-dotenv";
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {onAuthStateChanged} from "firebase/auth";
 import Toast from "react-native-toast-message";
 import {useColorScheme, View} from "react-native";
 import {Application} from "../main";
-import {WelcomeLoading} from "../../screens";
 import AuthorizationFlow from "../authorization";
-import {AnimatePresence, View as MView} from "moti";
 
 
 const ApplicationFlow = () => {
     const user = useAppSelector((state)=>state.user.user);
     const isNotificationOff = useAppSelector((state)=>state.config.notificationOff);
     const isLoadingInApp = useAppSelector((state)=>state.config.isLoading);
-
     const dispatch = useAppDispatch();
     const baseTheme = useColorScheme();
 
@@ -41,7 +40,7 @@ const ApplicationFlow = () => {
 
     useEffect(() => {
         const unsubscribeAuthHandler = onAuthStateChanged(auth, (userInstance) => {
-            if(!!userInstance?.emailVerified || !!userInstance?.phoneNumber) {
+            if (!!userInstance?.emailVerified || !!userInstance?.phoneNumber) {
                 onUserSignIn({userInstance});
             } else {
                 if(!!userInstance){
@@ -54,13 +53,12 @@ const ApplicationFlow = () => {
             }
         });
         loadBaseColorTheme(baseTheme).then(colorTheme => {
-            dispatch(setTheme(colorTheme));
+            dispatch(appSetTheme(colorTheme));
         })
         loadNotificationStatus().then((isNotificationOff)=>{
-            dispatch(setNotificationsStatus(isNotificationOff));
+            dispatch(appSetNotificationsStatus(isNotificationOff));
         })
     }, []);
-
 
     return <View style={{flex: 1, backgroundColor: '#fff'}}>
         {

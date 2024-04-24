@@ -1,11 +1,12 @@
 {
   "expo": {
+    "scheme": "toydelapp",
     "plugins": [
       [
         "@react-native-google-signin/google-signin"
       ]
     ],
-    "name": "ToyDelApp",
+    "name": "ToyBox",
     "slug": "ToyDelApp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -26,6 +27,26 @@
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
+      "intentFilters": [
+        {
+          "autoVerify": true,
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "toyboxlink.page.link/link"
+            },
+            {
+              "scheme": "https",
+              "host": "toyboxlink.page.link",
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
       "permissions": [

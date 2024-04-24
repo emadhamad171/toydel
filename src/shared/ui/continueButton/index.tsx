@@ -1,15 +1,17 @@
 import {Text, TouchableOpacity} from "react-native";
+import {normalize} from "../../lib";
 
-export const ContinueButton = ({children, onPress, mv = 0, color='#FBF7F0'}: {children: string, onPress: ()=>void, mv?: number | "auto", color?: string}) => {
+export const ContinueButton = ({isValid = true, children, onPress, mv = 0}: {isValid?: boolean, children: string, onPress: ()=>void, mv?: number | "auto"}) => {
     return <TouchableOpacity
         style={{
-            backgroundColor: '#7065EB',
+            backgroundColor: isValid ? '#7065EB' : '#9a93c4',
             alignItems: 'center',
             justifyContent: 'center',
-            paddingVertical: 16,
+            paddingVertical: normalize(18),
             marginVertical: mv
         }}
-        onPress={onPress}>
+        activeOpacity={isValid ? .5 : 1}
+        onPress={isValid ? onPress : void 0}>
         <Text style={{
             textTransform: 'uppercase',
             fontFamily: 'Cera-Pro-Black',

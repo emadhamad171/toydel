@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 
-const useTimer = ({minutes, seconds=0}: {minutes: number, seconds?: number}) => {
-    const maxTime = minutes * 60 * 1000 + seconds *1000; // 5 хвилин у мілісекундах
+const useTimer = ({minutes, seconds=0, onTimerOut = ()=>{}, autoRefresh = false}: {minutes: number, seconds?: number, onTimerOut?: ()=>void, autoRefresh?: boolean}) => {
+    const [maxTime] = useState(minutes * 60 * 1000 + seconds *1000); // 5 хвилин у мілісекундах
     const [startTime, setStartTime] = useState(new Date().getTime());
     const [timeLeft, setTimeLeft] = useState(maxTime);
 
@@ -13,6 +13,11 @@ const useTimer = ({minutes, seconds=0}: {minutes: number, seconds?: number}) => 
             setTimeLeft(remainingTime);
 
             if (remainingTime === 0) {
+                onTimerOut();
+                if(autoRefresh){
+                    setStartTime(new Date().getTime());
+                    return;
+                }
                 clearInterval(timerID);
             }
         }, 1000);

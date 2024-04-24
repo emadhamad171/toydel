@@ -6,3 +6,4 @@ export * from './detailInput';
 export * from './continueButton'
 export * from './header';
 export * from './description';
+export * from './errorMessageText'

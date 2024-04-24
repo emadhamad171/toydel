@@ -30,8 +30,17 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="com.toydelapp"/>
+        <data android:scheme="toydelapp"/>
+      </intent-filter>
+      <intent-filter android:autoVerify="true" data-generated="true">
+        <action android:name="android.intent.action.VIEW"/>
+        <data android:scheme="https" android:host="toyboxlink.page.link/link"/>
+        <data android:scheme="https" android:host="toyboxlink.page.link"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+        <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>
+    <activity android:name="com.toydelapp" android:screenOrientation="portrait"/>
   </application>
 </manifest>

@@ -8,40 +8,60 @@ export interface ConfigState {
     isDarkTheme: boolean,
     isLoading: boolean,
     notificationOff: boolean,
+    isResetPassword: boolean,
+    isLogin: boolean,
+    isConnectionLost: boolean,
+    oobCode?: string
 }
 
 const initialState: ConfigState = {
     theme: 'light',
     isDarkTheme: true,
     isLoading: false,
-    notificationOff: false
+    notificationOff: false,
+    isResetPassword: false,
+    isLogin: false,
+    isConnectionLost: false,
+    oobCode: ''
 }
 
 export const configSlice = createSlice({
-    name: 'theme',
+    name: 'config',
     initialState,
     reducers: {
-        toggleTheme: (state,)=>{
+        appToggleTheme: (state,)=>{
             setBaseColorTheme(state.isDarkTheme ? 'light':'dark').then();
             state.theme = state.isDarkTheme ? 'light':'dark';
             state.isDarkTheme = !state.isDarkTheme;
         },
-        setTheme: (state, action) =>{
+        appSetTheme: (state, action) =>{
             state.theme = action.payload;
             state.isDarkTheme = action.payload === 'dark';
         },
-        toggleNotificationsStatus: (state)=>{
+        appToggleNotificationsStatus: (state)=>{
             state.notificationOff = !state.notificationOff;
         },
-        setNotificationsStatus: (state, action) => {
+        appSetNotificationsStatus: (state, action) => {
             state.notificationOff = action.payload;
         },
         appSetLoading: (state, action: PayloadAction<boolean>) => {
             state.isLoading = action.payload;
+        },
+        appSetConnection: (state, action: PayloadAction<boolean>) => {
+            state.isConnectionLost = !action.payload;
+        },
+        appSetIsLogin: (state, action: PayloadAction<boolean>) => {
+            state.isLogin = action.payload;
+        },
+        appSetIsResetPassword: (state, action: PayloadAction<boolean>) => {
+            state.isResetPassword = action.payload;
+        },
+        appSetOobCode: (state, action: PayloadAction<string>)=>{
+            state.oobCode = action.payload;
         }
     },
 })
 
-export const { toggleTheme,setTheme, toggleNotificationsStatus,setNotificationsStatus,appSetLoading } = configSlice.actions
+export const { appSetOobCode, appToggleTheme, appSetTheme, appToggleNotificationsStatus,appSetNotificationsStatus,appSetLoading, appSetConnection, appSetIsResetPassword, appSetIsLogin } = configSlice.actions
 
 export default configSlice.reducer

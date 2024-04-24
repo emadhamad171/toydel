@@ -10,10 +10,10 @@ import {
     useAppSelector, windowHeight, windowWidth
 } from "@shared";
 import {useState} from "react";
-import {Image, SafeAreaView, View} from "react-native";
+import {SafeAreaView, View} from "react-native";
 import {confirmPasswordReset} from "firebase/auth";
 import Toast from "react-native-toast-message";
-import {AnimatePresence, MotiView} from "moti";
+import {AnimatePresence} from "moti";
 import Icon from "react-native-vector-icons/Entypo";
 import {AnimatedView, Circle, Cloud, Star} from "./ui";
 
@@ -30,7 +30,7 @@ const ResetPasswordScreen = () => {
     const [advice, setAdvice] = useState(advices.default);
     const [isReset, setReset] = useState(false);
 
-    return <SafeAreaView style={{flex: 1, justifyContent: 'center', paddingHorizontal: normalize(32)}}>
+    return <SafeAreaView style={{flex: 1, justifyContent: 'center', marginHorizontal: normalize(32)}}>
         <AnimatePresence exitBeforeEnter>
             {
                 isReset && <AnimatedView
@@ -71,7 +71,7 @@ const ResetPasswordScreen = () => {
             <DetailInput placeholder={"Новий пароль"} description={"Новий пароль"} onChangeText={setPassword} value={password} isPassword isValid={isValid} setIsValid={setIsValid}/>
             <DetailInput placeholder={"Новий пароль"} description={"Новий пароль"} onChangeText={setRepeatPassword} value={repeatPassword} isPassword isValid={isValid} setIsValid={setIsValid}/>
             <ContinueButton
-                isValid={isValid}
+                isValid={isValid && !isReset}
                 onPress={()=>{
                     const isPasswordSame = password === repeatPassword;
                     if(!isPasswordSame) {

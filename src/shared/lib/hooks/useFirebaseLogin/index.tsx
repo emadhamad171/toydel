@@ -39,6 +39,7 @@ export const useFirebaseLogin = ({
                 ref={recaptchaVerifier}
                 firebaseConfig={firebaseConfig}
                 {...modalOption}
+                attemptInvisibleVerification={true}
             />
         ),
         recaptchaBanner: <FirebaseRecaptchaBanner {...bannerOption} />,

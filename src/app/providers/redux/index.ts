@@ -7,7 +7,7 @@ export const store = configureStore({
         api: apiSlice.reducer,
         modal: modalSliceReducer,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiSlice.middleware),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false}).concat(apiSlice.middleware),
 })
 
 

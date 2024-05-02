@@ -10,7 +10,7 @@ import {
     useAppDispatch,
     ContinueButton,
     Description,
-    Header, ErrorMessageText, RDSSA
+    Header, ErrorMessageText, RDSSA, windowWidth
 } from "@shared";
 import {SafeAreaView, Text, TouchableOpacity, View} from "react-native";
 import {getEmailByPhoneNumber} from "./api";
@@ -38,6 +38,7 @@ const LoginScreen = ({setIsLogin} :{setIsLogin: RDSSA<boolean>}) => {
         try {
             email = !isEmail ? await getEmailByPhoneNumber(emailOrPhoneNumber) : emailOrPhoneNumber
         } catch (e){
+            console.log(e);
             const message = e?.message() || '';
             switch (message) {
                 case "USER-NOT-FOUND":
@@ -71,7 +72,8 @@ const LoginScreen = ({setIsLogin} :{setIsLogin: RDSSA<boolean>}) => {
         }
 
         signInWithEmailAndPassword(auth, email, password).then(()=>{
-        }).catch(()=>{
+        }).catch((er)=>{
+            console.log(er);
             setIsGlobalErrorShown(true);
             setIsPasswordValid(false);
             setGlobalErrorMessage('Неправильно введені дані, спробуйте ще раз');
@@ -111,7 +113,7 @@ const LoginScreen = ({setIsLogin} :{setIsLogin: RDSSA<boolean>}) => {
             bottom: 16,
             alignItems: 'center',
             justifyContent: 'center',
-            width: '100%'
+            width: windowWidth
         }}
         >
             <Description fontSize={normalize(20)}>

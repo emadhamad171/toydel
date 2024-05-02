@@ -26,7 +26,7 @@ export const DetailInput = ({placeholder, description, onChangeText, textContent
                 onChangeText={(text)=>{
                     onChangeText(text);
                     if(!isValid)
-                        setIsValid(true);
+                        setIsValid && setIsValid(true);
                 }}
                 placeholder={placeholder} />
             {

@@ -33,13 +33,14 @@ const ResetPasswordScreen = () => {
     return <SafeAreaView style={{flex: 1, justifyContent: 'center', marginHorizontal: normalize(32)}}>
         <AnimatePresence exitBeforeEnter>
             {
-                isReset && <AnimatedView
+                !isReset && <AnimatedView
                     style={{
                         width: windowWidth,
                         height: windowHeight,
                         position: 'absolute',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        left: -normalize(32),
                         zIndex: 555,
                         backgroundColor: '#fff'
                     }} >

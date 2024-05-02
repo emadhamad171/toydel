@@ -9,8 +9,7 @@ export const WelcomeLoading = ({closeLoading}:{closeLoading: ()=>void}) =>{
     }, []);
     return<MotiView
             from={{
-            opacity: 0,
-            scale: 1,
+                scale: 1.1,
             }}
             animate={{
                 opacity: 1,

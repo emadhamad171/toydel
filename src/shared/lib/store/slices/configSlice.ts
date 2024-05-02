@@ -17,7 +17,7 @@ export interface ConfigState {
 const initialState: ConfigState = {
     theme: 'light',
     isDarkTheme: true,
-    isLoading: false,
+    isLoading: true,
     notificationOff: false,
     isResetPassword: false,
     isLogin: false,

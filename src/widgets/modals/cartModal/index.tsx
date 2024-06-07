@@ -19,7 +19,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView as SAView } from "react-native-safe-area-context/lib/typescript/src/SafeAreaView";
+import { SafeAreaView as SAView } from "react-native-safe-area-context";
 import EIcon from "react-native-vector-icons/Entypo";
 import { Iconify } from "react-native-iconify";
 import Icon from "react-native-vector-icons/FontAwesome";

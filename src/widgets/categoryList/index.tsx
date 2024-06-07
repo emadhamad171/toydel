@@ -80,7 +80,7 @@ export const CategoryList = () => {
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         data={Object.values(mockCategory)}
-        renderItem={CategoryItem}
+        renderItem={({ item }) => <CategoryItem item={item} />}
         horizontal
       />
       <Header ml={normalize(24)} fontSize={normalize(34)}>

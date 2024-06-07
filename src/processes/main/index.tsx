@@ -1,41 +1,104 @@
-import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
-import {NavigationContainer} from "@react-navigation/native";
-import {Cart, Notifications} from "../../screens";
-import Profile from '../../screens/profile/index'
-import Icon from "react-native-vector-icons/AntDesign";
+import { NavigationContainer } from "@react-navigation/native";
+import { Cart, Notifications } from "../../screens";
+import Profile from "../../screens/profile/index";
 import SetupDetails from "../../screens/setupDetails";
-import {useAppSelector, screenOptions, normalize} from "@shared";
-import {Text, View} from "react-native";
+import { useAppSelector, screenOptions } from "@shared";
 import MainScreen from "../../screens/main";
+import {
+  HomeIcon,
+  CatalogIcon,
+  FavouriteIcon,
+  ProfileIcon,
+  TabBarLabel,
+} from "./ui/TabBarIcons";
+import { TouchableOpacity, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+
 const Tab = createBottomTabNavigator();
 
-const TabBarIcon = ({name, focused, placeholder}) => {
-    return <View style={{paddingVertical: normalize(12), gap: normalize(8), alignItems: 'center', justifyContent: 'center'}}>
-        <View style={{borderRadius: 30,backgroundColor: focused ? '#5753D8' : '#fff', alignItems: 'center', justifyContent: 'center'}}>
-            <Icon name={name} size={24} style={{paddingVertical: 5, paddingHorizontal: 14, borderRadius: 30}} color={focused ? "#fff" : "#5753D8"} />
-        </View>
-        <Text style={{color: "#5753D8", fontFamily: focused ? 'Manrope-Bold' : 'Manrope'}}>
-            {placeholder}
-        </Text>
+const CustomTabButton = (props) => (
+  <TouchableOpacity {...props}>
+    <View>
+      <LinearGradient
+        colors={["#a091ff", "#5451D6"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{
+          width: 64,
+          height: props.accessibilityState.selected ? 2 : 0,
+          alignSelf: "center",
+          marginBottom: 6,
+        }}
+      />
+      {props.children}
     </View>
-}
-
+  </TouchableOpacity>
+);
 export function Application() {
-    const user = useAppSelector((state)=>state.user.user);
+  const user = useAppSelector((state) => state.user.user);
 
-
-    return <NavigationContainer>
-            <Tab.Navigator initialRouteName={user.isOnboarded ? 'Profile' : 'Onboarding'} screenOptions={screenOptions}>
-                {!user.isOnboarded && <Tab.Screen name={'Onboarding'} options={{tabBarStyle: {display:'none'}}} component={SetupDetails}/>}
-                <Tab.Screen name="Home" options={{tabBarIcon: ({focused})=>{
-                        return <TabBarIcon placeholder={"Головна"} name="home" focused={focused} />;}}} component={MainScreen} />
-                <Tab.Screen name="Cart" options={{tabBarIcon: ({focused})=>{
-                        return <TabBarIcon placeholder={"Каталог"} name={'appstore-o'} focused={focused}/>;}}} component={Cart} />
-                <Tab.Screen name="Notifications" options={{tabBarIcon: ({focused})=>{
-                        return <TabBarIcon placeholder={"Обране"} name={'hearto'} focused={focused} />;}}} component={Notifications} />
-                <Tab.Screen name="Profile" options={{tabBarIcon: ({focused})=>{
-                        return <TabBarIcon placeholder={"Профіль"} name={'user'} focused={focused} />;}}} component={Profile} />
-            </Tab.Navigator>
-        </NavigationContainer>
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        initialRouteName={user.isOnboarded ? "Profile" : "Onboarding"}
+        screenOptions={screenOptions}
+      >
+        {!user.isOnboarded && (
+          <Tab.Screen
+            name={"Onboarding"}
+            options={{ tabBarStyle: { display: "none" } }}
+            component={SetupDetails}
+          />
+        )}
+        <Tab.Screen
+          name="Home"
+          options={{
+            tabBarButton: CustomTabButton,
+            tabBarLabel: (props) => (
+              <TabBarLabel isActive={props.focused} {...props} text={"Home"} />
+            ),
+            tabBarIcon: (props) => (
+              <HomeIcon isActive={props.focused} {...props} />
+            ),
+          }}
+          component={MainScreen}
+        />
+        <Tab.Screen
+          name="Catalog"
+          options={{
+            tabBarLabel: "Каталог",
+            tabBarButton: CustomTabButton,
+            tabBarIcon: (props) => (
+              <CatalogIcon isActive={props.focused} {...props} />
+            ),
+          }}
+          component={Cart}
+        />
+        <Tab.Screen
+          name="Favourite"
+          options={{
+            tabBarLabel: "Обране",
+            tabBarButton: CustomTabButton,
+            tabBarIcon: (props) => (
+              <FavouriteIcon isActive={props.focused} {...props} />
+            ),
+          }}
+          component={Notifications}
+        />
+        <Tab.Screen
+          name="Profile"
+          options={{
+            tabBarLabel: "Профіль",
+            tabBarButton: CustomTabButton,
+            tabBarIcon: (props) => (
+              <ProfileIcon isActive={props.focused} {...props} />
+            ),
+          }}
+          component={Profile}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
 }

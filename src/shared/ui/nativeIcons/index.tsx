@@ -30,3 +30,9 @@ export const NativeCategoryIcons = {
     <Iconify icon="ph:star-four-fill" color={color} size={size} />
   ),
 };
+
+export const NativeTabBarIcons = {
+  "hugeicons:home-03": ({ color, size = defaultIconSize }) => (
+    <Iconify icon="ph:star-four-fill" color={color} size={size} />
+  ),
+};

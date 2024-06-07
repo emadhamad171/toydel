@@ -29,11 +29,11 @@ const ResetPasswordScreen = () => {
     const [isValid, setIsValid] = useState(true);
     const [advice, setAdvice] = useState(advices.default);
     const [isReset, setReset] = useState(false);
-
+    console.log(oobCode);
     return <SafeAreaView style={{flex: 1, justifyContent: 'center', marginHorizontal: normalize(32)}}>
         <AnimatePresence exitBeforeEnter>
             {
-                !isReset && <AnimatedView
+                isReset && <AnimatedView
                     style={{
                         width: windowWidth,
                         height: windowHeight,
@@ -42,7 +42,8 @@ const ResetPasswordScreen = () => {
                         justifyContent: 'center',
                         left: -normalize(32),
                         zIndex: 555,
-                        backgroundColor: '#fff'
+                        backgroundColor: '#fff',
+                        gap: normalize(32)
                     }} >
 
                     <Circle>
@@ -54,7 +55,7 @@ const ResetPasswordScreen = () => {
                             <Cloud top={-normalize(148)} left={normalize(138)} duration={2000}/>
                             <Cloud top={-normalize(82)} left={-normalize(158)} duration={2000} width={normalize(92)} fromLeft/>
 
-                            <Icon name="check" color="#fff" size={normalize(48)} />
+                            <Icon name="check" color="#fff" size={normalize(62)} />
                         </AnimatePresence>
                     </Circle>
                     <Header>Пароль змінено!</Header>
@@ -70,7 +71,7 @@ const ResetPasswordScreen = () => {
         <View style={{gap: normalize(24)}}>
             <Header>Змінити пароль</Header>
             <DetailInput placeholder={"Новий пароль"} description={"Новий пароль"} onChangeText={setPassword} value={password} isPassword isValid={isValid} setIsValid={setIsValid}/>
-            <DetailInput placeholder={"Новий пароль"} description={"Новий пароль"} onChangeText={setRepeatPassword} value={repeatPassword} isPassword isValid={isValid} setIsValid={setIsValid}/>
+            <DetailInput placeholder={"Повторити пароль"} description={"Повторити пароль"} onChangeText={setRepeatPassword} value={repeatPassword} isPassword isValid={isValid} setIsValid={setIsValid}/>
             <ContinueButton
                 isValid={isValid && !isReset}
                 onPress={()=>{

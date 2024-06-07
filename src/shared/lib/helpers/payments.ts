@@ -18,27 +18,29 @@ type responseType ={
     data?: any,
     error?: FetchBaseQueryError | SerializedError
 }
-export const createPayment = async ({userID, planName,createPaymentIntent}:{userID: string, planName: string,createPaymentIntent:any}) : Promise<string> => {
+export const createPayment = async ({userID,ids, planName,createPaymentIntent}:{userID: string, ids?:string[], planName: string,createPaymentIntent:any}) : Promise<string> => {
     const response :responseType = await createPaymentIntent({
         userID,
-        planName
+        planName,
+        ids
     });
 
     if (response.error) {
+        console.log(response.error);
         throw new Error("CREATE-PAYMENT-INTENT-ERROR");
     }
     return response.data.paymentIntent;
 }
 
-export const confirmPlatformIntent = async ({intent, planName} : {intent: string, planName: string}) => {
+export const confirmPlatformIntent = async ({intent,totalPrice, planName} : {intent: string,totalPrice?:number, planName: string}) => {
     const { error } = await confirmPlatformPayPayment(
         intent,
         {
             applePay: {
                 cartItems: [
                     {
-                        label: `ToyBox ${planName} Plan`,
-                        amount: `${price[planName]/100} UAH`,
+                        label: `ToyBox Services`,
+                        amount: `${totalPrice} UAH`,
                         paymentType: PlatformPay.PaymentType.Immediate,
                     },
                 ],
@@ -63,10 +65,10 @@ export const confirmPlatformIntent = async ({intent, planName} : {intent: string
     return error;
 }
 
-export const initPlatformPayment = async ({userID, planName,updateUserPlan,createPaymentIntent}:{userID: string, planName: string,updateUserPlan: (a:string)=>void,createPaymentIntent:any}) => {
+export const initPlatformPayment = async ({userID, totalPrice,  planName, ids, updateUserPlan,createPaymentIntent}:{userID: string, totalPrice?:number, ids?: string[], planName?: string,updateUserPlan: (a:string)=>void,createPaymentIntent:any}) => {
     try {
-        const intent = await createPayment({userID, planName,createPaymentIntent});
-        const error = await confirmPlatformIntent({intent, planName});
+        const intent = await createPayment({userID, ids, planName,createPaymentIntent});
+        const error = await confirmPlatformIntent({intent, totalPrice, planName});
         if(error) throw new Error('CONFIRM-PAYMENT-ERROR');
         updateUserPlan(planName);
         Toast.show({type: 'success', text1: 'Play already active!'});

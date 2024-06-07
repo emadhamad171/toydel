@@ -88,7 +88,7 @@ export type itemType = {
     isIncludedInPlan: boolean,
     name: string,
     photo: string,
-    price: string | number,
+    price: number,
     rate: string | number,
     initPrice?: number | string,
     amount?: number,
@@ -136,4 +136,19 @@ export type chatType = {
     photoURL?: string,
     date?: string,
     id: string,
+}
+
+export interface ICategory {
+    headerColor: string,
+    name: string,
+    iconName: 'mdi:lego' | 'mingcute:bear-fill' | 'icon-park-outline:cube' | 'teenyicons:robot-solid'| 'mingcute:toy-horse-fill' | 'material-symbols:toys' | 'file-icons:sandbox',
+    gradientColors: string[],
+    iconColor: string
+}
+export type generalCategoryName = "Конструктори" | "Розвиваючі" | "М'які" | "Електронні" | "Ляльки" | "Машинки" | "Для пісочниці";
+
+export type nonCategory<T extends string> = T extends generalCategoryName ? never : T;
+export type categoryName = nonCategory<string> | generalCategoryName;
+export interface IMockedCategory {
+    [key: categoryName]: ICategory
 }

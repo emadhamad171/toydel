@@ -39,8 +39,8 @@ export const Circle = ({children}: {children: any}) => <AnimatedView
     }}
     exitDuration={1600}
     style={{
-        width: normalize(82),
-        height: normalize(82),
+        width: normalize(112),
+        height: normalize(112),
         borderRadius: 50,
         position: 'relative',
         alignItems: 'center',

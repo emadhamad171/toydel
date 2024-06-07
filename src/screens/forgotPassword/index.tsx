@@ -92,14 +92,14 @@ const ForgotPassword = ({setIsForgotPassword}:{setIsForgotPassword: RDSSA<boolea
                     ОК
                 </ContinueButton>
             </View>
-            : <View style={{gap: normalize(32)}}>
-                <Header mb={normalize(-12)}>Скинути пароль</Header>
-                <Description mb={normalize(12)} fontSize={normalize(22)}>Введіть зареєстровану адресу електронної пошти
+            : <View style={{gap: normalize(42)}}>
+                <Header mb={normalize(-12)} fontSize={normalize(42)}>Скинути пароль</Header>
+                <Description fontSize={normalize(18)}>Введіть зареєстровану адресу електронної пошти
                     або номер телефону, щоб скинути пароль</Description>
                 <DetailInput isValid={isValid} setIsValid={setIsValid} errorText={errorMessage}
                              placeholder={"Ел. пошта або номер телефону"} description={"Ел. пошта або номер телефону"}
                              onChangeText={setEmail} value={emailOrPhone} textContentType={'emailAddress'}/>
-                <ContinueButton mv={normalize(12)} onPress={handleClick}> Надіслати </ContinueButton>
+                <ContinueButton onPress={handleClick}> Надіслати </ContinueButton>
             </View>
         }
     </SafeAreaView>

@@ -317,9 +317,13 @@ const TelegramPoster = ({link}) => {
 return <TouchableOpacity style={{
     alignSelf: 'center',
     alignItems: 'center',
-    gap: 8
+    borderRadius: 10,
+    padding: normalize(32),
+    backgroundColor: '#fefefe',
+    gap: 12,
+    marginVertical: normalize(16)
 }} onPress={()=>{
-    Linking.canOpenURL(`tg:${link}`)
+    Linking.canOpenURL(`tg://${link}`)
         .then(supported => {
             if (!supported) {
                 console.warn("TELEGRAM-DEEP-LINK-ERROR");
@@ -328,7 +332,7 @@ return <TouchableOpacity style={{
             }
         })
 }}>
-   <BrandIcon name={"telegram"} size={normalize(52)} color={"#2AABEE"}/>
+   <BrandIcon name={"telegram"} size={normalize(64)} color={"#2AABEE"}/>
     <Text style={{
         fontFamily: 'Manrope-SemiBold',
         fontSize: normalize(22)
@@ -338,14 +342,16 @@ return <TouchableOpacity style={{
 </TouchableOpacity>
 }
 const SupportModal = () => {
-    return <SAView style={{flex: 1}}>
-        <SafeAreaView style={{ flex: 1, zIndex: 955, margin: normalize(24), gap: normalize(24)}}>
-            <DefaultModalHeader text={"Служба підтримки"} />
-            <TelegramPoster link={'rromsky'}/>
-            <PhoneContainer phoneNumber={"0 700 700 700"} description={"Для дзвінків по Україні (безкоштовно)"} />
-            <PhoneContainer phoneNumber={"+380 44 000 00 00"} description={"Для дзвінків з інших країн"}/>
-        </SafeAreaView>
-    </SAView>
+    return <View style={{flex: 1, backgroundColor: '#fbfbfb'}}>
+        <SAView style={{flex: 1}}>
+            <SafeAreaView style={{ flex: 1, zIndex: 955, margin: normalize(24), gap: normalize(24)}}>
+                <DefaultModalHeader text={"Служба підтримки"} />
+                <TelegramPoster link={'rromsky'}/>
+                <PhoneContainer phoneNumber={"0 700 700 700"} description={"Для дзвінків по Україні (безкоштовно)"} />
+                <PhoneContainer phoneNumber={"+380 44 000 00 00"} description={"Для дзвінків з інших країн"}/>
+            </SafeAreaView>
+        </SAView>
+    </View>
 }
 const OrderItem = ({item}:{item?: itemType}) => {
     const {openModal} = useModal();

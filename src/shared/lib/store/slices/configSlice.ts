@@ -12,6 +12,8 @@ export interface ConfigState {
     isLogin: boolean,
     isConnectionLost: boolean,
     oobCode?: string
+    offsetTop?: number,
+    offsetBottom?: number
 }
 
 const initialState: ConfigState = {
@@ -22,7 +24,9 @@ const initialState: ConfigState = {
     isResetPassword: false,
     isLogin: false,
     isConnectionLost: false,
-    oobCode: ''
+    oobCode: '',
+    offsetTop: 0,
+    offsetBottom: 0
 }
 
 export const configSlice = createSlice({
@@ -58,10 +62,16 @@ export const configSlice = createSlice({
         },
         appSetOobCode: (state, action: PayloadAction<string>)=>{
             state.oobCode = action.payload;
+        },
+        appSetOffset: (state, action: PayloadAction<{bottom: number, top: number}>) => {
+            if(!!action.payload.top)
+                state.offsetTop = action.payload.top;
+            if(!!action.payload.bottom)
+                state.offsetBottom = action.payload.bottom;
         }
     },
 })
 
-export const { appSetOobCode, appToggleTheme, appSetTheme, appToggleNotificationsStatus,appSetNotificationsStatus,appSetLoading, appSetConnection, appSetIsResetPassword, appSetIsLogin } = configSlice.actions
+export const { appSetOffset, appSetOobCode, appToggleTheme, appSetTheme, appToggleNotificationsStatus,appSetNotificationsStatus,appSetLoading, appSetConnection, appSetIsResetPassword, appSetIsLogin } = configSlice.actions
 
 export default configSlice.reducer

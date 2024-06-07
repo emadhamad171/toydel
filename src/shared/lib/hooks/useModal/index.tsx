@@ -1,4 +1,12 @@
-import {modalGoBack, modalHide, modalSetHeader, removeModal, setModal} from "@shared";
+import {
+    modalGoBack,
+    modalHide,
+    modalSetAnimateFromLeft,
+    modalSetBackgroundColor,
+    modalSetHeader,
+    removeModal,
+    setModal
+} from "@shared";
 import {useAppDispatch, useAppSelector} from "../useAppStore";
 import {useEffect} from "react";
 export const useModal = (modalName=" ")=> {
@@ -21,14 +29,16 @@ export const useModal = (modalName=" ")=> {
     const goBack = () => {
         dispatch(modalGoBack());
     }
-    const openModal = (modal: any) => {
+    const openModal = (modal: any, isFromLeft=true, backgroundColor='#fff') => {
+        dispatch(modalSetBackgroundColor(backgroundColor));
+        dispatch(modalSetAnimateFromLeft(isFromLeft));
         dispatch(setModal(modal));
     }
 
     const header = useAppSelector((state)=>state.modal.header) || '';
     const Modal = useAppSelector((state)=>state.modal.component) || undefined;
     const isOpen = useAppSelector((state)=>state.modal.isOpen) || false;
-
+    const isAnimateFromLeft = useAppSelector(state=>state.modal.animateFromLeft);
 
     return {
         closeModal,
@@ -38,6 +48,7 @@ export const useModal = (modalName=" ")=> {
         isOpen,
         header,
         setHeader,
-        goBack
+        goBack,
+        isAnimateFromLeft
     };
 }

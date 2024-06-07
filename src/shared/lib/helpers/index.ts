@@ -28,7 +28,7 @@ export const setNotificationStatus = async (status : boolean)=>{
 }
 
 export const {width: windowWidth, height: windowHeight} = Dimensions.get("window");
-export  const normalize = (fontSize) => Math.round(PixelRatio.roundToNearestPixel(windowHeight/1080*fontSize));
+export const normalize = (fontSize) => Math.round(PixelRatio.roundToNearestPixel(windowHeight/1080*fontSize));
 
 export const wait = async (duration?: number) =>{
     return await new Promise((resolve)=>{setTimeout(()=>{resolve(1);}, duration || 600)});
@@ -155,11 +155,11 @@ export const notificationStackSample : notificationType[] = [
 
 export const itemSample : itemType = {
     brand: 'brand',
-    category: ['category'],
+    category: ['Category'],
     description: 'description',
     id: '0a',
     isIncludedInPlan: true,
-    name: 'Name',
+    name: 'Name of Toy',
     photo: defaultPhoto,
     price: 400,
     rate: 4
@@ -171,6 +171,7 @@ export const itemsStackSample : itemType[] = [
     {...itemSample, id: '2s'},
     {...itemSample, id: '3d'},
     {...itemSample, id: '4e'},
+    {...itemSample, id: '5f'},
 ]
 export function formatDate(date:Date) {
     // Get date components

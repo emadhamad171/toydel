@@ -4,14 +4,18 @@ export interface modalSliceType {
     component: any,
     isOpen: boolean,
     header: string,
-    prevModal: Array<{component: any, header: string}>
+    prevModal: Array<{component: any, header: string}>,
+    animateFromLeft?: boolean
+    backgroundColor: string
 }
 
 const initialState: modalSliceType = {
     component: null,
     isOpen: false,
     header: '',
-    prevModal: []
+    prevModal: [],
+    animateFromLeft: true,
+    backgroundColor: '#fff'
 }
 const modalSlice = createSlice({
     name: 'modal',
@@ -24,6 +28,9 @@ const modalSlice = createSlice({
             state.component = action.payload;
             state.prevModal.push({component: action.payload, header: state.header});
 
+        },
+        modalSetBackgroundColor: (state: modalSliceType, action: PayloadAction<string>)=>{
+          state.backgroundColor = action.payload;
         },
         modalSetHeader: (state: modalSliceType, action: PayloadAction<string>)=>{
             state.header = action.payload;
@@ -46,8 +53,11 @@ const modalSlice = createSlice({
 
             state.component = prevModal.component;
             state.header = prevModal.header;
+        },
+        modalSetAnimateFromLeft: (state: modalSliceType, action: PayloadAction<boolean>)=>{
+            state.animateFromLeft = action.payload;
         }
     }
 })
-export const {modalHide, modalShow, modalGoBack, setModal, removeModal, modalSetHeader} = modalSlice.actions;
+export const {modalSetAnimateFromLeft,modalSetBackgroundColor, modalHide, modalShow, modalGoBack, setModal, removeModal, modalSetHeader} = modalSlice.actions;
 export default modalSlice.reducer;

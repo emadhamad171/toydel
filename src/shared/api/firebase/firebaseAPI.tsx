@@ -92,7 +92,7 @@ export const loadSpecialItems = async ({path, specOps})  : Promise<userType[] | 
     const specialItems = fetchedData.docs.map((el)=>{return {...el.data()}});
     return specialItems;
 }
-export const loadUser = async ({userID}:{userID ?: string}) : Promise<userType[] | firebaseResponseType[]> =>{
+export const loadUser = async ({userID}:{userID ?: string}) : Promise<userType[]> =>{
     const userRef= query(collection(fStorage, "users"), where('id','==',userID || getCurrentUser()));
     const fetchedUser = await getDocs(userRef);
     return fetchedUser.docs.map(el=>{return{...el.data()}});

@@ -36,5 +36,15 @@ yarn-error.*
 
 # Expo
 .expo
-dist/
-web-build/
+dist
+web-build
+
+# Envoirnment
+
+.env
+google-services.json
+GoogleService-Info.plist
+
+# Build files
+ios
+android

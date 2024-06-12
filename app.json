@@ -4,6 +4,19 @@
     "plugins": [
       [
         "@react-native-google-signin/google-signin"
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "14.0"
+          }
+        }
       ]
     ],
     "name": "ToyBox",
@@ -38,7 +51,7 @@
             },
             {
               "scheme": "https",
-              "host": "toyboxlink.page.link",
+              "host": "toyboxlink.page.link"
             }
           ],
           "category": [

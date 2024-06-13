@@ -1,4 +1,4 @@
-import { View, FlatList, RefreshControl } from "react-native";
+import { FlatList, RefreshControl, View } from "react-native";
 import {
   BottomGradient,
   cartGlobalSetItems,
@@ -7,6 +7,7 @@ import {
   normalize,
   useAppDispatch,
   useAppSelector,
+  useInfiniteScroll,
   userType,
 } from "@shared";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,9 +21,13 @@ const MainScreen = () => {
   const [isLoading, setLoading] = useState(true);
   const dispatch = useAppDispatch();
   const isFiltered = useAppSelector((state) => state.cart.isFiltered);
-  const displayedItems = useAppSelector((state) => state.cart.displayedItems);
+  const items = useAppSelector((state) => state.cart.displayedItems);
   const isButtonShown = useAppSelector((state) => state.cart.isButtonShown);
   const user: userType = useAppSelector((state) => state.user.user);
+  const { displayedItems, fetchNextPage, ListEndLoader } = useInfiniteScroll({
+    items,
+    step: 6,
+  });
   const onRefresh = async () => {
     setLoading(true);
     const path = "items";
@@ -53,6 +58,9 @@ const MainScreen = () => {
           paddingBottom: bottom + isButtonShown ? normalize(32) * 3.5 : 0,
         }}
         data={displayedItems}
+        onEndReachedThreshold={0.8}
+        ListFooterComponent={ListEndLoader} // Loader when loading next page.
+        onEndReached={fetchNextPage}
         renderItem={({ item }) => (
           <ItemComponent
             isLoading={isLoading}
